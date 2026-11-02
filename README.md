@@ -23,7 +23,18 @@ This repository contains:
 | After provisioning: unsigned input rejected | SERIAL1 yes; **SERIAL0 / channel 0 no, by design** | n/a | yes, on both links |
 | Unsigned re-key after first key rejected | not tested | n/a | yes |
 
-Details and raw data: [results/](results/README.md) · Discussion: [paper draft](paper/paper1-draft.md) §7.
+Details and raw data: [results/](results/README.md)
+
+## Research papers
+
+Four reproducible IEEE-format papers build on this data and model (see [papers/](papers/README.md)):
+
+1. **Signed but Unprotected** — measurement + a formal acceptance model + a CRA conformance crosswalk. The model predicts the ArduPilot ch0 "signed yet unprotected" case before it is measured.
+2. **A Decade of Defaults** — longitudinal study: signing was added to ArduPilot in 2016 and PX4 in 2026, and *never* shipped on by default.
+3. **Acceptance Semantics for MAVLink 2 Signing** — bounded symbolic analysis + model-based conformance testing; a liveness-constrained search shows ArduPilot needs two independent fixes where PX4 1.18 needs one.
+4. **Scoring Secure by Default** — a reproducible, CRA-grounded 0–100 metric that prices the ch0 pitfall numerically (42 vs 70).
+
+To our knowledge, no prior work gives a formal model of MAVLink signing, a decade-long measurement of flight-stack defaults, or a measurable CRA conformance score (see [research/](research/)). · Discussion: [paper draft](paper/paper1-draft.md) §7.
 
 ## mavaudit
 

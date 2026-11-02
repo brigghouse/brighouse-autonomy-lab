@@ -106,3 +106,8 @@ Or undo this operation with:
 
 Turn off this advice by setting config variable advice.detachedHead to false
 
+fatal: unable to connect to github.com:
+github.com[0: 140.82.112.3]: errno=Connection timed out
+
+fatal: clone of 'git://github.com/ArduPilot/ChibiOS.git' into submodule path '/home/claude/sitl-long/ardupilot-Copter-4.0.7/modules/ChibiOS' failed
+Failed to clone 'modules/ChibiOS'. Retry scheduled

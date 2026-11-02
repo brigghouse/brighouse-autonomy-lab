@@ -43,15 +43,30 @@ def clone(url, ref, dest, log, submodules=True):
 
 
 # ---------------------------------------------------------------- ArduPilot
+def _waf_build(src, log, py):
+    if sh([py, "waf", "configure", "--board", "sitl"], src, log) != 0:
+        return "configure failed"
+    if sh([py, "waf", "copter"], src, log) != 0:
+        return "build failed"
+    return "ok"
+
+
 def build_ardupilot(ref, work, log):
     src = work / f"ardupilot-{ref}"
     if clone("https://github.com/ArduPilot/ardupilot.git", ref, src, log) != 0:
         return None, "clone failed"
-    if sh(["./waf", "configure", "--board", "sitl"], src, log) != 0:
-        return src, "configure failed"
-    if sh(["./waf", "copter"], src, log) != 0:
-        return src, "build failed"
-    return src, "ok"
+    status = _waf_build(src, log, "python3")
+    # Pre-4.5 ships a waf that uses the `imp` module, removed in Python 3.12. Older
+    # releases therefore fail to configure on a current toolchain (a maintainability
+    # finding); retry with Python 3.11 to recover the measurable posture where possible.
+    if status == "configure failed" and shutil.which("python3.11"):
+        with open(log) as fh:
+            if "No module named 'imp'" in fh.read():
+                sh(["git", "clean", "-xfdq", "build"], src, log)
+                status = _waf_build(src, log, "python3.11")
+                if status == "ok":
+                    status = "ok (python3.11)"
+    return src, status
 
 
 def measure_ardupilot(src, out, duration):
@@ -148,7 +163,8 @@ def main():
     jobs = [("ardupilot", r) for r in a.ardupilot] + [("px4", r) for r in a.px4]
     for stack, ref in jobs:
         key = f"{stack}:{ref}"
-        if key in results and results[key].get("build") == "ok" and "measure_error" not in results[key]:
+        if key in results and str(results[key].get("build", "")).startswith("ok") \
+                and "measure_error" not in results[key]:
             continue
         out = a.out / f"{stack}-{ref}"
         out.mkdir(exist_ok=True)
@@ -160,7 +176,7 @@ def main():
         entry["build_seconds"] = round(time.time() - t0)
         if src is not None:
             entry["source_rev"] = labkit.git_rev(src)
-        if status == "ok":
+        if status.startswith("ok"):
             try:
                 entry["measurements"] = (measure_ardupilot(src, out, a.duration) if stack == "ardupilot"
                                          else measure_px4(src, out, a.duration, a.px4_model))

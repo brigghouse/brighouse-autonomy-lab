@@ -440,3 +440,875 @@ Build failed
  -> task in 'uavcan' failed (exit status 1): 
 	{task 139995446891168: uavcangen .github,ardupilot,com,cuav,dronecan,mppt,tests,uavcan -> }
  (run with -v to display more information)
+
+$ git clone -q --depth 1 --branch Copter-4.4.4 --recurse-submodules --shallow-submodules https://github.com/ArduPilot/ardupilot.git /home/claude/sitl-long/ardupilot-Copter-4.4.4
+Note: switching to 'db53a28f321dc8233ee49d3cc6b395b5835c768b'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+
+$ python3 waf configure --board sitl
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Utils.py:733: SyntaxWarning: invalid escape sequence '\d'
+  return re.split('\d+$', s)[0]
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/ConfigSet.py:14: SyntaxWarning: invalid escape sequence '\ '
+  re_imp = re.compile('^(#)*?([^#=]*?)\ =\ (.*?)$', re.M)
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/ansiterm.py:267: SyntaxWarning: invalid escape sequence '\['
+  ansi_tokens = re.compile('(?:\x1b\[([0-9?;]*)([a-zA-Z])|([^\x1b]+))')
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Context.py:616: SyntaxWarning: invalid escape sequence '\_'
+  :param var: glob expression, for example 'cxx\_\*.py'
+Traceback (most recent call last):
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waf-light", line 166, in <module>
+    from waflib import Scripting
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Scripting.py", line 10, in <module>
+    from waflib import Utils, Configure, Logs, Options, ConfigSet, Context, Errors, Build, Node
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Configure.py", line 16, in <module>
+    from waflib import ConfigSet, Utils, Options, Logs, Context, Build, Errors
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Options.py", line 14, in <module>
+    from waflib import Logs, Utils, Context, Errors
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Context.py", line 9, in <module>
+    import os, re, imp, sys
+ModuleNotFoundError: No module named 'imp'
+
+$ git clean -xfdq build
+
+$ /root/.local/share/uv/python/cpython-3.9-linux-x86_64-gnu/bin/python3.9 waf configure --board sitl
+Setting top to                           : /home/claude/sitl-long/ardupilot-Copter-4.4.4 
+Setting out to                           : /home/claude/sitl-long/ardupilot-Copter-4.4.4/build 
+Autoconfiguration                        : enabled 
+Setting board to                         : sitl 
+Using toolchain                          : native 
+Checking for 'g++' (C++ compiler)        : /usr/bin/g++ 
+Checking for 'gcc' (C compiler)          : /usr/bin/gcc 
+Checking for c flags '-MMD'              : yes 
+Checking for cxx flags '-MMD'            : yes 
+CXX Compiler                             : g++ 13.3.0 
+Checking for need to link with librt     : not necessary 
+Checking for feenableexcept              : yes 
+Enabled OpenDroneID                      : no 
+Enabled firmware ID checking             : no 
+GPS Debug Logging                        : no 
+Enabled custom controller                : yes 
+Checking for HAVE_CMATH_ISFINITE         : yes 
+Checking for HAVE_CMATH_ISINF            : yes 
+Checking for HAVE_CMATH_ISNAN            : yes 
+Checking for NEED_CMATH_ISFINITE_STD_NAMESPACE : yes 
+Checking for NEED_CMATH_ISINF_STD_NAMESPACE    : yes 
+Checking for NEED_CMATH_ISNAN_STD_NAMESPACE    : yes 
+Checking for header endian.h                   : yes 
+Checking for header byteswap.h                 : yes 
+Checking for HAVE_MEMRCHR                      : yes 
+Configured VSCode Intellisense:                : no 
+Checking for program 'python'                  : /root/.local/share/uv/python/cpython-3.9-linux-x86_64-gnu/bin/python3.9 
+Checking for python version >= 2.7.0           : 3.9.25 
+Checking for program 'python'                  : /root/.local/share/uv/python/cpython-3.9-linux-x86_64-gnu/bin/python3.9 
+Checking for python version >= 2.7.0           : 3.9.25 
+DSDL compiler                                  : /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/uavcan/libuavcan/dsdl_compiler/libuavcan_dsdlc 
+Source is git repository                       : yes 
+Update submodules                              : yes 
+Checking for program 'git'                     : /usr/bin/git 
+Checking for program 'size'                    : /usr/bin/size 
+Benchmarks                                     : disabled 
+Unit tests                                     : enabled 
+Scripting                                      : enabled 
+Scripting runtime checks                       : enabled 
+Debug build                                    : disabled 
+Coverage build                                 : disabled 
+SITL 32-bit build                              : disabled 
+Checking for program 'rsync'                   : not found 
+'configure' finished successfully (1.584s)
+
+$ /root/.local/share/uv/python/cpython-3.9-linux-x86_64-gnu/bin/python3.9 waf copter
+Waf: Entering directory `/home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl'
+Embedding file locations.txt:Tools/autotest/locations.txt
+Embedding file models/Callisto.json:Tools/autotest/models/Callisto.json
+Embedding file models/plane-3d.parm:Tools/autotest/models/plane-3d.parm
+Embedding file models/plane.parm:Tools/autotest/models/plane.parm
+Embedding file models/xplane_heli.json:Tools/autotest/models/xplane_heli.json
+Embedding file models/xplane_plane.json:Tools/autotest/models/xplane_plane.json
+[3/7] Compiling libraries/AP_Scripting/generator/src/main.c
+[4/7] Processing modules/mavlink/message_definitions/v1.0/all.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/all.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/all.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ardupilotmega.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ardupilotmega.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ASLUAV.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ASLUAV.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/common.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/common.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/development.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/development.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/icarous.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/icarous.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/minimal.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/minimal.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/python_array_test.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/python_array_test.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/standard.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/standard.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/test.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/test.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ualberta.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ualberta.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/uAvionix.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/uAvionix.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/loweheiser.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/loweheiser.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/storm32.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/storm32.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/AVSSUAS.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/AVSSUAS.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/cubepilot.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/cubepilot.xml
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Found 329 MAVLink message types in 16 XML files
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/all
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/ardupilotmega
+[5/7] Processing uavcangen: modules/DroneCAN/DSDL/.github modules/DroneCAN/DSDL/ardupilot modules/DroneCAN/DSDL/com modules/DroneCAN/DSDL/cuav modules/DroneCAN/DSDL/dronecan modules/DroneCAN/DSDL/mppt modules/DroneCAN/DSDL/tests modules/DroneCAN/DSDL/uavcan
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/ASLUAV
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/common
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/development
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/icarous
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/minimal
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/python_array_test
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/standard
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/test
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/ualberta
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/uAvionix
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/loweheiser
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/storm32
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/AVSSUAS
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/cubepilot
+Copying fixed headers for protocol 2.0 to /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0
+[6/7] Creating build/sitl/ap_version.h
+[7/7] Processing /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/AP_Scripting/lua_generated_bindings.cpp,/home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/AP_Scripting/lua_generated_bindings.h: libraries/AP_Scripting/generator/description/bindings.desc build/sitl/gen-bindings -> build/sitl/libraries/AP_Scripting/lua_generated_bindings.cpp build/sitl/libraries/AP_Scripting/lua_generated_bindings.h
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/uavcan/libuavcan/dsdl_compiler/pyuavcan/dronecan/__init__.py:19: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+
+[   8/1006] Compiling libraries/AC_AttitudeControl/ControlMonitor.cpp
+[   9/1006] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl_Multi_6DoF.cpp
+[  10/1006] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl_Heli.cpp
+[  11/1006] Compiling libraries/AC_AttitudeControl/AC_CommandModel.cpp
+[  12/1006] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl_Multi.cpp
+[  13/1006] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl_TS.cpp
+[  14/1006] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl_Sub.cpp
+[  15/1006] Compiling libraries/AC_AutoTune/AC_AutoTune_FreqResp.cpp
+[  16/1006] Compiling libraries/AC_AutoTune/AC_AutoTune_Heli.cpp
+[  17/1006] Compiling libraries/AC_AutoTune/AC_AutoTune_Multi.cpp
+[  18/1006] Compiling libraries/AC_Autorotation/AC_Autorotation.cpp
+[  19/1006] Compiling libraries/AC_Avoidance/AP_OAVisGraph.cpp
+[  20/1006] Compiling libraries/AC_Avoidance/AC_Avoidance_Logging.cpp
+[  21/1006] Compiling libraries/AC_Avoidance/AP_OADijkstra.cpp
+[  22/1006] Compiling libraries/AC_Avoidance/AP_OAPathPlanner.cpp
+[  23/1006] Compiling libraries/AC_CustomControl/AC_CustomControl_PID.cpp
+[  24/1006] Compiling libraries/AC_CustomControl/AC_CustomControl_Empty.cpp
+[  25/1006] Compiling libraries/AC_CustomControl/AC_CustomControl.cpp
+[  26/1006] Compiling libraries/AC_InputManager/AC_InputManager.cpp
+[  27/1006] Compiling libraries/AC_InputManager/AC_InputManager_Heli.cpp
+[  28/1006] Compiling libraries/AC_PID/AC_PI_2D.cpp
+[  29/1006] Compiling libraries/AC_PID/AC_PI.cpp
+[  30/1006] Compiling libraries/AC_PID/AC_P.cpp
+[  31/1006] Compiling libraries/AC_PID/AC_HELI_PID.cpp
+[  32/1006] Compiling libraries/AC_PID/AC_PID.cpp
+[  33/1006] Compiling libraries/AC_PID/AC_PID_2D.cpp
+[  34/1006] Compiling libraries/AC_PID/AC_P_1D.cpp
+[  35/1006] Compiling libraries/AC_PID/AC_PID_Basic.cpp
+[  36/1006] Compiling libraries/AC_PID/AC_P_2D.cpp
+[  37/1006] Compiling libraries/AC_PrecLand/AC_PrecLand_IRLock.cpp
+[  38/1006] Compiling libraries/AC_PrecLand/AC_PrecLand_Companion.cpp
+[  39/1006] Compiling libraries/AC_PrecLand/PosVelEKF.cpp
+[  40/1006] Compiling libraries/AC_PrecLand/AC_PrecLand_SITL_Gazebo.cpp
+[  41/1006] Compiling libraries/AC_PrecLand/AC_PrecLand_SITL.cpp
+[  42/1006] Compiling libraries/AC_PrecLand/AC_PrecLand_StateMachine.cpp
+[  43/1006] Compiling libraries/AC_Sprayer/AC_Sprayer.cpp
+[  44/1006] Compiling libraries/AC_WPNav/AC_WPNav_OA.cpp
+[  45/1006] Compiling libraries/AC_WPNav/AC_Circle.cpp
+[  46/1006] Compiling libraries/AC_WPNav/AC_WPNav.cpp
+[  47/1006] Compiling libraries/AP_ADC/AP_ADC_ADS1115.cpp
+[  48/1006] Compiling libraries/AP_ADSB/AP_ADSB_Backend.cpp
+[  49/1006] Compiling libraries/AP_ADSB/AP_ADSB_uAvionix_MAVLink.cpp
+[  50/1006] Compiling libraries/AP_ADSB/AP_ADSB_uAvionix_UCP.cpp
+[  51/1006] Compiling libraries/AP_ADSB/AP_ADSB_Sagetech.cpp
+[  52/1006] Compiling libraries/AP_AHRS/AP_AHRS_SIM.cpp
+[  53/1006] Compiling libraries/AP_AHRS/AP_AHRS_View.cpp
+[  54/1006] Compiling libraries/AP_AHRS/AP_AHRS_Logging.cpp
+[  55/1006] Compiling libraries/AP_AccelCal/AccelCalibrator.cpp
+[  56/1006] Compiling libraries/AP_AccelCal/AP_AccelCal.cpp
+[  57/1006] Compiling libraries/AP_AdvancedFailsafe/AP_AdvancedFailsafe.cpp
+[  58/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_UAVCAN.cpp
+[  59/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_SDP3X.cpp
+[  60/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_MS4525.cpp
+[  61/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_Health.cpp
+[  62/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_Backend.cpp
+[  63/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_DLVR.cpp
+[  64/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_MSP.cpp
+[  65/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_analog.cpp
+[  66/1006] Compiling libraries/AP_Airspeed/Airspeed_Calibration.cpp
+[  67/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_MS5525.cpp
+[  68/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_SITL.cpp
+[  69/1006] Compiling libraries/AP_Airspeed/AP_Airspeed_ASP5033.cpp
+[  70/1006] Compiling libraries/AP_Baro/AP_Baro_BMP085.cpp
+[  71/1006] Compiling libraries/AP_Baro/AP_Baro_UAVCAN.cpp
+[  72/1006] Compiling libraries/AP_Baro/AP_Baro_LPS2XH.cpp
+[  73/1006] Compiling libraries/AP_Baro/AP_Baro_KellerLD.cpp
+[  74/1006] Compiling libraries/AP_Baro/AP_Baro_ICP201XX.cpp
+[  75/1006] Compiling libraries/AP_Baro/AP_Baro_ICP101XX.cpp
+[  76/1006] Compiling libraries/AP_Baro/AP_Baro_ICM20789.cpp
+[  77/1006] Compiling libraries/AP_Baro/AP_Baro_HIL.cpp
+[  78/1006] Compiling libraries/AP_Baro/AP_Baro_FBM320.cpp
+[  79/1006] Compiling libraries/AP_Baro/AP_Baro_ExternalAHRS.cpp
+[  80/1006] Compiling libraries/AP_Baro/AP_Baro_Dummy.cpp
+[  81/1006] Compiling libraries/AP_Baro/AP_Baro_DPS280.cpp
+[  82/1006] Compiling libraries/AP_Baro/AP_Baro_Backend.cpp
+[  83/1006] Compiling libraries/AP_Baro/AP_Baro_BMP388.cpp
+[  84/1006] Compiling libraries/AP_Baro/AP_Baro_BMP280.cpp
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp: In member function ‘void AP_Baro_BMP388::timer()’:
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:148:34: warning: dangling pointer to ‘buf’ may be used [-Wdangling-pointer=]
+  148 |         update_temperature((buf[6] << 16) | (buf[5] << 8) | buf[4]);
+      |                             ~~~~~^
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:136:13: note: ‘buf’ declared here
+  136 |     uint8_t buf[7];
+      |             ^~~
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:148:51: warning: dangling pointer to ‘buf’ may be used [-Wdangling-pointer=]
+  148 |         update_temperature((buf[6] << 16) | (buf[5] << 8) | buf[4]);
+      |                                              ~~~~~^
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:136:13: note: ‘buf’ declared here
+  136 |     uint8_t buf[7];
+      |             ^~~
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:148:66: warning: dangling pointer to ‘buf’ may be used [-Wdangling-pointer=]
+  148 |         update_temperature((buf[6] << 16) | (buf[5] << 8) | buf[4]);
+      |                                                             ~~~~~^
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:136:13: note: ‘buf’ declared here
+  136 |     uint8_t buf[7];
+      |             ^~~
+In member function ‘void AP_Baro_BMP388::timer()’,
+    inlined from ‘static RetType Functor<RetType, Args>::method_wrapper(void*, Args ...) [with T = AP_Baro_BMP388; RetType (T::* method)(Args ...) = &AP_Baro_BMP388::timer; RetType = void; Args = {}]’ at ../../libraries/AP_HAL/utility/functor.h:88:28:
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:148:34: warning: dangling pointer to ‘buf’ may be used [-Wdangling-pointer=]
+  148 |         update_temperature((buf[6] << 16) | (buf[5] << 8) | buf[4]);
+      |                             ~~~~~^
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp: In static member function ‘static RetType Functor<RetType, Args>::method_wrapper(void*, Args ...) [with T = AP_Baro_BMP388; RetType (T::* method)(Args ...) = &AP_Baro_BMP388::timer; RetType = void; Args = {}]’:
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:136:13: note: ‘buf’ declared here
+  136 |     uint8_t buf[7];
+      |             ^~~
+In member function ‘void AP_Baro_BMP388::timer()’,
+    inlined from ‘static RetType Functor<RetType, Args>::method_wrapper(void*, Args ...) [with T = AP_Baro_BMP388; RetType (T::* method)(Args ...) = &AP_Baro_BMP388::timer; RetType = void; Args = {}]’ at ../../libraries/AP_HAL/utility/functor.h:88:28:
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:148:51: warning: dangling pointer to ‘buf’ may be used [-Wdangling-pointer=]
+  148 |         update_temperature((buf[6] << 16) | (buf[5] << 8) | buf[4]);
+      |                                              ~~~~~^
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp: In static member function ‘static RetType Functor<RetType, Args>::method_wrapper(void*, Args ...) [with T = AP_Baro_BMP388; RetType (T::* method)(Args ...) = &AP_Baro_BMP388::timer; RetType = void; Args = {}]’:
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:136:13: note: ‘buf’ declared here
+  136 |     uint8_t buf[7];
+      |             ^~~
+In member function ‘void AP_Baro_BMP388::timer()’,
+    inlined from ‘static RetType Functor<RetType, Args>::method_wrapper(void*, Args ...) [with T = AP_Baro_BMP388; RetType (T::* method)(Args ...) = &AP_Baro_BMP388::timer; RetType = void; Args = {}]’ at ../../libraries/AP_HAL/utility/functor.h:88:28:
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:148:66: warning: dangling pointer to ‘buf’ may be used [-Wdangling-pointer=]
+  148 |         update_temperature((buf[6] << 16) | (buf[5] << 8) | buf[4]);
+      |                                                             ~~~~~^
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp: In static member function ‘static RetType Functor<RetType, Args>::method_wrapper(void*, Args ...) [with T = AP_Baro_BMP388; RetType (T::* method)(Args ...) = &AP_Baro_BMP388::timer; RetType = void; Args = {}]’:
+../../libraries/AP_Baro/AP_Baro_BMP388.cpp:136:13: note: ‘buf’ declared here
+  136 |     uint8_t buf[7];
+      |             ^~~
+
+[  85/1006] Compiling libraries/AP_Baro/AP_Baro_Wind.cpp
+[  86/1006] Compiling libraries/AP_Baro/AP_Baro_SPL06.cpp
+[  87/1006] Compiling libraries/AP_Baro/AP_Baro_Logging.cpp
+[  88/1006] Compiling libraries/AP_Baro/AP_Baro_MSP.cpp
+[  89/1006] Compiling libraries/AP_Baro/AP_Baro_MS5611.cpp
+[  90/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_UAVCAN.cpp
+[  91/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Synthetic_Current.cpp
+[  92/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus_NeoDesign.cpp
+[  93/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus_Generic.cpp
+[  94/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus.cpp
+[  95/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Logging.cpp
+[  96/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_LTC2946.cpp
+[  97/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_INA2xx.cpp
+[  98/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_INA239.cpp
+[  99/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Generator.cpp
+[ 100/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_FuelLevel_PWM.cpp
+[ 101/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_FuelLevel_Analog.cpp
+[ 102/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_FuelFlow.cpp
+[ 103/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_ESC.cpp
+[ 104/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_EFI.cpp
+[ 105/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Bebop.cpp
+[ 106/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Backend.cpp
+[ 107/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp
+[ 108/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Torqeedo.cpp
+[ 109/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Sum.cpp
+[ 110/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus_Rotoye.cpp
+[ 111/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus_Solo.cpp
+[ 112/1006] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus_SUI.cpp
+[ 113/1006] Compiling libraries/AP_Beacon/AP_Beacon_SITL.cpp
+[ 114/1006] Compiling libraries/AP_Beacon/AP_Beacon_Nooploop.cpp
+[ 115/1006] Compiling libraries/AP_Beacon/AP_Beacon_Pozyx.cpp
+[ 116/1006] Compiling libraries/AP_Beacon/AP_Beacon_Marvelmind.cpp
+[ 117/1006] Compiling libraries/AP_Beacon/AP_Beacon_Backend.cpp
+[ 118/1006] Compiling libraries/AP_Beacon/AP_Beacon.cpp
+[ 119/1006] Compiling libraries/AP_BoardConfig/IMU_heater.cpp
+[ 120/1006] Compiling libraries/AP_BoardConfig/board_drivers.cpp
+[ 121/1006] Compiling libraries/AP_Button/AP_Button.cpp
+[ 122/1006] Compiling libraries/AP_CANManager/AP_SLCANIface.cpp
+[ 123/1006] Compiling libraries/AP_CANManager/AP_CANIfaceParams.cpp
+[ 124/1006] Compiling libraries/AP_CANManager/AP_CANTester.cpp
+[ 125/1006] Compiling libraries/AP_CANManager/AP_CANSensor.cpp
+[ 126/1006] Compiling libraries/AP_CANManager/AP_CANTester_KDECAN.cpp
+[ 127/1006] Compiling libraries/AP_CSVReader/AP_CSVReader.cpp
+[ 128/1006] Compiling libraries/AP_Camera/AP_Camera_Relay.cpp
+[ 129/1006] Compiling libraries/AP_Camera/AP_Camera_MAVLink.cpp
+[ 130/1006] Compiling libraries/AP_Camera/AP_RunCam.cpp
+[ 131/1006] Compiling libraries/AP_Camera/AP_Camera_SoloGimbal.cpp
+[ 132/1006] Compiling libraries/AP_Camera/AP_Camera_Servo.cpp
+[ 133/1006] Compiling libraries/AP_Camera/AP_Camera_Mount.cpp
+[ 134/1006] Compiling libraries/AP_Camera/AP_Camera_Logging.cpp
+[ 135/1006] Compiling libraries/AP_Camera/AP_Camera_Backend.cpp
+[ 136/1006] Compiling libraries/AP_Camera/AP_Camera.cpp
+[ 137/1006] Compiling libraries/AP_Camera/AP_Camera_Params.cpp
+[ 138/1006] Compiling libraries/AP_CheckFirmware/monocypher.cpp
+[ 139/1006] Compiling libraries/AP_CheckFirmware/AP_CheckFirmware.cpp
+[ 140/1006] Compiling libraries/AP_CheckFirmware/AP_CheckFirmware_secure_command.cpp
+[ 141/1006] Compiling libraries/AP_Common/sorting.cpp
+[ 142/1006] Compiling libraries/AP_Common/Location.cpp
+[ 143/1006] Compiling libraries/AP_Common/AP_FWVersion.cpp
+[ 144/1006] Compiling libraries/AP_Common/AP_ExpandingArray.cpp
+[ 145/1006] Compiling libraries/AP_Common/AP_Common.cpp
+[ 146/1006] Compiling libraries/AP_Common/MultiHeap.cpp
+[ 147/1006] Compiling libraries/AP_Common/float16.cpp
+[ 148/1006] Compiling libraries/AP_Common/ExpandingString.cpp
+[ 149/1006] Compiling libraries/AP_Common/c++.cpp
+[ 150/1006] Compiling libraries/AP_Common/NMEA.cpp
+[ 151/1006] Compiling libraries/AP_Compass/Compass_learn.cpp
+[ 152/1006] Compiling libraries/AP_Compass/CompassCalibrator.cpp
+[ 153/1006] Compiling libraries/AP_Compass/AP_Compass_MSP.cpp
+[ 154/1006] Compiling libraries/AP_Compass/AP_Compass_MMC5xx3.cpp
+[ 155/1006] Compiling libraries/AP_Compass/AP_Compass_MMC3416.cpp
+[ 156/1006] Compiling libraries/AP_Compass/AP_Compass_MAG3110.cpp
+[ 157/1006] Compiling libraries/AP_Compass/AP_Compass_RM3100.cpp
+[ 158/1006] Compiling libraries/AP_Compass/AP_Compass_LSM303D.cpp
+[ 159/1006] Compiling libraries/AP_Compass/AP_Compass_LSM9DS1.cpp
+[ 160/1006] Compiling libraries/AP_Compass/AP_Compass_IST8310.cpp
+[ 161/1006] Compiling libraries/AP_Compass/AP_Compass_IST8308.cpp
+[ 162/1006] Compiling libraries/AP_Compass/AP_Compass_HMC5843.cpp
+[ 163/1006] Compiling libraries/AP_Compass/AP_Compass_ExternalAHRS.cpp
+[ 164/1006] Compiling libraries/AP_Compass/AP_Compass_Calibration.cpp
+[ 165/1006] Compiling libraries/AP_Compass/AP_Compass_Backend.cpp
+[ 166/1006] Compiling libraries/AP_Compass/AP_Compass_BMM150.cpp
+[ 167/1006] Compiling libraries/AP_Compass/AP_Compass_AK8963.cpp
+[ 168/1006] Compiling libraries/AP_Compass/AP_Compass_LIS3MDL.cpp
+[ 169/1006] Compiling libraries/AP_Compass/Compass_PerMotor.cpp
+[ 170/1006] Compiling libraries/AP_Compass/AP_Compass_UAVCAN.cpp
+[ 171/1006] Compiling libraries/AP_Compass/AP_Compass_QMC5883L.cpp
+[ 172/1006] Compiling libraries/AP_Compass/AP_Compass_SITL.cpp
+[ 173/1006] Compiling libraries/AP_Compass/AP_Compass_AK09916.cpp
+[ 174/1006] Compiling libraries/AP_DAL/AP_DAL_InertialSensor.cpp
+[ 175/1006] Compiling libraries/AP_DAL/AP_DAL_Compass.cpp
+[ 176/1006] Compiling libraries/AP_DAL/AP_DAL_GPS.cpp
+[ 177/1006] Compiling libraries/AP_DAL/AP_DAL_Baro.cpp
+[ 178/1006] Compiling libraries/AP_DAL/AP_DAL_Airspeed.cpp
+[ 179/1006] Compiling libraries/AP_Declination/AP_Declination.cpp
+[ 180/1006] Compiling libraries/AP_Declination/tables.cpp
+[ 181/1006] Compiling libraries/AP_Devo_Telem/AP_Devo_Telem.cpp
+[ 182/1006] Compiling libraries/AP_EFI/AP_EFI_Serial_MS.cpp
+[ 183/1006] Compiling libraries/AP_EFI/AP_EFI_Backend.cpp
+[ 184/1006] Compiling libraries/AP_EFI/AP_EFI_DroneCAN.cpp
+[ 185/1006] Compiling libraries/AP_EFI/AP_EFI_Serial_Lutan.cpp
+[ 186/1006] Compiling libraries/AP_EFI/AP_EFI_NWPMU.cpp
+[ 187/1006] Compiling libraries/AP_EFI/AP_EFI_Currawong_ECU.cpp
+[ 188/1006] Compiling libraries/AP_EFI/AP_EFI_Scripting.cpp
+[ 189/1006] Compiling libraries/AP_EFI/AP_EFI.cpp
+[ 190/1006] Compiling libraries/AP_ESC_Telem/AP_ESC_Telem_SITL.cpp
+[ 191/1006] Compiling libraries/AP_ESC_Telem/AP_ESC_Telem.cpp
+[ 192/1006] Compiling libraries/AP_ESC_Telem/AP_ESC_Telem_Backend.cpp
+[ 193/1006] Compiling libraries/AP_ExternalAHRS/AP_ExternalAHRS_LORD.cpp
+[ 194/1006] Compiling libraries/AP_ExternalAHRS/AP_ExternalAHRS_backend.cpp
+[ 195/1006] Compiling libraries/AP_ExternalAHRS/AP_ExternalAHRS.cpp
+../../libraries/AP_ExternalAHRS/AP_ExternalAHRS_LORD.cpp: In member function ‘float AP_ExternalAHRS_LORD::extract_float(const uint8_t*, uint8_t) const’:
+../../libraries/AP_ExternalAHRS/AP_ExternalAHRS_LORD.cpp:576:13: warning: dereferencing type-punned pointer will break strict-aliasing rules [-Wstrict-aliasing]
+  576 |     return *reinterpret_cast<float*>(&tmp);
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../../libraries/AP_ExternalAHRS/AP_ExternalAHRS_LORD.cpp: In member function ‘double AP_ExternalAHRS_LORD::extract_double(const uint8_t*, uint8_t) const’:
+../../libraries/AP_ExternalAHRS/AP_ExternalAHRS_LORD.cpp:583:13: warning: dereferencing type-punned pointer will break strict-aliasing rules [-Wstrict-aliasing]
+  583 |     return *reinterpret_cast<double*>(&tmp);
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[ 196/1006] Compiling libraries/AP_ExternalAHRS/AP_ExternalAHRS_VectorNav.cpp
+[ 197/1006] Compiling libraries/AP_FETtecOneWire/AP_FETtecOneWire.cpp
+[ 198/1006] Compiling libraries/AP_Filesystem/posix_compat.cpp
+[ 199/1006] Compiling libraries/AP_Filesystem/AP_Filesystem_FATFS.cpp
+[ 200/1006] Compiling libraries/AP_Filesystem/AP_Filesystem_ESP32.cpp
+[ 201/1006] Compiling libraries/AP_Filesystem/AP_Filesystem.cpp
+[ 202/1006] Compiling libraries/AP_Filesystem/AP_Filesystem_Param.cpp
+[ 203/1006] Compiling libraries/AP_Filesystem/AP_Filesystem_Sys.cpp
+[ 204/1006] Compiling libraries/AP_Filesystem/AP_Filesystem_ROMFS.cpp
+[ 205/1006] Compiling libraries/AP_Filesystem/AP_Filesystem_Mission.cpp
+[ 206/1006] Compiling libraries/AP_Filesystem/AP_Filesystem_backend.cpp
+[ 207/1006] Compiling libraries/AP_FlashStorage/AP_FlashStorage.cpp
+[ 208/1006] Compiling libraries/AP_Frsky_Telem/AP_Frsky_Telem.cpp
+[ 209/1006] Compiling libraries/AP_Frsky_Telem/AP_Frsky_Parameters.cpp
+[ 210/1006] Compiling libraries/AP_Frsky_Telem/AP_Frsky_D.cpp
+[ 211/1006] Compiling libraries/AP_Frsky_Telem/AP_Frsky_Backend.cpp
+[ 212/1006] Compiling libraries/AP_Frsky_Telem/AP_Frsky_SPort.cpp
+[ 213/1006] Compiling libraries/AP_Frsky_Telem/AP_Frsky_MAVlite_SPortToMAVlite.cpp
+[ 214/1006] Compiling libraries/AP_Frsky_Telem/AP_Frsky_MAVliteMsgHandler.cpp
+[ 215/1006] Compiling libraries/AP_Frsky_Telem/AP_Frsky_MAVlite_Message.cpp
+[ 216/1006] Compiling libraries/AP_Frsky_Telem/AP_Frsky_MAVlite_MAVliteToSPort.cpp
+[ 217/1006] Compiling libraries/AP_GPS/RTCM3_Parser.cpp
+[ 218/1006] Compiling libraries/AP_GPS/GPS_Backend.cpp
+[ 219/1006] Compiling libraries/AP_GPS/AP_GPS_SITL.cpp
+[ 220/1006] Compiling libraries/AP_GPS/AP_GPS_SBP.cpp
+[ 221/1006] Compiling libraries/AP_GPS/AP_GPS_SBF.cpp
+[ 222/1006] Compiling libraries/AP_GPS/AP_GPS_NOVA.cpp
+[ 223/1006] Compiling libraries/AP_GPS/AP_GPS_SBP2.cpp
+[ 224/1006] Compiling libraries/AP_GPS/AP_GPS_MSP.cpp
+[ 225/1006] Compiling libraries/AP_GPS/AP_GPS_MAV.cpp
+[ 226/1006] Compiling libraries/AP_GPS/AP_GPS_GSOF.cpp
+[ 227/1006] Compiling libraries/AP_GPS/AP_GPS_ExternalAHRS.cpp
+[ 228/1006] Compiling libraries/AP_GPS/AP_GPS_NMEA.cpp
+[ 229/1006] Compiling libraries/AP_GPS/AP_GPS.cpp
+[ 230/1006] Compiling libraries/AP_GPS/AP_GPS_ERB.cpp
+[ 231/1006] Compiling libraries/AP_GPS/MovingBase.cpp
+[ 232/1006] Compiling libraries/AP_GPS/AP_GPS_UBLOX.cpp
+[ 233/1006] Compiling libraries/AP_GPS/AP_GPS_SIRF.cpp
+[ 234/1006] Compiling libraries/AP_GPS/AP_GPS_UAVCAN.cpp
+[ 235/1006] Compiling libraries/AP_Generator/AP_Generator_RichenPower.cpp
+[ 236/1006] Compiling libraries/AP_Generator/AP_Generator_IE_2400.cpp
+[ 237/1006] Compiling libraries/AP_Generator/AP_Generator_IE_650_800.cpp
+[ 238/1006] Compiling libraries/AP_Generator/AP_Generator.cpp
+[ 239/1006] Compiling libraries/AP_Generator/AP_Generator_Backend.cpp
+[ 240/1006] Compiling libraries/AP_Generator/AP_Generator_IE_FuelCell.cpp
+[ 241/1006] Compiling libraries/AP_Gripper/AP_Gripper_EPM.cpp
+[ 242/1006] Compiling libraries/AP_Gripper/AP_Gripper.cpp
+[ 243/1006] Compiling libraries/AP_Gripper/AP_Gripper_Servo.cpp
+[ 244/1006] Compiling libraries/AP_Gripper/AP_Gripper_Backend.cpp
+[ 245/1006] Compiling libraries/AP_Hott_Telem/AP_Hott_Telem.cpp
+[ 246/1006] Compiling libraries/AP_ICEngine/AP_ICEngine.cpp
+[ 247/1006] Compiling libraries/AP_IOMCU/AP_IOMCU.cpp
+[ 248/1006] Compiling libraries/AP_IOMCU/fw_uploader.cpp
+[ 249/1006] Compiling libraries/AP_IRLock/IRLock.cpp
+[ 250/1006] Compiling libraries/AP_IRLock/AP_IRLock_I2C.cpp
+[ 251/1006] Compiling libraries/AP_IRLock/AP_IRLock_SITL_Gazebo.cpp
+[ 252/1006] Compiling libraries/AP_IRLock/AP_IRLock_SITL.cpp
+[ 253/1006] Compiling libraries/AP_InertialNav/AP_InertialNav.cpp
+[ 254/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Invensensev2.cpp
+[ 255/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Backend.cpp
+[ 256/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_BMI055.cpp
+[ 257/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_BMI160.cpp
+[ 258/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_ADIS1647x.cpp
+[ 259/1006] Compiling libraries/AP_InertialSensor/AuxiliaryBus.cpp
+[ 260/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_tempcal.cpp
+[ 261/1006] Compiling libraries/AP_InertialSensor/BatchSampler.cpp
+[ 262/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_SITL.cpp
+[ 263/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_RST.cpp
+[ 264/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Params.cpp
+[ 265/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_NONE.cpp
+[ 266/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_SCHA63T.cpp
+[ 267/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_LSM9DS1.cpp
+[ 268/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_LSM9DS0.cpp
+[ 269/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_L3G4200D.cpp
+[ 270/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Invensensev3.cpp
+[ 271/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_ExternalAHRS.cpp
+[ 272/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_BMI270.cpp
+[ 273/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_BMI088.cpp
+[ 274/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Invensense.cpp
+[ 275/1006] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Logging.cpp
+[ 276/1006] Compiling libraries/AP_InternalError/AP_InternalError.cpp
+[ 277/1006] Compiling libraries/AP_KDECAN/AP_KDECAN.cpp
+[ 278/1006] Compiling libraries/AP_LTM_Telem/AP_LTM_Telem.cpp
+[ 279/1006] Compiling libraries/AP_Logger/AP_Logger_Block.cpp
+[ 280/1006] Compiling libraries/AP_Logger/AP_Logger_DataFlash.cpp
+[ 281/1006] Compiling libraries/AP_Logger/LogFile.cpp
+[ 282/1006] Compiling libraries/AP_Logger/AP_Logger_MAVLink.cpp
+[ 283/1006] Compiling libraries/AP_Logger/AP_Logger_W25N01GV.cpp
+[ 284/1006] Compiling libraries/AP_Logger/AP_Logger_MAVLinkLogTransfer.cpp
+[ 285/1006] Compiling libraries/AP_MSP/msp_sbuf.cpp
+[ 286/1006] Compiling libraries/AP_MSP/AP_MSP_Telem_Generic.cpp
+[ 287/1006] Compiling libraries/AP_MSP/msp.cpp
+[ 288/1006] Compiling libraries/AP_MSP/AP_MSP_Telem_DisplayPort.cpp
+[ 289/1006] Compiling libraries/AP_MSP/AP_MSP.cpp
+[ 290/1006] Compiling libraries/AP_MSP/AP_MSP_Telem_DJI.cpp
+[ 291/1006] Compiling libraries/AP_MSP/AP_MSP_Telem_Backend.cpp
+[ 292/1006] Compiling libraries/AP_Math/vector2.cpp
+[ 293/1006] Compiling libraries/AP_Math/polygon.cpp
+[ 294/1006] Compiling libraries/AP_Math/location_double.cpp
+[ 295/1006] Compiling libraries/AP_Math/location.cpp
+[ 296/1006] Compiling libraries/AP_Math/matrixN.cpp
+[ 297/1006] Compiling libraries/AP_Math/control.cpp
+[ 298/1006] Compiling libraries/AP_Math/chirp.cpp
+[ 299/1006] Compiling libraries/AP_Math/SplineCurve.cpp
+[ 300/1006] Compiling libraries/AP_Math/crc.cpp
+[ 301/1006] Compiling libraries/AP_Math/AP_GeodesicGrid.cpp
+[ 302/1006] Compiling libraries/AP_Math/spline5.cpp
+[ 303/1006] Compiling libraries/AP_Math/polyfit.cpp
+[ 304/1006] Compiling libraries/AP_Math/matrix3.cpp
+[ 305/1006] Compiling libraries/AP_Math/matrix_alg.cpp
+[ 306/1006] Compiling libraries/AP_Math/AP_Math.cpp
+[ 307/1006] Compiling libraries/AP_Mission/AP_Mission_Commands.cpp
+[ 308/1006] Compiling libraries/AP_Mission/AP_Mission_ChangeDetector.cpp
+[ 309/1006] Compiling libraries/AP_Module/AP_Module.cpp
+[ 310/1006] Compiling libraries/AP_Motors/AP_MotorsSingle.cpp
+[ 311/1006] Compiling libraries/AP_Motors/AP_MotorsHeli_Single.cpp
+[ 312/1006] Compiling libraries/AP_Motors/AP_MotorsHeli_RSC.cpp
+[ 313/1006] Compiling libraries/AP_Motors/AP_MotorsHeli_Swash.cpp
+[ 314/1006] Compiling libraries/AP_Motors/AP_MotorsHeli_Dual.cpp
+[ 315/1006] Compiling libraries/AP_Motors/AP_MotorsHeli.cpp
+[ 316/1006] Compiling libraries/AP_Motors/AP_MotorsCoax.cpp
+[ 317/1006] Compiling libraries/AP_Motors/AP_Motors6DOF.cpp
+[ 318/1006] Compiling libraries/AP_Motors/AP_MotorsMatrix_6DoF_Scripting.cpp
+[ 319/1006] Compiling libraries/AP_Motors/AP_Motors_Class.cpp
+[ 320/1006] Compiling libraries/AP_Motors/AP_MotorsMatrix_Scripting_Dynamic.cpp
+[ 321/1006] Compiling libraries/AP_Motors/AP_MotorsTailsitter.cpp
+[ 322/1006] Compiling libraries/AP_Motors/AP_MotorsHeli_Quad.cpp
+[ 323/1006] Compiling libraries/AP_Mount/SoloGimbal_Parameters.cpp
+[ 324/1006] Compiling libraries/AP_Mount/SoloGimbal.cpp
+[ 325/1006] Compiling libraries/AP_Mount/AP_Mount_SToRM32_serial.cpp
+[ 326/1006] Compiling libraries/AP_Mount/AP_Mount_SToRM32.cpp
+[ 327/1006] Compiling libraries/AP_Mount/AP_Mount_Params.cpp
+[ 328/1006] Compiling libraries/AP_Mount/AP_Mount_Gremsy.cpp
+[ 329/1006] Compiling libraries/AP_Mount/AP_Mount_Backend.cpp
+[ 330/1006] Compiling libraries/AP_Mount/AP_Mount_Servo.cpp
+[ 331/1006] Compiling libraries/AP_Mount/AP_Mount_Alexmos.cpp
+[ 332/1006] Compiling libraries/AP_Mount/SoloGimbalEKF.cpp
+[ 333/1006] Compiling libraries/AP_Mount/AP_Mount.cpp
+[ 334/1006] Compiling libraries/AP_Mount/AP_Mount_SoloGimbal.cpp
+[ 335/1006] Compiling libraries/AP_Mount/AP_Mount_Scripting.cpp
+[ 336/1006] Compiling libraries/AP_Mount/AP_Mount_Siyi.cpp
+[ 337/1006] Compiling libraries/AP_NMEA_Output/AP_NMEA_Output.cpp
+[ 338/1006] Compiling libraries/AP_NavEKF/EKFGSF_Logging.cpp
+[ 339/1006] Compiling libraries/AP_NavEKF/EKFGSF_yaw.cpp
+[ 340/1006] Compiling libraries/AP_NavEKF/AP_NavEKF_Source.cpp
+[ 341/1006] Compiling libraries/AP_NavEKF/AP_NavEKF_core_common.cpp
+[ 342/1006] Compiling libraries/AP_NavEKF/EKF_Buffer.cpp
+[ 343/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF2_core.cpp
+[ 344/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF2_PosVelFusion.cpp
+[ 345/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF2_MagFusion.cpp
+[ 346/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF2_Logging.cpp
+[ 347/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF2_Control.cpp
+[ 348/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF2_AirDataFusion.cpp
+[ 349/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF2_RngBcnFusion.cpp
+[ 350/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF_GyroBias.cpp
+[ 351/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF2_Outputs.cpp
+[ 352/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF2_Measurements.cpp
+[ 353/1006] Compiling libraries/AP_NavEKF2/AP_NavEKF2_VehicleStatus.cpp
+[ 354/1006] Compiling libraries/AP_Notify/VRBoard_LED.cpp
+[ 355/1006] Compiling libraries/AP_Notify/ToshibaLED_I2C.cpp
+[ 356/1006] Compiling libraries/AP_Notify/RGBLed.cpp
+[ 357/1006] Compiling libraries/AP_Notify/RCOutputRGBLed.cpp
+[ 358/1006] Compiling libraries/AP_Notify/ProfiLED.cpp
+[ 359/1006] Compiling libraries/AP_Notify/PixRacerLED.cpp
+[ 360/1006] Compiling libraries/AP_Notify/PCA9685LED_I2C.cpp
+[ 361/1006] Compiling libraries/AP_Notify/OreoLED_I2C.cpp
+[ 362/1006] Compiling libraries/AP_Notify/NeoPixel.cpp
+[ 363/1006] Compiling libraries/AP_Notify/NavigatorLED.cpp
+[ 364/1006] Compiling libraries/AP_Notify/NCP5623.cpp
+[ 365/1006] Compiling libraries/AP_Notify/MMLPlayer.cpp
+[ 366/1006] Compiling libraries/AP_Notify/Led_Sysfs.cpp
+[ 367/1006] Compiling libraries/AP_Notify/LP5562.cpp
+[ 368/1006] Compiling libraries/AP_Notify/IS31FL3195.cpp
+[ 369/1006] Compiling libraries/AP_Notify/ExternalLED.cpp
+[ 370/1006] Compiling libraries/AP_Notify/Display_SSD1306_I2C.cpp
+[ 371/1006] Compiling libraries/AP_Notify/Display_SITL.cpp
+[ 372/1006] Compiling libraries/AP_Notify/Display_SH1106_I2C.cpp
+[ 373/1006] Compiling libraries/AP_Notify/Display.cpp
+[ 374/1006] Compiling libraries/AP_Notify/DiscreteRGBLed.cpp
+[ 375/1006] Compiling libraries/AP_Notify/DiscoLED.cpp
+[ 376/1006] Compiling libraries/AP_Notify/DShotLED.cpp
+[ 377/1006] Compiling libraries/AP_Notify/Buzzer.cpp
+[ 378/1006] Compiling libraries/AP_Notify/SITL_SFML_LED.cpp
+[ 379/1006] Compiling libraries/AP_Notify/AP_Notify.cpp
+[ 380/1006] Compiling libraries/AP_Notify/AP_BoardLED.cpp
+[ 381/1006] Compiling libraries/AP_Notify/UAVCAN_RGB_LED.cpp
+[ 382/1006] Compiling libraries/AP_Notify/SerialLED.cpp
+[ 383/1006] Compiling libraries/AP_Notify/ScriptingLED.cpp
+[ 384/1006] Compiling libraries/AP_Notify/ToneAlarm.cpp
+[ 385/1006] Compiling libraries/AP_Notify/AP_BoardLED2.cpp
+[ 386/1006] Compiling libraries/AP_OLC/AP_OLC.cpp
+[ 387/1006] Compiling libraries/AP_OSD/AP_OSD_SITL.cpp
+[ 388/1006] Compiling libraries/AP_OSD/AP_OSD.cpp
+[ 389/1006] Compiling libraries/AP_OSD/AP_OSD_Setting.cpp
+[ 390/1006] Compiling libraries/AP_OSD/AP_OSD_MAX7456.cpp
+[ 391/1006] Compiling libraries/AP_OSD/AP_OSD_MSP_DisplayPort.cpp
+[ 392/1006] Compiling libraries/AP_OSD/AP_OSD_Backend.cpp
+[ 393/1006] Compiling libraries/AP_OSD/AP_OSD_MSP.cpp
+[ 394/1006] Compiling libraries/AP_OpenDroneID/AP_OpenDroneID_DroneCAN.cpp
+[ 395/1006] Compiling libraries/AP_OpenDroneID/AP_OpenDroneID.cpp
+[ 396/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_SITL.cpp
+[ 397/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_Onboard.cpp
+[ 398/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_HereFlow.cpp
+[ 399/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_Calibrator.cpp
+[ 400/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_CXOF.cpp
+[ 401/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_Backend.cpp
+[ 402/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow.cpp
+[ 403/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_UPFLOW.cpp
+[ 404/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_Pixart.cpp
+[ 405/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_MAV.cpp
+[ 406/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_PX4Flow.cpp
+[ 407/1006] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_MSP.cpp
+[ 408/1006] Compiling libraries/AP_Parachute/AP_Parachute.cpp
+[ 409/1006] Compiling libraries/AP_Param/AP_Param.cpp
+[ 410/1006] Compiling libraries/AP_Param/AP_ParamT.cpp
+[ 411/1006] Compiling libraries/AP_PiccoloCAN/AP_PiccoloCAN.cpp
+[ 412/1006] Compiling libraries/AP_Proximity/AP_Proximity_RangeFinder.cpp
+../../libraries/AP_Param/AP_Param.cpp: In static member function ‘static bool AP_Param::add_param(uint8_t, uint8_t, const char*, float)’:
+../../libraries/AP_Param/AP_Param.cpp:3036:26: warning: dereferencing type-punned pointer will break strict-aliasing rules [-Wstrict-aliasing]
+ 3036 |     const int32_t crc = *(const int32_t *)(&hinfo.def_value);
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[ 413/1006] Compiling libraries/AP_Proximity/AP_Proximity_Params.cpp
+[ 414/1006] Compiling libraries/AP_Proximity/AP_Proximity_LightWareSerial.cpp
+[ 415/1006] Compiling libraries/AP_Proximity/AP_Proximity_LightWareSF45B.cpp
+[ 416/1006] Compiling libraries/AP_Proximity/AP_Proximity_LightWareSF40C.cpp
+[ 417/1006] Compiling libraries/AP_Proximity/AP_Proximity_DroneCAN.cpp
+[ 418/1006] Compiling libraries/AP_Proximity/AP_Proximity_Cygbot_D1.cpp
+[ 419/1006] Compiling libraries/AP_Proximity/AP_Proximity_Boundary_3D.cpp
+[ 420/1006] Compiling libraries/AP_Proximity/AP_Proximity_Backend_Serial.cpp
+[ 421/1006] Compiling libraries/AP_Proximity/AP_Proximity_AirSimSITL.cpp
+[ 422/1006] Compiling libraries/AP_Proximity/AP_Proximity.cpp
+[ 423/1006] Compiling libraries/AP_Proximity/AP_Proximity_RPLidarA2.cpp
+[ 424/1006] Compiling libraries/AP_Proximity/AP_Proximity_TeraRangerTower.cpp
+[ 425/1006] Compiling libraries/AP_Proximity/AP_Proximity_MAV.cpp
+[ 426/1006] Compiling libraries/AP_Proximity/AP_Proximity_TeraRangerTowerEvo.cpp
+[ 427/1006] Compiling libraries/AP_Proximity/AP_Proximity_SITL.cpp
+[ 428/1006] Compiling libraries/AP_RAMTRON/AP_RAMTRON.cpp
+[ 429/1006] Compiling libraries/AP_RCMapper/AP_RCMapper.cpp
+[ 430/1006] Compiling libraries/AP_RCProtocol/AP_RCProtocol_SBUS.cpp
+[ 431/1006] Compiling libraries/AP_RCProtocol/AP_RCProtocol_PPMSum.cpp
+[ 432/1006] Compiling libraries/AP_RCProtocol/AP_RCProtocol_IBUS.cpp
+[ 433/1006] Compiling libraries/AP_RCProtocol/spm_srxl.cpp
+[ 434/1006] Compiling libraries/AP_RCProtocol/SoftSerial.cpp
+[ 435/1006] Compiling libraries/AP_RCProtocol/AP_RCProtocol_SRXL.cpp
+[ 436/1006] Compiling libraries/AP_RCProtocol/AP_RCProtocol_SUMD.cpp
+[ 437/1006] Compiling libraries/AP_RCProtocol/AP_RCProtocol_ST24.cpp
+[ 438/1006] Compiling libraries/AP_RCTelemetry/AP_Spektrum_Telem.cpp
+[ 439/1006] Compiling libraries/AP_ROMFS/tinfgzip.cpp
+[ 440/1006] Compiling libraries/AP_ROMFS/tinflate.cpp
+[ 441/1006] Compiling libraries/AP_ROMFS/AP_ROMFS.cpp
+[ 442/1006] Compiling libraries/AP_RPM/RPM_Generator.cpp
+[ 443/1006] Compiling libraries/AP_RPM/RPM_EFI.cpp
+[ 444/1006] Compiling libraries/AP_RPM/AP_RPM_Params.cpp
+[ 445/1006] Compiling libraries/AP_RPM/AP_RPM.cpp
+[ 446/1006] Compiling libraries/AP_RPM/RPM_ESC_Telem.cpp
+[ 447/1006] Compiling libraries/AP_RPM/RPM_Pin.cpp
+[ 448/1006] Compiling libraries/AP_RPM/RPM_HarmonicNotch.cpp
+[ 449/1006] Compiling libraries/AP_RPM/RPM_Backend.cpp
+[ 450/1006] Compiling libraries/AP_RPM/RPM_SITL.cpp
+[ 451/1006] Compiling libraries/AP_RSSI/AP_RSSI.cpp
+[ 452/1006] Compiling libraries/AP_RTC/JitterCorrection.cpp
+[ 453/1006] Compiling libraries/AP_RTC/AP_RTC.cpp
+[ 454/1006] Compiling libraries/AP_Radio/driver_cc2500.cpp
+[ 455/1006] Compiling libraries/AP_Radio/AP_Radio_backend.cpp
+[ 456/1006] Compiling libraries/AP_Radio/AP_Radio_bk2425.cpp
+[ 457/1006] Compiling libraries/AP_Radio/driver_bk2425.cpp
+[ 458/1006] Compiling libraries/AP_Radio/AP_Radio.cpp
+[ 459/1006] Compiling libraries/AP_Radio/AP_Radio_cypress.cpp
+[ 460/1006] Compiling libraries/AP_Radio/AP_Radio_cc2500.cpp
+[ 461/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_analog.cpp
+[ 462/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_VL53L1X.cpp
+[ 463/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_TeraRanger_Serial.cpp
+[ 464/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_TeraRangerI2C.cpp
+[ 465/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_SITL.cpp
+[ 466/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_PulsedLightLRF.cpp
+[ 467/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Params.cpp
+[ 468/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_PWM.cpp
+[ 469/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_NMEA.cpp
+[ 470/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_MaxsonarSerialLV.cpp
+[ 471/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_MaxsonarI2CXL.cpp
+[ 472/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_USD1_CAN.cpp
+[ 473/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_MAVLink.cpp
+[ 474/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Lua.cpp
+[ 475/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_LightWareSerial.cpp
+[ 476/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_LightWareI2C.cpp
+[ 477/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_LeddarVu8.cpp
+[ 478/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_LeddarOne.cpp
+[ 479/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Lanbao.cpp
+[ 480/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_HC_SR04.cpp
+[ 481/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_GYUS42v2.cpp
+[ 482/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Benewake_TFMiniPlus.cpp
+[ 483/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Benewake_CAN.cpp
+[ 484/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Benewake.cpp
+[ 485/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_MSP.cpp
+[ 486/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Backend_Serial.cpp
+[ 487/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Bebop.cpp
+[ 488/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_BLPing.cpp
+[ 489/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_BBB_PRU.cpp
+[ 490/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Backend.cpp
+[ 491/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Wasp.cpp
+[ 492/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_VL53L0X.cpp
+[ 493/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_UAVCAN.cpp
+[ 494/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder_USD1_Serial.cpp
+[ 495/1006] Compiling libraries/AP_RangeFinder/AP_RangeFinder.cpp
+[ 496/1006] Compiling libraries/AP_Relay/AP_Relay.cpp
+[ 497/1006] Compiling libraries/AP_RobotisServo/AP_RobotisServo.cpp
+[ 498/1006] Compiling libraries/AP_SBusOut/AP_SBusOut.cpp
+[ 499/1006] Compiling libraries/AP_Scheduler/PerfInfo.cpp
+[ 500/1006] Compiling libraries/AP_SerialLED/AP_SerialLED.cpp
+[ 501/1006] Compiling libraries/AP_SerialManager/AP_SerialManager.cpp
+[ 502/1006] Compiling libraries/AP_ServoRelayEvents/AP_ServoRelayEvents.cpp
+[ 503/1006] Compiling libraries/AP_SmartRTL/AP_SmartRTL.cpp
+[ 504/1006] Compiling libraries/AP_Stats/AP_Stats.cpp
+[ 505/1006] Compiling libraries/AP_TempCalibration/AP_TempCalibration.cpp
+[ 506/1006] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_Backend.cpp
+[ 507/1006] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_MCP9600.cpp
+[ 508/1006] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_MAX31865.cpp
+[ 509/1006] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_TSYS01.cpp
+[ 510/1006] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_Params.cpp
+[ 511/1006] Compiling libraries/AP_Terrain/TerrainMission.cpp
+[ 512/1006] Compiling libraries/AP_Terrain/TerrainIO.cpp
+[ 513/1006] Compiling libraries/AP_Terrain/TerrainUtil.cpp
+[ 514/1006] Compiling libraries/AP_Terrain/TerrainGCS.cpp
+[ 515/1006] Compiling libraries/AP_Torqeedo/AP_Torqeedo.cpp
+[ 516/1006] Compiling libraries/AP_Tuning/AP_Tuning.cpp
+[ 517/1006] Compiling libraries/AP_UAVCAN/AP_UAVCAN_IfaceMgr.cpp
+[ 518/1006] Compiling libraries/AP_UAVCAN/AP_UAVCAN_pool.cpp
+[ 519/1006] Compiling libraries/AP_UAVCAN/AP_UAVCAN_DNA_Server.cpp
+[ 520/1006] Compiling libraries/AP_UAVCAN/AP_UAVCAN.cpp
+[ 521/1006] Compiling libraries/AP_VideoTX/AP_VideoTX.cpp
+[ 522/1006] Compiling libraries/AP_VideoTX/AP_Tramp.cpp
+[ 523/1006] Compiling libraries/AP_VideoTX/AP_SmartAudio.cpp
+[ 524/1006] Compiling libraries/AP_VisualOdom/AP_VisualOdom_Logging.cpp
+[ 525/1006] Compiling libraries/AP_VisualOdom/AP_VisualOdom.cpp
+[ 526/1006] Compiling libraries/AP_VisualOdom/AP_VisualOdom_MAV.cpp
+[ 527/1006] Compiling libraries/AP_VisualOdom/AP_VisualOdom_IntelT265.cpp
+[ 528/1006] Compiling libraries/AP_VisualOdom/AP_VisualOdom_Backend.cpp
+[ 529/1006] Compiling libraries/AP_Volz_Protocol/AP_Volz_Protocol.cpp
+[ 530/1006] Compiling libraries/AP_WheelEncoder/AP_WheelEncoder.cpp
+[ 531/1006] Compiling libraries/AP_WheelEncoder/WheelEncoder_Quadrature.cpp
+[ 532/1006] Compiling libraries/AP_WheelEncoder/WheelEncoder_SITL_Quadrature.cpp
+[ 533/1006] Compiling libraries/AP_WheelEncoder/AP_WheelRateControl.cpp
+[ 534/1006] Compiling libraries/AP_WheelEncoder/WheelEncoder_Backend.cpp
+[ 535/1006] Compiling libraries/AP_Winch/AP_Winch_Daiwa.cpp
+[ 536/1006] Compiling libraries/AP_Winch/AP_Winch.cpp
+[ 537/1006] Compiling libraries/AP_Winch/AP_Winch_PWM.cpp
+[ 538/1006] Compiling libraries/AP_Winch/AP_Winch_Backend.cpp
+[ 539/1006] Compiling libraries/Filter/ModeFilter.cpp
+[ 540/1006] Compiling libraries/Filter/NotchFilter.cpp
+[ 541/1006] Compiling libraries/Filter/HarmonicNotchFilter.cpp
+[ 542/1006] Compiling libraries/Filter/SlewCalculator2D.cpp
+[ 543/1006] Compiling libraries/Filter/SlewLimiter.cpp
+[ 544/1006] Compiling libraries/Filter/LowPassFilter.cpp
+[ 545/1006] Compiling libraries/Filter/DerivativeFilter.cpp
+[ 546/1006] Compiling libraries/Filter/LowPassFilter2p.cpp
+[ 547/1006] Compiling libraries/GCS_MAVLink/GCS.cpp
+[ 548/1006] Compiling libraries/GCS_MAVLink/GCS_Param.cpp
+[ 549/1006] Compiling libraries/GCS_MAVLink/MAVLink_routing.cpp
+[ 550/1006] Compiling libraries/GCS_MAVLink/GCS_ServoRelay.cpp
+[ 551/1006] Compiling libraries/GCS_MAVLink/GCS_Signing.cpp
+[ 552/1006] Compiling libraries/GCS_MAVLink/GCS_Rally.cpp
+[ 553/1006] Compiling libraries/GCS_MAVLink/GCS_MAVLink.cpp
+[ 554/1006] Compiling libraries/GCS_MAVLink/GCS_FTP.cpp
+[ 555/1006] Compiling libraries/GCS_MAVLink/GCS_DeviceOp.cpp
+[ 556/1006] Compiling libraries/GCS_MAVLink/GCS_serial_control.cpp
+[ 557/1006] Compiling libraries/GCS_MAVLink/MissionItemProtocol_Waypoints.cpp
+[ 558/1006] Compiling libraries/GCS_MAVLink/MissionItemProtocol.cpp
+[ 559/1006] Compiling libraries/GCS_MAVLink/MissionItemProtocol_Rally.cpp
+[ 560/1006] Compiling libraries/GCS_MAVLink/MissionItemProtocol_Fence.cpp
+[ 561/1006] Compiling libraries/RC_Channel/RC_Channels.cpp
+[ 562/1006] Compiling libraries/SRV_Channel/SRV_Channel.cpp
+[ 563/1006] Compiling libraries/SRV_Channel/SRV_Channel_aux.cpp
+[ 564/1006] Compiling libraries/AP_HAL/utility/getopt_cpp.cpp
+[ 565/1006] Compiling libraries/AP_HAL/utility/sumd.cpp
+[ 566/1006] Compiling libraries/AP_HAL/utility/st24.cpp
+[ 567/1006] Compiling libraries/AP_HAL/Scheduler.cpp
+[ 568/1006] Compiling libraries/AP_HAL/utility/replace.cpp
+[ 569/1006] Compiling libraries/AP_HAL/utility/print_vprintf.cpp
+[ 570/1006] Compiling libraries/AP_HAL/utility/packetise.cpp
+[ 571/1006] Compiling libraries/AP_HAL/utility/srxl.cpp
+[ 572/1006] Compiling libraries/AP_HAL/utility/dsm.cpp
+[ 573/1006] Compiling libraries/AP_HAL/utility/Socket.cpp
+[ 574/1006] Compiling libraries/AP_HAL/utility/RingBuffer.cpp
+[ 575/1006] Compiling libraries/AP_HAL/utility/RCOutput_Tap_Linux.cpp
+[ 576/1006] Compiling libraries/AP_HAL/utility/RCOutput_Tap.cpp
+[ 577/1006] Compiling libraries/AP_HAL/utility/BetterStream.cpp
+[ 578/1006] Compiling libraries/AP_HAL/Util.cpp
+[ 579/1006] Compiling libraries/AP_HAL/Storage.cpp
+[ 580/1006] Compiling libraries/AP_HAL/Semaphores.cpp
+[ 581/1006] Compiling libraries/AP_HAL/RCOutput.cpp
+[ 582/1006] Compiling libraries/AP_HAL/HAL.cpp
+[ 583/1006] Compiling libraries/AP_HAL/GPIO.cpp
+[ 584/1006] Compiling libraries/AP_HAL/Device.cpp
+[ 585/1006] Compiling libraries/AP_HAL/CANIface.cpp
+[ 586/1006] Compiling libraries/AP_HAL/utility/utoa_invert.cpp
+[ 587/1006] Compiling libraries/AP_HAL/DSP.cpp
+[ 588/1006] Compiling libraries/AP_HAL/EventHandle.cpp
+[ 589/1006] Compiling libraries/AP_HAL/system.cpp
+[ 590/1006] Compiling libraries/AP_HAL/utility/ftoa_engine.cpp
+[ 591/1006] Compiling libraries/AP_HAL_Empty/RCOutput.cpp
+[ 592/1006] Compiling libraries/AP_HAL_Empty/UARTDriver.cpp
+[ 593/1006] Compiling libraries/AP_HAL_Empty/GPIO.cpp
+[ 594/1006] Compiling libraries/AP_HAL_Empty/RCInput.cpp
+[ 595/1006] Compiling libraries/AP_HAL_Empty/AnalogIn.cpp
+[ 596/1006] Compiling libraries/AP_HAL_Empty/Storage.cpp
+[ 597/1006] Compiling libraries/AP_HAL_Empty/HAL_Empty_Class.cpp
+[ 598/1006] Compiling libraries/AP_HAL_Empty/Semaphores.cpp
+[ 599/1006] Compiling modules/uavcan/libuavcan/src/marshal/uc_scalar_codec.cpp
+[ 600/1006] Compiling modules/uavcan/libuavcan/src/driver/uc_can.cpp
+[ 601/1006] Compiling modules/uavcan/libuavcan/src/uc_error.cpp
+[ 602/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_transfer_sender.cpp
+[ 603/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_transfer_receiver.cpp
+[ 604/1006] Compiling modules/uavcan/libuavcan/src/uc_data_type.cpp
+[ 605/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_transfer.cpp
+[ 606/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_transfer_listener.cpp
+[ 607/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_frame.cpp
+[ 608/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_crc.cpp
+[ 609/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_outgoing_transfer_registry.cpp
+[ 610/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_can_acceptance_filter_configurator.cpp
+[ 611/1006] Compiling modules/uavcan/libuavcan/src/protocol/uc_node_status_provider.cpp
+[ 612/1006] Compiling modules/uavcan/libuavcan/src/protocol/uc_dynamic_node_id_client.cpp
+[ 613/1006] Compiling modules/uavcan/libuavcan/src/node/uc_timer.cpp
+[ 614/1006] Compiling modules/uavcan/libuavcan/src/node/uc_service_client.cpp
+[ 615/1006] Compiling modules/uavcan/libuavcan/src/node/uc_global_data_type_registry.cpp
+[ 616/1006] Compiling modules/uavcan/libuavcan/src/node/uc_generic_subscriber.cpp
+[ 617/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_can_io.cpp
+[ 618/1006] Compiling modules/uavcan/libuavcan/src/marshal/uc_float_spec.cpp
+[ 619/1006] Compiling modules/uavcan/libuavcan/src/marshal/uc_bit_stream.cpp
+[ 620/1006] Compiling modules/uavcan/libuavcan/src/node/uc_scheduler.cpp
+[ 621/1006] Compiling modules/uavcan/libuavcan/src/marshal/uc_bit_array_copy.cpp
+[ 622/1006] Compiling modules/uavcan/libuavcan/src/node/uc_generic_publisher.cpp
+[ 623/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_dispatcher.cpp
+[ 624/1006] Compiling modules/uavcan/libuavcan/src/uc_dynamic_memory.cpp
+[ 625/1006] Compiling modules/uavcan/libuavcan/src/transport/uc_transfer_buffer.cpp
+[ 626/1006] Compiling libraries/AP_HAL_SITL/SITL_State.cpp
+[ 627/1006] Compiling libraries/AP_HAL_SITL/I2CDevice.cpp
+[ 628/1006] Compiling libraries/AP_HAL_SITL/Util.cpp
+[ 629/1006] Compiling libraries/AP_HAL_SITL/UART_utils.cpp
+[ 630/1006] Compiling libraries/AP_HAL_SITL/Semaphores.cpp
+[ 631/1006] Compiling libraries/AP_HAL_SITL/sitl_rangefinder.cpp
+[ 632/1006] Compiling libraries/AP_HAL_SITL/SPIDevice.cpp
+[ 633/1006] Compiling libraries/AP_HAL_SITL/SITL_Periph_State.cpp
+[ 634/1006] Compiling libraries/AP_HAL_SITL/RCOutput.cpp
+[ 635/1006] Compiling libraries/AP_HAL_SITL/RCInput.cpp
+[ 636/1006] Compiling libraries/AP_HAL_SITL/HAL_SITL_Class.cpp
+[ 637/1006] Compiling libraries/AP_HAL_SITL/GPIO.cpp
+[ 638/1006] Compiling libraries/AP_HAL_SITL/DSP.cpp
+[ 639/1006] Compiling libraries/AP_HAL_SITL/AnalogIn.cpp
+[ 640/1006] Compiling libraries/AP_HAL_SITL/ToneAlarm_SF.cpp
+[ 641/1006] Compiling libraries/AP_HAL_SITL/Scheduler.cpp
+[ 642/1006] Compiling libraries/AP_HAL_SITL/system.cpp
+[ 643/1006] Compiling libraries/AP_HAL_SITL/sitl_airspeed.cpp
+[ 644/1006] Compiling libraries/AP_HAL_SITL/CANSocketIface.cpp
+[ 645/1006] Compiling libraries/SITL/SIM_Webots_Python.cpp
+[ 646/1006] Compiling libraries/SITL/SIM_AirSim.cpp
+../../libraries/AP_HAL_SITL/CANSocketIface.cpp:262:42: error: ‘uint16_t’ in namespace ‘std’ does not name a type; did you mean ‘wint_t’?
+  262 |                               const std::uint16_t num_configs)
+      |                                          ^~~~~~~~
+      |                                          wint_t
+compilation terminated due to -Wfatal-errors.
+
+Waf: Leaving directory `/home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl'
+Build failed
+ -> task in 'objs/AP_HAL_SITL' failed (exit status 1): 
+	{task 140375664926896: cxx CANSocketIface.cpp -> CANSocketIface.cpp.0.o}
+ (run with -v to display more information)

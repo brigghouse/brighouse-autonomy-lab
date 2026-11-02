@@ -420,3 +420,22 @@ Build failed
  -> task in 'uavcan' failed (exit status 1): 
 	{task 140098707242256: uavcangen ardupilot,com,cuav,dronecan,mppt,uavcan -> }
  (run with -v to display more information)
+
+$ git clone -q --depth 1 --branch Copter-4.2.4 --recurse-submodules --shallow-submodules https://github.com/ArduPilot/ardupilot.git /home/claude/sitl-long/ardupilot-Copter-4.2.4
+Note: switching to '245996c8609e683ad4bb988473df288314bb2599'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+

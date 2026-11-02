@@ -1,0 +1,165 @@
+{
+  "stack": "PX4 (SIH)",
+  "source_rev": "v1.18.0-rc1@fca3df865af3",
+  "started_utc": "2026-11-02T16:33:23Z",
+  "runs": {
+    "E3-default-gcs": {
+      "exit_code": 0,
+      "frames": 7551,
+      "signed_frames": 0,
+      "v1_frames": 0,
+      "unsigned_types": [
+        "ALTITUDE",
+        "ATTITUDE",
+        "ATTITUDE_QUATERNION",
+        "ATTITUDE_TARGET",
+        "AUTOPILOT_VERSION",
+        "BATTERY_STATUS",
+        "COMMAND_ACK",
+        "CURRENT_MODE",
+        "DISTANCE_SENSOR",
+        "ESTIMATOR_STATUS",
+        "EXTENDED_SYS_STATE",
+        "GLOBAL_POSITION_INT",
+        "GNSS_INTEGRITY",
+        "GPS_RAW_INT",
+        "HEARTBEAT",
+        "HOME_POSITION",
+        "LOCAL_POSITION_NED",
+        "MISSION_CURRENT",
+        "OPEN_DRONE_ID_LOCATION",
+        "OPEN_DRONE_ID_SYSTEM",
+        "PARAM_VALUE",
+        "PING",
+        "POSITION_TARGET_LOCAL_NED",
+        "SCALED_PRESSURE",
+        "SERVO_OUTPUT_RAW",
+        "SYS_STATUS",
+        "UNKNOWN_290",
+        "UNKNOWN_291",
+        "UNKNOWN_380",
+        "UNKNOWN_411",
+        "UNKNOWN_514",
+        "UNKNOWN_8",
+        "VFR_HUD",
+        "VIBRATION"
+      ],
+      "firmware": "1.18.0 (type 192)",
+      "ftp_advertised": true,
+      "command_ack_result": 0,
+      "unsigned_probe_answered": true,
+      "findings": [
+        "MAV-002",
+        "MAV-004",
+        "MAV-005",
+        "MAV-006",
+        "MAV-007"
+      ]
+    },
+    "E3-default-onboard": {
+      "exit_code": 0,
+      "frames": 8672,
+      "signed_frames": 0,
+      "v1_frames": 0,
+      "unsigned_types": [
+        "ALTITUDE",
+        "ATTITUDE",
+        "ATTITUDE_QUATERNION",
+        "ATTITUDE_TARGET",
+        "AUTOPILOT_VERSION",
+        "BATTERY_STATUS",
+        "COMMAND_ACK",
+        "CURRENT_MODE",
+        "DISTANCE_SENSOR",
+        "ESTIMATOR_STATUS",
+        "EXTENDED_SYS_STATE",
+        "GLOBAL_POSITION_INT",
+        "GNSS_INTEGRITY",
+        "GPS_RAW_INT",
+        "HEARTBEAT",
+        "HIGHRES_IMU",
+        "HOME_POSITION",
+        "LOCAL_POSITION_NED",
+        "MISSION_CURRENT",
+        "ODOMETRY",
+        "OPEN_DRONE_ID_LOCATION",
+        "OPEN_DRONE_ID_SYSTEM",
+        "PARAM_VALUE",
+        "PING",
+        "POSITION_TARGET_LOCAL_NED",
+        "SCALED_PRESSURE",
+        "SERVO_OUTPUT_RAW",
+        "SYSTEM_TIME",
+        "SYS_STATUS",
+        "TIMESYNC",
+        "UNKNOWN_290",
+        "UNKNOWN_291",
+        "UNKNOWN_380",
+        "UNKNOWN_411",
+        "UNKNOWN_514",
+        "UNKNOWN_8",
+        "VFR_HUD",
+        "VIBRATION"
+      ],
+      "firmware": "1.18.0 (type 192)",
+      "ftp_advertised": true,
+      "command_ack_result": 0,
+      "unsigned_probe_answered": true,
+      "findings": [
+        "MAV-002",
+        "MAV-004",
+        "MAV-005",
+        "MAV-006",
+        "MAV-007"
+      ]
+    },
+    "E4-signed-gcs": {
+      "exit_code": 0,
+      "frames": 7506,
+      "signed_frames": 7506,
+      "v1_frames": 0,
+      "unsigned_types": [],
+      "firmware": null,
+      "ftp_advertised": null,
+      "command_ack_result": null,
+      "unsigned_probe_answered": false,
+      "findings": [
+        "MAV-004"
+      ],
+      "keyed_check": {
+        "frames_decoded": 2900,
+        "valid_signatures": 2900,
+        "unknown_msgid_frames_skipped": 34
+      }
+    },
+    "E4-signed-onboard": {
+      "exit_code": 0,
+      "frames": 8681,
+      "signed_frames": 8681,
+      "v1_frames": 0,
+      "unsigned_types": [],
+      "firmware": null,
+      "ftp_advertised": null,
+      "command_ack_result": null,
+      "unsigned_probe_answered": false,
+      "findings": [
+        "MAV-004"
+      ],
+      "keyed_check": {
+        "frames_decoded": 3219,
+        "valid_signatures": 3219,
+        "unknown_msgid_frames_skipped": 181
+      }
+    }
+  },
+  "key_file_present": true,
+  "key_file_size": 40,
+  "tofu_unsigned_rekey": {
+    "key_file_changed": false,
+    "original_key_still_valid": {
+      "frames_decoded": 2917,
+      "valid_signatures": 2917,
+      "unknown_msgid_frames_skipped": 35
+    }
+  }
+}

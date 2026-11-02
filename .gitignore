@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+reports/
+demo/
+.trash/
+
+# Obsidian: per-machine state stays local; app.json travels
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.obsidian/plugins/*/data.json

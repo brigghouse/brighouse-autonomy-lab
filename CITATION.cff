@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use mavaudit or the lab results, please cite it as below."
+title: "Brighouse Autonomy Security Lab: mavaudit and MAVLink signing measurements"
+authors:
+  - family-names: Brighouse
+    given-names: Ian
+    affiliation: Brighouse Security Labs
+version: 0.2.0
+date-released: 2026-11-02
+license: Apache-2.0
+repository-code: "https://github.com/brigghouse/brighouse-autonomy-lab"
+keywords:
+  - MAVLink
+  - drone security
+  - PX4
+  - ArduPilot
+  - Cyber Resilience Act

@@ -69,7 +69,7 @@ We describe attack classes conceptually, following the published literature.
 
 - **Protocol level.** NVD lists cleartext transmission (CVE-2020-10281), lack of authentication in MAVLink 1 (CVE-2020-10282) and downgrade from v2 to v1 (CVE-2020-10283). In 2026, CISA advisory ICSA-26-090-02 assigned CVE-2026-1579 (CWE-306, CVSS 9.8) to MAVLink in PX4 with signing off; the remediation is to enable signing on all non-USB links.
 - **Implementation level.** From 2021 to 2026, PX4 accumulated CVEs in MAVLink-facing code: buffer overflows in message handlers, use-after-free in the MAVLink shell, path traversal in MAVLink FTP (CVE-2026-32709) and stack overflows in the log handler. ArduPilot recorded CVE-2026-38971 in `handle_serial_control()`.
-- **Reachability argument.** With signing off, every one of these handlers is reachable by any peer that can inject frames: a radio in range, or a host on the same IP network for MAVLink-over-UDP. Signing does not fix memory-safety bugs, but it **restricts their reachability to key holders**. We test this as a yes/no conformance check in §7 (E-reach), without exploitation.
+- **Reachability argument.** With signing off, every one of these handlers is reachable by any peer that can inject frames: a radio in range, or a host on the same IP network for MAVLink-over-UDP. Signing does not fix memory-safety bugs, but it **restricts their reachability to key holders**. §7 measures a proxy for this: whether unauthenticated parameter reads and `AUTOPILOT_VERSION` (which advertises FTP) are answered. A per-CVE reachability matrix is future work.
 - **Beyond authentication.** Fuzzing work (RVFuzzer `[cite:kim2019rvfuzzer]`, PGFUZZ `[cite:kim2021pgfuzz]`, ADGFUZZ `[cite:wang2026adgfuzz]`) and stealthy-attack studies `[cite:dash2019]` show that *authenticated is not safe*: an authorised or compromised GCS can still send harmful but well-formed inputs. Signing is necessary but not sufficient.
 - **GCS gap.** NVD returns no CVEs for QGroundControl or Mission Planner, and GCS-focused academic work is sparse `[cite:mansfield2013]`. We read this as a lack of scrutiny, not evidence of security.
 
@@ -105,11 +105,11 @@ The Art. 14 reporting of actively exploited vulnerabilities and severe incidents
 
 **mavaudit** (released in this repository, v0.2.0) is a passive auditor that **never needs the signing key**. It classifies every frame it observes from the raw header bytes: MAVLink 1 (`0xFE`), unsigned MAVLink 2, or signed MAVLink 2 (incompatibility flag `0x01`). It identifies the autopilot from HEARTBEAT.
 
-With `--active-probe` it sends two **unsigned, read-only** requests:
+With `--active-probe` it sends two **unsigned, read-only** requests (only to peers inside the lab scope):
 - a `PARAM_REQUEST_READ` by index 0, so it does not depend on parameter names that change between releases (ArduPilot 4.7 renamed `SYSID_THISMAV` to `MAV_SYSID`);
 - a `MAV_CMD_REQUEST_MESSAGE` for `AUTOPILOT_VERSION`, which gives the firmware version and capability flags.
 
-Findings MAV-001 to MAV-007 (`docs/findings.md`) map to the crosswalk in §5.4. A scope guard limits targets to loopback and private addresses. The tool is validated against a Python reference vehicle in unsigned, signed and MAVLink 1 modes (10 automated tests in CI).
+Findings MAV-001 to MAV-007 (`docs/findings.md`) map to the crosswalk in §5.4. A scope guard limits targets to loopback and private addresses. The tool is validated against a Python reference vehicle in unsigned, signed and MAVLink 1 modes (15 automated tests in CI, including a signing-exempt mode that reproduces R4).
 
 **Testbed.** One headless Ubuntu 24.04 VM (2 vCPU, 7 GB). We built from source:
 - ArduPilot Copter 4.7.2 (`fb7735678960`, the upstream `ArduCopter-stable` tag at run time);
@@ -134,14 +134,14 @@ Full table: `results/README.md`. Raw reports and logs are in each `results/<run>
 
 | Stack | Link | Default: signed frames | Default: unsigned read answered | After provisioning: signed frames | After provisioning: unsigned read answered | Signatures verified with key |
 |---|---|---|---|---|---|---|
-| ArduPilot 4.7.2 | SERIAL0 (chan 0) | 0/35 | yes | 27/27 | **yes** | 9/9 |
-| ArduPilot 4.7.2 | SERIAL1 | 0/31 | yes | 24/24 | no | 9/9 |
-| PX4 v1.17.0 | GCS | 0/7321 | yes | 0/7309 | yes | 0/2906 |
-| PX4 v1.17.0 | Onboard | 0/8023 | yes | 0/8058 | yes | 0/3194 |
-| PX4 v1.18.0-rc1 | GCS | 0/7355 | yes | 7371/7371 | no | 2911/2911 |
-| PX4 v1.18.0-rc1 | Onboard | 0/8470 | yes | 8486/8486 | no | 3222/3222 |
+| ArduPilot 4.7.2 | SERIAL0 (chan 0) | 0/36 | yes | 27/27 | **yes** | 10/10 |
+| ArduPilot 4.7.2 | SERIAL1 | 0/33 | yes | 25/25 | no | 9/9 |
+| PX4 v1.17.0 | GCS | 0/7492 | yes | 0/7489 | yes | 0/2913 |
+| PX4 v1.17.0 | Onboard | 0/8269 | yes | 0/8263 | yes | 0/3222 |
+| PX4 v1.18.0-rc1 | GCS | 0/7551 | yes | 7506/7506 | no | 2900/2900 |
+| PX4 v1.18.0-rc1 | Onboard | 0/8672 | yes | 8681/8681 | no | 3219/3219 |
 
-Frame counts differ between stacks because ArduPilot SITL streams telemetry only when a GCS requests it, while PX4 streams by default. "Signatures verified" counts only frames that pymavlink could decode; frames with message IDs missing from its dialect are skipped and reported in the summaries.
+Values are from the final run of each script (re-runs give the same yes/no outcomes; frame counts vary by a few percent). Frame counts differ between stacks because ArduPilot SITL streams telemetry only when a GCS requests it, while PX4 streams by default. "Signatures verified" counts only frames that pymavlink could decode; frames with message IDs missing from its dialect are skipped and reported in the summaries. The verifier is started with a zero initial timestamp. Otherwise pymavlink rejects streams whose signing timestamp lags its own wall clock by more than a minute, which PX4 SITL's clock can do under load. In one early run this made valid signatures look invalid (`scripts/debug_px4_tofu.py` reproduces the check).
 
 **R1: insecure by default, everywhere.** On all 6 default links: 0 signed frames, unauthenticated parameter reads answered, and MAVLink FTP advertised (`MAV_PROTOCOL_CAPABILITY_FTP`) to an unauthenticated peer. A manufacturer that ships either stack unchanged ships a C2 link with no integrity or access control (findings MAV-002, -005 and -006 on every default run).
 
@@ -155,7 +155,7 @@ Frame counts differ between stacks because ArduPilot SITL streams telemetry only
 
 The trust-on-first-use window before the first key is installed remains a provisioning risk (§8).
 
-**R4: ArduPilot's channel-0 exemption hides from passive observers.** With a key installed, SERIAL1 signs everything and ignores unsigned input. SERIAL0 also signs **every frame it sends (27/27), yet still answers unsigned requests**. This is by design: `accept_unsigned_callback` accepts all unsigned traffic on MAVLINK_COMM_0, which is assumed to be a secure channel (USB on ChibiOS boards). An auditor that only watches traffic would conclude this link is protected. That is why mavaudit's MAV-005 relies on an active read-only probe and states the discrepancy explicitly. Integrators must make sure that whatever ends up as MAVLink channel 0 is physically trusted.
+**R4: ArduPilot's channel-0 exemption hides from passive observers.** With a key installed, SERIAL1 signs everything and ignores unsigned input. SERIAL0 also signs **every frame it sends (27/27), yet still answers unsigned requests**, and acknowledges the unsigned `MAV_CMD_REQUEST_MESSAGE` (COMMAND_ACK result 0, accepted). This is by design: `accept_unsigned_callback` accepts all unsigned traffic on MAVLINK_COMM_0, which is assumed to be a secure channel (USB on ChibiOS boards). An auditor that only watches traffic would conclude this link is protected. That is why mavaudit's MAV-005 relies on an active read-only probe and states the discrepancy explicitly. Integrators must make sure that whatever ends up as MAVLink channel 0 is physically trusted.
 
 **Not yet measured.** E5 (GCS × stack interoperability and the provisioning UX in QGroundControl, Mission Planner and MAVProxy), replay behaviour across reboots, and ArduPilot versions other than 4.7.2.
 
@@ -178,7 +178,7 @@ The study covers simulation only; vendor firmware and hardware radios may behave
 
 ## 10. Conclusion
 
-MAVLink signing works when it is turned on. In our measurements PX4 v1.18.0-rc1 and ArduPilot 4.7.2 telemetry ports enforce it exactly as documented. But it is off by default in every stack we tested. It is **absent from the current stable PX4 release**. And on ArduPilot it is bypassed by design on channel 0, which a passive observer cannot see. For EU manufacturers, the CRA turns this integrator responsibility into a legal obligation, with reporting duties already live. A reproducible audit that combines passive observation with a read-only active probe, such as mavaudit, is a cheap first piece of evidence, and the lab in this repository lets anyone reproduce ours in about 30 minutes.
+MAVLink signing works when it is turned on. In our measurements PX4 v1.18.0-rc1 (both links) and ArduPilot 4.7.2 SERIAL1 enforce it exactly as documented. But it is off by default in every stack we tested. It is **absent from the current stable PX4 release**. And on ArduPilot it is bypassed by design on channel 0, which a passive observer cannot see. For EU manufacturers, the CRA turns this integrator responsibility into a legal obligation, with reporting duties already live. A reproducible audit that combines passive observation with a read-only active probe, such as mavaudit, is a cheap first piece of evidence, and the lab in this repository lets anyone reproduce ours in about 30 minutes.
 
 ## References
 

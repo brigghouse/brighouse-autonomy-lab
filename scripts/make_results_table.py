@@ -16,7 +16,8 @@ software-in-the-loop simulations on 127.0.0.1.
 
 **Columns.** *signed* = frames sent by the vehicle that carried a MAVLink 2 signature.
 *Unsigned request answered* = the vehicle replied to mavaudit's unsigned, read-only parameter
-request. *Keyed check* = frames whose signature verified with the lab key (decoded frames only).
+request. *FTP advertised* = from `AUTOPILOT_VERSION`; *unknown* when the vehicle ignored the unsigned
+request for it. *Keyed check* = frames whose signature verified with the lab key (decoded frames only).
 **E2/E4** = the same audit repeated after the defender provisioning step (an unsigned `SETUP_SIGNING` with the
 lab key over the local link). On a stack without signing support the step has no effect.
 
@@ -40,7 +41,7 @@ def main():
             rows.append(
                 f"| [{folder}]({folder}/) | {s['source_rev']} | {run} | {r['frames']} | "
                 f"{r['signed_frames']} | {'yes' if r['unsigned_probe_answered'] else 'no'} | "
-                f"{'yes' if r['ftp_advertised'] else ('no' if r['ftp_advertised'] is False else '-')} | "
+                f"{'yes' if r['ftp_advertised'] else ('no' if r['ftp_advertised'] is False else 'unknown')} | "
                 f"{fmt_keyed(r.get('keyed_check'))} | {', '.join(r['findings'])} |"
             )
         extra = {k: v for k, v in s.items() if k not in ("runs", "stack", "source_rev", "started_utc")}

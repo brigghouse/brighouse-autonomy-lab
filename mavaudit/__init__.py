@@ -1,7 +1,7 @@
 """mavaudit: defensive MAVLink configuration auditor for lab and authorised testing.
 
-Brighouse Autonomy Security Lab. Passive by default; the only active check sends a
-single read-only parameter request. Never use against systems you are not
+Brighouse Autonomy Security Lab. Passive by default; --active-probe sends two
+unsigned, read-only requests (a parameter read and an AUTOPILOT_VERSION request). Never use against systems you are not
 authorised in writing to test.
 """
 

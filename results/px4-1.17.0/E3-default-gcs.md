@@ -2,7 +2,7 @@
 
 - Target: `udpin:127.0.0.1:14550`
 - Scope reference: lab / private network
-- Generated (UTC): 2026-11-02T15:43:43+00:00 by mavaudit 0.2.0
+- Generated (UTC): 2026-11-02T16:31:50+00:00 by mavaudit 0.2.0
 - Passive observation window: 15.0 s
 - Active read-only probe: yes
 
@@ -10,13 +10,13 @@
 
 | sysid/compid | autopilot | firmware | frames | MAVLink 1 | MAVLink 2 | signed | FTP advertised |
 |---|---|---|---|---|---|---|---|
-| 1/1 | px4 | 1.17.0 (type 255) | 7321 | 0 | 7321 | 0 | yes |
+| 1/1 | px4 | 1.17.0 (type 255) | 7492 | 0 | 7492 | 0 | yes |
 
 ## Findings
 
 ### MAV-002 [HIGH] No signed MAVLink frames (1/1)
 
-0/7321 frames carry a MAVLink 2 signature. Commands and telemetry on this link have no cryptographic integrity or origin authentication.
+0/7492 frames carry a MAVLink 2 signature. Commands and telemetry on this link have no cryptographic integrity or origin authentication.
 
 - CRA: Annex I.I.2(b) secure by default; Annex I.I.2(d) protection from unauthorised access; Annex I.I.2(f) integrity of data and commands
 - Recommendation: Enable MAVLink 2 message signing with a per-vehicle key and a key-provisioning process.

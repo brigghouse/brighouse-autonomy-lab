@@ -6,10 +6,8 @@ build/
 dist/
 .venv/
 reports/
-# Obsidian per-machine state
-vault/.obsidian/workspace.json
-vault/.obsidian/workspace-mobile.json
-vault/.trash/
+demo/
+.trash/
 
 # Obsidian: per-machine state stays local; app.json travels
 .obsidian/workspace.json

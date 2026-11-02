@@ -15,6 +15,7 @@ El script completo es [scripts/setup_sitl.sh](../../scripts/setup_sitl.sh). Lo q
 5. **PX4 v1.18:** la clave de firma se guarda en `<rootfs>/mavlink/mavlink-signing-key.bin` (40 bytes).
 6. **pymavlink no decodifica algunos ID de mensaje de PX4 1.18** (290, 291, 380, 411, 514, 8), ni siquiera con el dialecto `all`. mavaudit lee el sysid/compid de la cabecera cruda para no atribuirlos al sistema 0, y la comprobación con clave los excluye.
 7. **`git describe` en un clon superficial de ArduPilot** devuelve una etiqueta equivocada (APMrover2-beta), porque hay muchas etiquetas en el mismo commit. Mejor `git tag --points-at HEAD`, filtrando las que llevan número de versión.
-8. **`pkill -f arducopter` se mata a sí mismo** si la línea de comandos contiene "arducopter". Usa `pkill -x`.
+8. **Al verificar firmas con pymavlink, usa `initial_timestamp=0`.** pymavlink rechaza una secuencia nueva si su *timestamp* va más de 1 minuto por detrás de su propio reloj, y el reloj de firma de PX4 SITL se atrasa con la máquina cargada. Sin esto, firmas válidas parecían inválidas (0/2908 en una repetición).
+9. **`pkill -f arducopter` se mata a sí mismo** si la línea de comandos contiene "arducopter". Usa `pkill -x`.
 
 Related: [Diario 2026-11-02](../diario/2026-11-02.md) · [pymavlink y MAVLink 2](pymavlink-mavlink2.md)

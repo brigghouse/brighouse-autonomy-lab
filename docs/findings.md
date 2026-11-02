@@ -9,7 +9,7 @@ Each finding maps to Regulation (EU) 2024/2847 (Cyber Resilience Act), Annex I. 
 | **MAV-003** | medium | Some frames signed, some not | I.2(f) | Reject unsigned input beyond the minimum allow-list |
 | **MAV-004** | info | Always reported: signing gives integrity, not confidentiality | I.2(e) confidentiality | Encrypted datalink or VPN where the risk assessment requires it |
 | **MAV-005** | high | The vehicle answered mavaudit's **unsigned**, read-only `PARAM_REQUEST_READ` (by index 0). If every frame the vehicle sends is signed but it still answers, the report says so: a passive check alone would wrongly suggest the link is protected. | I.2(d), I.2(j) limit attack surface | Enable signing; make sure signing-exempt links (e.g. USB / channel 0) are physically trusted |
-| **MAV-006** | high | `AUTOPILOT_VERSION` advertises `MAV_PROTOCOL_CAPABILITY_FTP` **and** unauthenticated peers are accepted | I.2(d), I.2(j) | Enable signing; disable or gate MAVLink FTP where not needed |
+| **MAV-006** | high | `AUTOPILOT_VERSION` (requested unsigned) advertises `MAV_PROTOCOL_CAPABILITY_FTP` **and** unauthenticated peers are accepted | I.2(d), I.2(j) | Enable signing; disable or gate MAVLink FTP where not needed |
 | **MAV-007** | info | Firmware version decoded from `AUTOPILOT_VERSION` | I.2(a) no known exploitable vulnerabilities, Part II(1) SBOM | Stay on a supported release; monitor advisories |
 
 ## Related advisories
@@ -27,7 +27,7 @@ mavaudit annotates findings with a small curated table (`mavaudit/advisories.py`
 | Mode | Traffic sent by mavaudit |
 |---|---|
 | default (passive) | No MAVLink messages; mavaudit only listens. |
-| `--active-probe` | 1× `PARAM_REQUEST_READ` (index 0) and 1× `COMMAND_LONG` / `MAV_CMD_REQUEST_MESSAGE` for `AUTOPILOT_VERSION`. Both are read-only. |
+| `--active-probe` | 1× `PARAM_REQUEST_READ` (index 0) and 1× `COMMAND_LONG` / `MAV_CMD_REQUEST_MESSAGE` for `AUTOPILOT_VERSION`. Both are read-only. Only replies for index 0 from the probed vehicle count; the `COMMAND_ACK` result is recorded as corroboration. If the vehicle ignores the request, "FTP advertised" is reported as unknown. Not sent if the traffic came from outside the lab scope; on serial targets it requires `--authorized --scope-ref`. |
 
 ## Exit codes
 

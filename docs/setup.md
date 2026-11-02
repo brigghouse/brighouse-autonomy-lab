@@ -9,13 +9,13 @@ git clone https://github.com/brigghouse/brighouse-autonomy-lab.git
 cd brighouse-autonomy-lab
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                                   # 10 tests against a reference MAVLink vehicle
+pytest -q                                   # 15 tests against a reference MAVLink vehicle
 ```
 
 Try it without any autopilot:
 
 ```bash
-python -m mavaudit.sim.fake_vehicle --mode unsigned --port 14550 &   # also: --mode signed | v1
+python -m mavaudit.sim.fake_vehicle --mode unsigned --port 14550 &   # also: signed | signed-exempt | v1
 mavaudit scan --target udpin:127.0.0.1:14550 --duration 10 --active-probe
 ```
 

@@ -128,3 +128,47 @@ def test_fail_on_high_exit_code(tmp_path):
 def test_version_decoding():
     from mavaudit.advisories import decode_version
     assert decode_version((4 << 24) | (7 << 16) | (2 << 8) | 255) == (4, 7, 2, 255)
+
+
+def test_signed_exempt_link_is_caught_by_active_probe(tmp_path):
+    """Link signs everything it sends but accepts unsigned input (ArduPilot channel 0 pattern)."""
+    rc, report = run_scan_vehicle(tmp_path, {"mode": "signed-exempt"})
+    ep = next(e for e in report["endpoints"] if e["sysid"] == 1)
+    assert ep["signed_frames"] == ep["frames"] > 0
+    assert "MAV-002" not in ids(report)          # passive view: looks protected
+    f5 = next(f for f in report["findings"] if f["id"] == "MAV-005")
+    assert "passive check alone would wrongly suggest" in f5["detail"]
+    assert "MAV-006" in ids(report)              # FTP reachable without the key
+    assert report["unsigned_probe"]["command_ack_result"] == 0
+
+
+def test_param_error_counts_as_answer(tmp_path):
+    rc, report = run_scan_vehicle(tmp_path, {"mode": "unsigned", "param_error": True})
+    assert report["unsigned_probe"]["answered"] is True
+    assert report["unsigned_probe"]["response"] == "PARAM_ERROR"
+
+
+def test_ftp_unknown_when_version_not_received(tmp_path):
+    rc, report = run_scan_vehicle(tmp_path, {"mode": "signed"})
+    ep = next(e for e in report["endpoints"] if e["sysid"] == 1)
+    assert ep["ftp_advertised"] is None
+
+
+def test_release_candidate_of_fixed_version_keeps_advisory(tmp_path):
+    rc, report = run_scan_vehicle(tmp_path, {"mode": "unsigned", "autopilot": "px4",
+                                             "version": (1, 17, 0), "version_type": 192})
+    f6 = next(f for f in report["findings"] if f["id"] == "MAV-006")
+    assert any(a["id"] == "CVE-2026-32709" for a in f6["advisories"])
+
+
+def test_scope_serial_and_listen_addresses():
+    from mavaudit.safety import check_peer
+    assert check_scope("/dev/ttyUSB0").kind == "serial"                      # passive serial ok
+    with pytest.raises(ScopeError):
+        check_scope("/dev/ttyUSB0", active=True)                            # active over radio: refuse
+    assert check_scope("/dev/ttyUSB0", authorized=True, scope_ref="ENG-1", active=True).kind == "serial"
+    with pytest.raises(ScopeError):
+        check_scope("udpin:drone.example.com:14550")                        # hostnames not trusted
+    assert check_peer("127.0.0.1") and check_peer("10.0.0.5") and check_peer(None)
+    assert not check_peer("8.8.8.8")
+    assert check_peer("8.8.8.8", authorized=True, scope_ref="ENG-1")

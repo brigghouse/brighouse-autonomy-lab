@@ -1,7 +1,7 @@
 {
   "tool": "mavaudit",
   "version": "0.2.0",
-  "generated_utc": "2026-11-02T15:37:01+00:00",
+  "generated_utc": "2026-11-02T16:30:10+00:00",
   "target": "tcp:127.0.0.1:5762",
   "scope_ref": null,
   "duration_s": 15.0,
@@ -10,15 +10,17 @@
     "compid": 1,
     "param": "index:0",
     "answered": true,
-    "response": "PARAM_VALUE"
+    "response": "PARAM_VALUE",
+    "command_ack_result": 0,
+    "autopilot_version_received": true
   },
   "endpoints": [
     {
       "sysid": 1,
       "compid": 1,
-      "frames": 31,
+      "frames": 33,
       "v1_frames": 0,
-      "v2_frames": 31,
+      "v2_frames": 33,
       "signed_frames": 0,
       "autopilot": "ardupilot",
       "mav_type": 2,
@@ -29,6 +31,7 @@
         "HEARTBEAT",
         "HOME_POSITION",
         "PARAM_VALUE",
+        "STATUSTEXT",
         "SYS_STATUS",
         "TIMESYNC"
       ],
@@ -39,6 +42,7 @@
         "HEARTBEAT",
         "HOME_POSITION",
         "PARAM_VALUE",
+        "STATUSTEXT",
         "SYS_STATUS",
         "TIMESYNC"
       ],
@@ -50,7 +54,8 @@
         "HOME_POSITION": 1,
         "PARAM_VALUE": 1,
         "COMMAND_ACK": 1,
-        "AUTOPILOT_VERSION": 1
+        "AUTOPILOT_VERSION": 1,
+        "STATUSTEXT": 2
       },
       "capabilities": 64495,
       "firmware": "4.7.2 (type 255)",
@@ -59,6 +64,7 @@
         7,
         2
       ],
+      "firmware_type": 255,
       "ftp_advertised": true
     }
   ],
@@ -67,7 +73,7 @@
       "id": "MAV-002",
       "severity": "high",
       "title": "No signed MAVLink frames",
-      "detail": "0/31 frames carry a MAVLink 2 signature. Commands and telemetry on this link have no cryptographic integrity or origin authentication.",
+      "detail": "0/33 frames carry a MAVLink 2 signature. Commands and telemetry on this link have no cryptographic integrity or origin authentication.",
       "endpoint": "1/1",
       "cra_refs": [
         "Annex I.I.2(b) secure by default",

@@ -1,11 +1,11 @@
 {
   "stack": "PX4 (SIH)",
   "source_rev": "v1.17.0@d6f12ad1c4f7",
-  "started_utc": "2026-11-02T15:43:02Z",
+  "started_utc": "2026-11-02T16:31:10Z",
   "runs": {
     "E3-default-gcs": {
       "exit_code": 0,
-      "frames": 7321,
+      "frames": 7492,
       "signed_frames": 0,
       "v1_frames": 0,
       "unsigned_types": [
@@ -43,6 +43,7 @@
       ],
       "firmware": "1.17.0 (type 255)",
       "ftp_advertised": true,
+      "command_ack_result": 0,
       "unsigned_probe_answered": true,
       "findings": [
         "MAV-002",
@@ -54,7 +55,7 @@
     },
     "E3-default-onboard": {
       "exit_code": 0,
-      "frames": 8023,
+      "frames": 8269,
       "signed_frames": 0,
       "v1_frames": 0,
       "unsigned_types": [
@@ -96,6 +97,7 @@
       ],
       "firmware": "1.17.0 (type 255)",
       "ftp_advertised": true,
+      "command_ack_result": 0,
       "unsigned_probe_answered": true,
       "findings": [
         "MAV-002",
@@ -107,7 +109,7 @@
     },
     "E4-signed-gcs": {
       "exit_code": 0,
-      "frames": 7309,
+      "frames": 7489,
       "signed_frames": 0,
       "v1_frames": 0,
       "unsigned_types": [
@@ -145,6 +147,7 @@
       ],
       "firmware": "1.17.0 (type 255)",
       "ftp_advertised": true,
+      "command_ack_result": 0,
       "unsigned_probe_answered": true,
       "findings": [
         "MAV-002",
@@ -154,14 +157,14 @@
         "MAV-007"
       ],
       "keyed_check": {
-        "frames_decoded": 2906,
+        "frames_decoded": 2913,
         "valid_signatures": 0,
-        "unknown_msgid_frames_skipped": 15
+        "unknown_msgid_frames_skipped": 14
       }
     },
     "E4-signed-onboard": {
       "exit_code": 0,
-      "frames": 8058,
+      "frames": 8263,
       "signed_frames": 0,
       "v1_frames": 0,
       "unsigned_types": [
@@ -203,6 +206,7 @@
       ],
       "firmware": "1.17.0 (type 255)",
       "ftp_advertised": true,
+      "command_ack_result": 0,
       "unsigned_probe_answered": true,
       "findings": [
         "MAV-002",
@@ -212,7 +216,7 @@
         "MAV-007"
       ],
       "keyed_check": {
-        "frames_decoded": 3194,
+        "frames_decoded": 3222,
         "valid_signatures": 0,
         "unknown_msgid_frames_skipped": 15
       }
@@ -223,9 +227,9 @@
   "tofu_unsigned_rekey": {
     "key_file_changed": false,
     "original_key_still_valid": {
-      "frames_decoded": 2885,
+      "frames_decoded": 2908,
       "valid_signatures": 0,
-      "unknown_msgid_frames_skipped": 14
+      "unknown_msgid_frames_skipped": 15
     }
   }
 }

@@ -39,13 +39,15 @@ class EndpointStats:
     capabilities: int | None = None
     firmware: str | None = None
     firmware_tuple: tuple[int, int, int] | None = None
+    firmware_type: int | None = None
 
     def to_dict(self) -> dict:
         d = asdict(self)
         d["msg_types"] = sorted(self.msg_types)
         d["unsigned_types"] = sorted(self.unsigned_types)
         d["firmware_tuple"] = list(self.firmware_tuple) if self.firmware_tuple else None
-        d["ftp_advertised"] = bool(self.capabilities and self.capabilities & CAP_FTP)
+        # None = unknown (AUTOPILOT_VERSION never received, e.g. the vehicle ignored the unsigned request)
+        d["ftp_advertised"] = None if self.capabilities is None else bool(self.capabilities & CAP_FTP)
         return d
 
 
@@ -100,6 +102,7 @@ class Observer:
             ep.capabilities = int(msg.capabilities)
             major, minor, patch, vtype = decode_version(msg.flight_sw_version)
             ep.firmware_tuple = (major, minor, patch)
+            ep.firmware_type = vtype
             ep.firmware = f"{major}.{minor}.{patch} (type {vtype})"
 
 
@@ -151,7 +154,7 @@ def evaluate(observer: Observer, unsigned_probe: dict | None = None) -> list[Fin
                 "so the file-transfer service is reachable without the signing key.",
                 name, ["Annex I.I.2(d) protection from unauthorised access", "Annex I.I.2(j) limit attack surface"],
                 "Enable signing; disable or restrict MAVLink FTP in production builds where not needed.",
-                matching(ep.autopilot, "ftp_unsigned", ep.firmware_tuple),
+                matching(ep.autopilot, "ftp_unsigned", ep.firmware_tuple, ep.firmware_type),
             ))
         if ep.firmware:
             findings.append(Finding(

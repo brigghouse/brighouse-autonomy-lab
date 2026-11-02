@@ -41,8 +41,8 @@ INFO  [mavlink] mode: Gimbal, data rate: 400000 B/s on udp port 13030 remote por
 INFO  [mavlink] mode: Custom, data rate: 400000 B/s on udp port 19450 remote port 19410
 INFO  [logger] logger started (mode=all)
 INFO  [logger] Start file log (type: full)
-INFO  [logger] [logger] ./log/2026-11-02/15_43_03.ulg	
-INFO  [logger] Opened full log file: ./log/2026-11-02/15_43_03.ulg
+INFO  [logger] [logger] ./log/2026-11-02/16_31_10.ulg	
+INFO  [logger] Opened full log file: ./log/2026-11-02/16_31_10.ulg
 INFO  [mavlink] MAVLink only on localhost (set param MAV_{i}_BROADCAST = 1 to enable network)
 INFO  [mavlink] MAVLink only on localhost (set param MAV_{i}_BROADCAST = 1 to enable network)
 INFO  [mavlink] MAVLink only on localhost (set param MAV_{i}_BROADCAST = 1 to enable network)

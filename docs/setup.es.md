@@ -7,17 +7,17 @@ Probado en Ubuntu 22.04/24.04 (en Windows, usa WSL2 con Ubuntu).
 
 ## 0. Requisitos
 
-- Ubuntu 22.04 o 24.04 (o WSL2), 16 GB de RAM recomendados, unos 15 GB libres
+- Ubuntu 22.04 o 24.04 (o WSL2), 8 GB de RAM bastan (los resultados se obtuvieron con 7 GB), unos 15 GB libres
 - Python 3.10 o superior, git
 - Opcional: Docker
 
 ## 1. Este repo y mavaudit
 
 ```bash
-git clone <url-del-repo-privado> brighouse-autonomy-lab
+git clone https://github.com/brigghouse/brighouse-autonomy-lab.git brighouse-autonomy-lab
 cd brighouse-autonomy-lab
 python3 -m pip install -e ".[dev]"
-python3 -m pytest -q          # 10 tests con un vehículo simulado en Python
+python3 -m pytest -q          # 15 tests con un vehículo simulado en Python
 ```
 
 Prueba rápida sin instalar ningún autopiloto:
@@ -25,7 +25,7 @@ Prueba rápida sin instalar ningún autopiloto:
 ```bash
 # Terminal 1: vehículo falso sin firma (configuración típica por defecto)
 python3 -m mavaudit.sim.fake_vehicle --mode unsigned --port 14550
-# Terminal 2: auditoría (pasiva + 1 petición de solo lectura)
+# Terminal 2: auditoría (pasiva + 2 peticiones de solo lectura)
 python3 -m mavaudit scan --target udpin:127.0.0.1:14550 --duration 10 --active-probe
 ```
 

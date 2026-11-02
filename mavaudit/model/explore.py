@@ -39,7 +39,11 @@ class World:
 
 
 def legit_provision(policy: Policy, w: World, p_link: str, a_link: str, clock: int) -> World:
-    """G installs K over p_link: unsigned when V is unkeyed (TOFU), signed otherwise."""
+    """G installs K. With oob_provision the key is factory-installed (no MAVLink SETUP,
+    no leak to A); otherwise it is pushed over p_link (unsigned TOFU, or signed re-key)."""
+    if policy.oob_provision and w.st.key is None:
+        return World(replace(w.st, key=K_LEGIT), w.a_key, w.observed,
+                     w.trace + ("factory: key installed out of band",))
     signed = w.st.key is not None
     fr = Frame(p_link, G_SRC, SETUP, signed=signed, key=w.st.key if signed else None,
                ts=clock, link_id=1, payload=K_LEGIT)
@@ -56,6 +60,12 @@ def legit_command(policy: Policy, w: World, link: str, a_link: str, clock: int) 
     d = step(policy, replace(w.st, clock=clock), fr)
     observed = w.observed + ((fr,) if link == a_link else ())
     return World(d.state, w.a_key, observed, w.trace + (f"G:CMD@{link} -> {d.reason}",)), fr, d.accepted
+
+
+def functional(policy: Policy, w: World, link: str, clock: int) -> bool:
+    """Liveness: a legitimate signed command from G is accepted (vehicle is usable)."""
+    fr = Frame(link, G_SRC, CMD, signed=w.st.key is not None, key=w.st.key, ts=clock + 5, link_id=1)
+    return step(policy, replace(w.st, clock=clock), fr).accepted
 
 
 def adversary_moves(w: World, a_link: str, clock: int) -> List[Tuple[str, Frame]]:

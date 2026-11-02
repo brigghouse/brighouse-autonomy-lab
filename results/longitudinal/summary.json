@@ -1,0 +1,22 @@
+{
+  "generated": "2026-11-02",
+  "versions": 1,
+  "rows": [
+    {
+      "stack": "ardupilot",
+      "ref": "Copter-4.6.3",
+      "ver": [
+        4,
+        6,
+        3
+      ],
+      "status": "ok",
+      "firmware": "4.6.3 (type 255)",
+      "default_signed": false,
+      "can_sign": true,
+      "ch0_exempt": true,
+      "valid_sig": 11,
+      "frames_decoded": 11
+    }
+  ]
+}

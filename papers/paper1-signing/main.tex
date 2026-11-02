@@ -453,7 +453,9 @@ CRA's ``secure by default'' requirement into a build-time check. The 2019/945
 Part~3 requirement that a class-C2/C3 command link be ``protected against
 unauthorised access'' is outcome-only; our measurements show that MAVLink
 signing is a candidate mechanism but that, under \prop{R4}, signing alone can
-fail a strict reading.
+fail a strict reading. The forthcoming EU Trusted Drone label and Drone Security
+Package~\cite{ec2026droneactionplan} may specify the C2-link property more
+concretely; a measurable crosswalk such as ours is a candidate evidence basis.
 
 \section{Discussion and Limitations}
 \label{sec:discussion}
@@ -476,9 +478,15 @@ encryption proposal~\cite{allouch2019} established the threat but predate the
 signing deployment we measure. Fuzzing of flight
 stacks~\cite{kim2019rvfuzzer,kim2021pgfuzz} shows that authentication is
 necessary but not sufficient. Surveys~\cite{hamza2024,nassi2021} catalogue
-threats without a formal acceptance model or longitudinal measurement. To our
-knowledge no prior work gives a parameterised semantics of MAVLink signing, nor
-a CRA conformance crosswalk.
+threats without a formal acceptance model or longitudinal measurement. Published
+regulatory crosswalks operate at the process level---CRA to
+ATT\&CK and to GDPR~\cite{ruohonen2025sok,ruohonen2025gdpr}, UNECE~R155 to
+ISO/SAE~21434~\cite{costantino2022r155}, DO-326A to avionics
+architecture~\cite{siddiqui2023do326a}---and none maps essential requirements to
+\emph{measurable protocol properties} of a drone C2 link or produces evidence by
+executing checks against the implementation. To our knowledge no prior work gives
+a parameterised semantics of MAVLink signing nor an executable CRA conformance
+crosswalk.
 
 \section{Conclusion}
 \label{sec:conclusion}

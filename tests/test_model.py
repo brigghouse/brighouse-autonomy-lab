@@ -87,3 +87,35 @@ def test_ardupilot_unsigned_rekey_on_trusted_link():
 def test_custom_policy_without_tofu_closes_window():
     pol = Policy(name="no-tofu", tofu=False, open_when_unkeyed=False)
     assert explore(pol, "pre-provisioning", "ch1", "ch1", depth=3)["P4"] is None
+
+
+def test_oob_provisioning_is_functional_and_secure():
+    from mavaudit.model.configs import IDEAL_OOB
+    from mavaudit.model.synthesis import is_functional, present, failures
+    assert is_functional(IDEAL_OOB)
+    assert not failures(present(IDEAL_OOB))  # no security failures
+
+
+def test_closing_tofu_without_oob_would_break_provisioning():
+    # honesty check: closing TOFU but keeping over-the-wire provisioning makes the vehicle
+    # unprovisionable (modelled: it cannot accept the legit first key), so it is NOT functional.
+    from mavaudit.model.semantics import Policy
+    from mavaudit.model.synthesis import is_functional
+    broken = Policy(name="closed-no-oob", tofu=False, open_when_unkeyed=False, oob_provision=False)
+    assert not is_functional(broken)
+
+
+def test_synthesis_ardupilot_needs_two_fixes():
+    from mavaudit.model.synthesis import analyse
+    a = analyse()
+    ap = a["ardupilot-4.7.2"]
+    assert ap["functional"] and not ap["residual_failures_after_combo"]
+    assert len(ap["min_edits_to_clear_failures"]) >= 2  # TOFU/key-exposure AND unsigned-rekey
+    assert ap["functional_after_combo"]
+
+
+def test_synthesis_px4_118_single_fix():
+    from mavaudit.model.synthesis import analyse
+    d = analyse()["px4-1.18"]
+    assert d["min_edits_to_clear_failures"] == ["close-tofu+oob"]
+    assert not d["residual_failures_after_combo"]

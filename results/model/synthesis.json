@@ -1,0 +1,138 @@
+{
+  "spec-strict": {
+    "present": [
+      "P1",
+      "P2",
+      "P4",
+      "P6"
+    ],
+    "failures": [
+      "P1",
+      "P2"
+    ],
+    "functional": true,
+    "single_edits": {
+      "close-tofu+oob": {
+        "removes": [
+          "P1",
+          "P2",
+          "P4",
+          "P6"
+        ],
+        "adds": [],
+        "still_functional": true
+      }
+    },
+    "min_edits_to_clear_failures": [
+      "close-tofu+oob"
+    ],
+    "residual_failures_after_combo": [],
+    "functional_after_combo": true
+  },
+  "px4-1.18": {
+    "present": [
+      "P1",
+      "P2",
+      "P4",
+      "P6"
+    ],
+    "failures": [
+      "P1",
+      "P2"
+    ],
+    "functional": true,
+    "single_edits": {
+      "close-tofu+oob": {
+        "removes": [
+          "P1",
+          "P2",
+          "P4",
+          "P6"
+        ],
+        "adds": [],
+        "still_functional": true
+      }
+    },
+    "min_edits_to_clear_failures": [
+      "close-tofu+oob"
+    ],
+    "residual_failures_after_combo": [],
+    "functional_after_combo": true
+  },
+  "px4-1.17": {
+    "present": [
+      "P3",
+      "P5"
+    ],
+    "failures": [
+      "P3"
+    ],
+    "functional": true,
+    "single_edits": {
+      "close-tofu+oob": {
+        "removes": [],
+        "adds": [
+          "P2"
+        ],
+        "still_functional": true
+      },
+      "drop-trusted-links": {
+        "removes": [
+          "P5"
+        ],
+        "adds": [
+          "P1"
+        ],
+        "still_functional": true
+      }
+    },
+    "min_edits_to_clear_failures": [
+      "refuse-setup-armed",
+      "enable-replay-check",
+      "strict-allowlist",
+      "no-unsigned-rekey",
+      "close-tofu+oob",
+      "drop-trusted-links"
+    ],
+    "residual_failures_after_combo": [],
+    "functional_after_combo": true
+  },
+  "ardupilot-4.7.2": {
+    "present": [
+      "P1",
+      "P2",
+      "P4",
+      "P5",
+      "P6"
+    ],
+    "failures": [
+      "P1",
+      "P2"
+    ],
+    "functional": true,
+    "single_edits": {
+      "close-tofu+oob": {
+        "removes": [
+          "P1",
+          "P4",
+          "P6"
+        ],
+        "adds": [],
+        "still_functional": true
+      },
+      "drop-trusted-links": {
+        "removes": [
+          "P5"
+        ],
+        "adds": [],
+        "still_functional": true
+      }
+    },
+    "min_edits_to_clear_failures": [
+      "close-tofu+oob",
+      "drop-trusted-links"
+    ],
+    "residual_failures_after_combo": [],
+    "functional_after_combo": true
+  }
+}

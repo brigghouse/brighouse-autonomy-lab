@@ -1,0 +1,343 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\graphicspath{{../common/figures/}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\prop}[1]{\textsf{#1}}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+
+\begin{document}
+
+\title{Acceptance Semantics for MAVLink~2 Signing:\\ Bounded Symbolic Analysis and Model-Based\\ Conformance Testing of Flight Stacks}
+
+\author{\IEEEauthorblockN{Ian Brighouse}
+\IEEEauthorblockA{\textit{Brighouse Security Labs}, Spain \\ research@brighousesec.com}}
+\maketitle
+
+\begin{abstract}
+The MAVLink~2 message-signing specification fixes a frame format and a timestamp
+rule but delegates the decisive question---\emph{when is an unsigned or
+unexpected frame accepted?}---to each implementation. The result is a family of
+subtly different receivers whose security cannot be compared by reading the
+specification. We give a precise, parameterised \emph{acceptance semantics} for
+MAVLink~2 signing as a labelled transition system, in which the choices the
+specification leaves open become explicit policy parameters, and we equip it with
+a bounded symbolic adversary and six security properties with machine-checkable
+definitions. Bounded breadth-first exploration is \emph{sound} (every reported
+violation is a concrete trace) and \emph{complete up to a depth bound}; it
+separates an idealised out-of-band provisioning policy, which satisfies every
+property while remaining functional, from the policies PX4 and ArduPilot
+implement, each of which violates a distinct subset. We then use the model
+generatively: a design-space search over single parameter edits, constrained to
+preserve a liveness (functionality) property, yields minimal remediations---and
+shows, for example, that the current ArduPilot policy requires \emph{two}
+independent changes where PX4~v1.18 requires one. Finally, we introduce
+\emph{model-based conformance testing} for flight stacks: read-only test frames
+derived from the semantics are executed against real software-in-the-loop builds,
+and the observed accept/reject decisions are compared with the model's
+predictions, turning each documentation-derived policy into a measured one. All
+models, proofs-in-code, and harnesses are released.
+\end{abstract}
+
+\begin{IEEEkeywords}
+formal methods, protocol security, transition systems, bounded model checking,
+conformance testing, MAVLink, UAV security.
+\end{IEEEkeywords}
+
+\section{Introduction}
+A security protocol whose acceptance rule is ``left to the implementation'' is
+really a \emph{family} of protocols. MAVLink~2 message signing is such a case:
+the specification pins the signature construction and a one-minute replay window
+but states that acceptance of unsigned traffic ``depends on the
+implementation,'' and offers only informal suggestions (accept
+\code{RADIO\_STATUS}; an ``unsigned mode''; ``accept unsigned until the first
+signed packet''). Two widely deployed receivers, PX4 and ArduPilot, resolve these
+degrees of freedom differently, and companion measurement
+work~\cite{brighouse2026signing} shows the differences have real consequences,
+including a link that signs every outbound frame yet still accepts unsigned
+commands. What has been missing is a \emph{model}: a precise object in which the
+choices are explicit, the adversary is fixed, and the properties are stated
+formally, so that implementations can be compared, attacked, and repaired by
+construction.
+
+\noindent\textbf{Contributions.}
+\begin{itemize}
+\item A parameterised acceptance semantics for MAVLink~2 signing
+(Section~\ref{sec:sem}): a transition system whose policy parameters capture
+exactly the specification's open choices, including out-of-band vs.\ over-the-wire
+key provisioning.
+\item A bounded symbolic adversary and six properties
+(Section~\ref{sec:adv}) with a soundness result and depth-bounded completeness
+(Section~\ref{sec:analysis}); exploration separates an idealised policy from the
+implemented ones.
+\item A generative use of the model (Section~\ref{sec:synth}): a
+liveness-constrained design-space search that computes \emph{minimal}
+remediations per policy, yielding non-obvious results (ArduPilot needs two
+independent fixes; PX4~v1.18 one).
+\item Model-based conformance testing for flight stacks
+(Section~\ref{sec:conf}): read-only tests derived from the semantics, executed
+against real SITL builds, validating the policies empirically.
+\end{itemize}
+
+\section{Acceptance Semantics}
+\label{sec:sem}
+
+\begin{definition}[Configuration]
+A configuration is $\sigma=(K,\mathit{armed},S,\mathrm{clk})$ with key
+$K\in\mathcal{K}\cup\{\bot\}$, arming flag $\mathit{armed}$, a partial map $S$
+from streams $s=(\mathit{sys},\mathit{comp},\mathit{id})$ to timestamps, and a
+local clock $\mathrm{clk}\in\mathbb{N}$.
+\end{definition}
+
+\begin{definition}[Frame]
+A frame is $f=(\ell,\mathit{src},\kappa,b,k,t,\mathit{id})$ with link
+$\ell\in\mathcal{L}$, source $\mathit{src}$, kind
+$\kappa\in\{\textsc{cmd},\textsc{read},\textsc{hb},\textsc{radio},\textsc{setup}\}$,
+signed bit $b\in\mathbb{B}$, signing key $k$, timestamp $t$, link id
+$\mathit{id}$, and (for \textsc{setup}) a payload key $k'$. Under the standard
+symbolic abstraction, $f$ \emph{verifies} in $\sigma$ iff $b$ and $k=K$:
+signatures are unforgeable and collision-free.
+\end{definition}
+
+\begin{definition}[Policy]
+A policy $\pi$ is a tuple
+$\langle \mathsf{trusted}\subseteq\mathcal{L},\ \mathsf{allow}\subseteq
+\text{Kinds},\ \mathsf{openUnkeyed},\ \mathsf{tofu},\ \mathsf{oob},\
+\mathsf{uRekey},\ \mathsf{sRekey},\ \mathsf{refuseArmed},\ \mathsf{replay}\rangle$
+of the specification's open choices.
+\end{definition}
+
+The transition relation $\sigma \xrightarrow{f/d}_\pi \sigma'$, with
+$d\in\{\mathsf{acc},\mathsf{rej}\}$, is defined by Algorithm~1 of
+\cite{brighouse2026signing} extended with the out-of-band case: when
+$\mathsf{oob}$ holds the key is factory-installed, so the initial configuration
+has $K\neq\bot$ and no \textsc{setup} frame is ever needed. Freshness is
+$\mathrm{fresh}(\sigma,f)\equiv \neg\mathsf{replay}\lor (S(s)\!\uparrow \land\,
+t+W\ge\mathrm{clk})\lor(S(s)\!\downarrow\land\,t>S(s))$ with $W=6{\times}10^6$.
+
+We instantiate five policies (Table~\ref{tab:pol}): \textsf{spec-strict}
+(strictest reading of the text), \textsf{ideal-oob} (out-of-band keys, no TOFU),
+and the three measured policies \textsf{px4-1.17}, \textsf{px4-1.18},
+\textsf{ardupilot-4.7.2}.
+
+\begin{table}[t]
+\caption{Policies (abridged; see \cite{brighouse2026signing} for the full tuple).}
+\label{tab:pol}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+ & trusted & TOFU & oob & u-rekey & allow \\
+\midrule
+\textsf{spec-strict}     & $\emptyset$ & yes & no  & no  & \{radio\}\\
+\textsf{ideal-oob}       & $\emptyset$ & no  & yes & no  & \{radio\}\\
+\textsf{px4-1.18}        & $\emptyset$ & yes & no  & no  & \{hb,radio\}\\
+\textsf{px4-1.17}        & all         & no  & no  & --- & ---\\
+\textsf{ardupilot-4.7.2} & \{ch0\}     & yes & no  & yes & \{radio\}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Adversary and Properties}
+\label{sec:adv}
+
+\begin{definition}[Adversary]
+The adversary $A$ controls one link $a$. Its one-step moves are: inject any
+unsigned frame on $a$; replay any frame previously observed on $a$; and inject a
+frame signed with a key $k\in\mathit{known}(A)$. $A$ cannot forge. Keys enter
+$\mathit{known}(A)$ exactly when $A$ observes a \textsc{setup} frame on $a$
+(\textsc{setup} carries $k'$ in clear).
+\end{definition}
+
+Properties are predicates over reachable traces. \prop{P1}
+command-integrity: no accepted \textsc{cmd} originates from $A$ on a link
+$\notin\mathsf{trusted}$. \prop{P2} key-integrity: no reachable configuration has
+$K=K_{\mathrm{adv}}$. \prop{P3} replay-resistance: no previously accepted
+\textsc{cmd} is accepted again. \prop{P4} first-use window: $\exists$ a
+pre-provisioning trace installing $K_{\mathrm{adv}}$. \prop{P5} trusted-link
+exemption: $\exists$ an accepted $A$-\textsc{cmd} on a link
+$\in\mathsf{trusted}$. \prop{P6} key exposure: with $A$ on the provisioning link,
+$\exists$ an accepted $A$-\textsc{cmd} after key leak. \prop{P1}--\prop{P3} are
+safety failures; \prop{P4}--\prop{P6} are exposure facts. Liveness
+\prop{L}: a legitimately provisioned vehicle accepts a legitimate signed
+\textsc{cmd} on an ordinary link.
+
+\section{Bounded Symbolic Analysis}
+\label{sec:analysis}
+
+We explore, per policy and per scenario, all adversary action sequences up to
+depth $k$ by breadth-first search, recording the shortest witness for each
+property.
+
+\begin{proposition}[Soundness]
+Every witness returned is a valid trace of $\xrightarrow{}_\pi$: the reported
+violation is realisable by the stated adversary.
+\end{proposition}
+\begin{proof}[Proof sketch]
+Each search edge applies $\mathrm{step}_\pi$ to a reachable configuration and an
+adversary-constructible frame; the witness is the concatenation of these edges,
+hence a trace. $A$-constructibility is enforced by the move generator
+(unsigned always; signed only with $k\in\mathit{known}(A)$; replay only of
+observed frames). \end{proof}
+
+\begin{proposition}[Depth-bounded completeness]
+If a property is violable within $k$ adversary steps from the post-provisioning
+configuration, the search finds a witness of length $\le k$.
+\end{proposition}
+\begin{proof}[Proof sketch]
+BFS over the finitely-branching move relation enumerates all sequences of length
+$\le k$; the abstraction makes the per-step frame set finite (bounded kinds,
+links, keys, and a canonical fresh timestamp), so no violating sequence of length
+$\le k$ is missed. \end{proof}
+
+For the measured policies the state space is small enough that $k=3$ is a
+fixpoint: no new property becomes violable at $k=4$. Fig.~\ref{fig:matrix}
+summarises the outcome. \textsf{ideal-oob} is the unique policy with no witnessed
+property in any scenario while satisfying \prop{L}; each implemented policy
+violates a distinct subset, matching the measurements of
+\cite{brighouse2026signing}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig_model_matrix.pdf}
+\caption{Exploration ($k{=}3$). Red: safety failure witnessed; orange: exposure
+fact; dot: none. \textsf{ideal-oob} is clean throughout.}
+\label{fig:matrix}
+\end{figure}
+
+\section{Generative Use: Minimal Remediation}
+\label{sec:synth}
+
+Because policies are first-class, we search the design space. For a base policy
+we consider the single-parameter edits in Table~\ref{tab:edits}, recompute the
+witnessed set, and retain an edit only if it preserves liveness \prop{L}. A
+greedy search then finds a minimal edit set clearing all safety failures.
+
+\begin{table}[t]
+\caption{Minimal liveness-preserving remediation (model, $k{=}3$).}
+\label{tab:edits}
+\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lp{3.1cm}c@{}}
+\toprule
+policy & minimal edit set clearing \prop{P1}--\prop{P3} & \prop{L}? \\
+\midrule
+\textsf{spec-strict}     & close TOFU + out-of-band keys & yes \\
+\textsf{px4-1.18}        & close TOFU + out-of-band keys & yes \\
+\textsf{ardupilot-4.7.2} & close TOFU + OOB keys \emph{and} remove unsigned re-key & yes \\
+\textsf{px4-1.17}        & adopt the full mechanism (no incremental fix) & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two results are worth stating. First, closing the trust-on-first-use window is
+only sound \emph{together with} out-of-band provisioning: closing TOFU alone
+makes the vehicle unprovisionable (it fails \prop{L}), a trap the liveness
+constraint catches automatically. Second, \textsf{ardupilot-4.7.2} requires
+\emph{two} independent edits---closing the key-exposure window and removing the
+unsigned re-key on the console link---because the two support distinct \prop{P2}
+witnesses; \textsf{px4-1.18} requires only the first. \textsf{px4-1.17}, which
+has no signing implementation, admits no small liveness-preserving fix: the whole
+mechanism must be added. These are precisely the actionable recommendations a
+vendor needs, derived rather than asserted.
+
+\section{Model-Based Conformance Testing}
+\label{sec:conf}
+
+A policy in Table~\ref{tab:pol} is a \emph{hypothesis} about an implementation.
+We test it. From the semantics we derive read-only probe frames---a
+\code{PARAM\_REQUEST\_READ} (kind \textsc{read}) signed or unsigned, on a trusted
+and an untrusted link, in the unkeyed and keyed states---and the reversible
+key-management steps. For a running SITL build we execute each probe, observe
+whether the vehicle responds, and compare with $\mathrm{step}_\pi$'s prediction
+(Algorithm~\ref{alg:conf}). No state-changing command is ever sent.
+
+\begin{algorithm}[t]
+\caption{Conformance of policy $\pi$ to a live stack}
+\label{alg:conf}
+\small
+\begin{algorithmic}[1]
+\State $A\gets 0,\;T\gets 0$
+\ForAll{$(\text{keyed},\ell,b)\in\{0,1\}\times\{\text{trust},\text{untrust}\}\times\{0,1\}$}
+  \State ensure vehicle in state keyed (provision once over trusted link)
+  \State $o\gets$ send unsigned/signed \textsc{read} on $\ell$; observe reply
+  \State $p\gets \mathrm{step}_\pi(\sigma_{\text{keyed},\ell},\textsc{read}_b).d$
+  \State $A\gets A+[o{=}p];\;T\gets T+1$
+\EndFor
+\State \Return agreement $A/T$ and the disagreeing cases
+\endgraf
+\end{algorithmic}
+\end{algorithm}
+
+Agreement turns a documentation-derived policy into a \emph{measured} one; a
+disagreement is a finding about the model or the implementation.
+Table~\ref{tab:conf} reports the agreement for the three stacks. \emph{[The
+agreement figures are produced by \code{scripts/conformance.py} against the SITL
+builds and inserted here on completion of the live run; the predicted/observed
+cases include the \textsf{ardupilot-4.7.2} trusted-link case, where the model
+predicts---and the stack confirms---that an unsigned read is answered while
+signed output continues.]}
+
+\begin{table}[t]
+\caption{Model-vs-implementation conformance (read-only probes).}
+\label{tab:conf}
+\centering\footnotesize
+\begin{tabular}{@{}lccc@{}}
+\toprule
+stack & policy & cases & agreement \\
+\midrule
+ArduPilot 4.7.2 & \textsf{ardupilot-4.7.2} & 8 & \emph{(live run)} \\
+PX4 1.18.0-rc1  & \textsf{px4-1.18}        & 8 & \emph{(live run)} \\
+PX4 1.17.0      & \textsf{px4-1.17}        & 8 & \emph{(live run)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Discussion and Related Work}
+\label{sec:disc}
+
+Our analysis is a bounded, special-purpose model checker rather than a
+general-purpose symbolic prover. A ProVerif or Tamarin encoding of the signing
+and provisioning sub-protocol---capturing unbounded sessions and the truncated-MAC
+abstraction more faithfully---is natural future work; we provide the semantics in
+a form amenable to such an encoding. The value of the lightweight model is that it
+is executable, testable against implementations, and generative. The only prior formal work on MAVLink models the protocol \emph{without} its
+native authentication and verifies an external cipher~\cite{wray2025pave,mak2025evtol},
+or uses session types and runtime monitors with no
+cryptography~\cite{amorim2025datum,amorim2026platum}; none models the signing
+scheme itself---its truncated MAC, per-stream timestamp window, and
+\textsc{setup\_signing} provisioning. Our methodological lineage is the symbolic
+analysis of adjacent provisioning protocols: Tamarin for ASTM~F3411 Remote
+ID~\cite{alam2026remoteid}, ProVerif for Bluetooth ``Just
+Works''/passkey~\cite{wu2022bluetooth,jangid2023passkey} and Matter
+commissioning~\cite{duttagupta2025matter}, and Tamarin for automotive
+SecOC~\cite{bodei2024autosar}. To our knowledge neither a formal model of MAVLink
+signing nor model-based conformance testing of a flight stack has appeared.
+Fuzzing of flight stacks~\cite{kim2019rvfuzzer,kim2021pgfuzz} targets input
+validation, a complementary concern: our model assumes memory safety and studies
+the acceptance decision.
+
+\section{Conclusion}
+Making the specification's open choices explicit turns ``MAVLink signing'' into a
+comparable, attackable, repairable family of policies. Bounded symbolic analysis
+separates an idealised policy from the deployed ones with concrete witnesses; a
+liveness-constrained search derives minimal fixes and reveals that ArduPilot needs
+two where PX4~v1.18 needs one; and model-based conformance testing ties the whole
+construction back to the running code.
+
+\section*{Availability}
+The executable semantics, exploration, synthesis, conformance harness, and tests
+are released. The work is defensive and uses only self-hosted simulators.
+
+\bibliographystyle{IEEEtran}
+\bibliography{../common/refs}
+\end{document}

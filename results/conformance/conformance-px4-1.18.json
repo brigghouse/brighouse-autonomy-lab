@@ -1,0 +1,75 @@
+{
+  "stack": "px4",
+  "policy": "px4-1.18",
+  "provisioned": true,
+  "cases_total": 8,
+  "cases_agree": 8,
+  "agreement": 1.0,
+  "disagreements": [],
+  "cases": [
+    {
+      "state": "unkeyed",
+      "link": "trusted",
+      "signed": false,
+      "predicted": true,
+      "observed": true,
+      "agree": true
+    },
+    {
+      "state": "unkeyed",
+      "link": "trusted",
+      "signed": true,
+      "predicted": true,
+      "observed": true,
+      "agree": true
+    },
+    {
+      "state": "unkeyed",
+      "link": "untrusted",
+      "signed": false,
+      "predicted": true,
+      "observed": true,
+      "agree": true
+    },
+    {
+      "state": "unkeyed",
+      "link": "untrusted",
+      "signed": true,
+      "predicted": true,
+      "observed": true,
+      "agree": true
+    },
+    {
+      "state": "keyed",
+      "link": "trusted",
+      "signed": false,
+      "predicted": false,
+      "observed": false,
+      "agree": true
+    },
+    {
+      "state": "keyed",
+      "link": "trusted",
+      "signed": true,
+      "predicted": true,
+      "observed": true,
+      "agree": true
+    },
+    {
+      "state": "keyed",
+      "link": "untrusted",
+      "signed": false,
+      "predicted": false,
+      "observed": false,
+      "agree": true
+    },
+    {
+      "state": "keyed",
+      "link": "untrusted",
+      "signed": true,
+      "predicted": true,
+      "observed": true,
+      "agree": true
+    }
+  ]
+}

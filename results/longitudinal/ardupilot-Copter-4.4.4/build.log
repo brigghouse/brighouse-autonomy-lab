@@ -39,3 +39,233 @@ Traceback (most recent call last):
   File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Context.py", line 9, in <module>
     import os, re, imp, sys
 ModuleNotFoundError: No module named 'imp'
+
+$ git clone -q --depth 1 --branch Copter-4.4.4 --recurse-submodules --shallow-submodules https://github.com/ArduPilot/ardupilot.git /home/claude/sitl-long/ardupilot-Copter-4.4.4
+Note: switching to 'db53a28f321dc8233ee49d3cc6b395b5835c768b'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+
+$ python3 waf configure --board sitl
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Utils.py:733: SyntaxWarning: invalid escape sequence '\d'
+  return re.split('\d+$', s)[0]
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/ConfigSet.py:14: SyntaxWarning: invalid escape sequence '\ '
+  re_imp = re.compile('^(#)*?([^#=]*?)\ =\ (.*?)$', re.M)
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/ansiterm.py:267: SyntaxWarning: invalid escape sequence '\['
+  ansi_tokens = re.compile('(?:\x1b\[([0-9?;]*)([a-zA-Z])|([^\x1b]+))')
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Context.py:616: SyntaxWarning: invalid escape sequence '\_'
+  :param var: glob expression, for example 'cxx\_\*.py'
+Traceback (most recent call last):
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waf-light", line 166, in <module>
+    from waflib import Scripting
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Scripting.py", line 10, in <module>
+    from waflib import Utils, Configure, Logs, Options, ConfigSet, Context, Errors, Build, Node
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Configure.py", line 16, in <module>
+    from waflib import ConfigSet, Utils, Options, Logs, Context, Build, Errors
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Options.py", line 14, in <module>
+    from waflib import Logs, Utils, Context, Errors
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Context.py", line 9, in <module>
+    import os, re, imp, sys
+ModuleNotFoundError: No module named 'imp'
+
+$ git clean -xfdq build
+
+$ python3.11 waf configure --board sitl
+Waf: The wscript in '/home/claude/sitl-long/ardupilot-Copter-4.4.4' is unreadable
+Traceback (most recent call last):
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Scripting.py", line 140, in waf_entry_point
+    set_main_module(os.path.normpath(os.path.join(Context.run_dir, Context.WSCRIPT_FILE)))
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Scripting.py", line 190, in set_main_module
+    Context.g_module = Context.load_module(file_path)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Context.py", line 665, in load_module
+    code = Utils.readf(path, m='rU', encoding=encoding)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Utils.py", line 231, in readf
+    with open(fname, m) as f:
+         ^^^^^^^^^^^^^^
+ValueError: invalid mode: 'rUb'
+
+$ git clone -q --depth 1 --branch Copter-4.4.4 --recurse-submodules --shallow-submodules https://github.com/ArduPilot/ardupilot.git /home/claude/sitl-long/ardupilot-Copter-4.4.4
+Note: switching to 'db53a28f321dc8233ee49d3cc6b395b5835c768b'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+
+$ python3 waf configure --board sitl
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Utils.py:733: SyntaxWarning: invalid escape sequence '\d'
+  return re.split('\d+$', s)[0]
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/ConfigSet.py:14: SyntaxWarning: invalid escape sequence '\ '
+  re_imp = re.compile('^(#)*?([^#=]*?)\ =\ (.*?)$', re.M)
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/ansiterm.py:267: SyntaxWarning: invalid escape sequence '\['
+  ansi_tokens = re.compile('(?:\x1b\[([0-9?;]*)([a-zA-Z])|([^\x1b]+))')
+/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Context.py:616: SyntaxWarning: invalid escape sequence '\_'
+  :param var: glob expression, for example 'cxx\_\*.py'
+Traceback (most recent call last):
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waf-light", line 166, in <module>
+    from waflib import Scripting
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Scripting.py", line 10, in <module>
+    from waflib import Utils, Configure, Logs, Options, ConfigSet, Context, Errors, Build, Node
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Configure.py", line 16, in <module>
+    from waflib import ConfigSet, Utils, Options, Logs, Context, Build, Errors
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Options.py", line 14, in <module>
+    from waflib import Logs, Utils, Context, Errors
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/waf/waflib/Context.py", line 9, in <module>
+    import os, re, imp, sys
+ModuleNotFoundError: No module named 'imp'
+
+$ git clean -xfdq build
+
+$ /root/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/bin/python3.10 waf configure --board sitl
+Setting top to                           : /home/claude/sitl-long/ardupilot-Copter-4.4.4 
+Setting out to                           : /home/claude/sitl-long/ardupilot-Copter-4.4.4/build 
+Autoconfiguration                        : enabled 
+Setting board to                         : sitl 
+Using toolchain                          : native 
+Checking for 'g++' (C++ compiler)        : /usr/bin/g++ 
+Checking for 'gcc' (C compiler)          : /usr/bin/gcc 
+Checking for c flags '-MMD'              : yes 
+Checking for cxx flags '-MMD'            : yes 
+CXX Compiler                             : g++ 13.3.0 
+Checking for need to link with librt     : not necessary 
+Checking for feenableexcept              : yes 
+Enabled OpenDroneID                      : no 
+Enabled firmware ID checking             : no 
+GPS Debug Logging                        : no 
+Enabled custom controller                : yes 
+Checking for HAVE_CMATH_ISFINITE         : yes 
+Checking for HAVE_CMATH_ISINF            : yes 
+Checking for HAVE_CMATH_ISNAN            : yes 
+Checking for NEED_CMATH_ISFINITE_STD_NAMESPACE : yes 
+Checking for NEED_CMATH_ISINF_STD_NAMESPACE    : yes 
+Checking for NEED_CMATH_ISNAN_STD_NAMESPACE    : yes 
+Checking for header endian.h                   : yes 
+Checking for header byteswap.h                 : yes 
+Checking for HAVE_MEMRCHR                      : yes 
+Configured VSCode Intellisense:                : no 
+Checking for program 'python'                  : /root/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/bin/python3.10 
+Checking for python version >= 2.7.0           : 3.10.20 
+Checking for program 'python'                  : /root/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/bin/python3.10 
+Checking for python version >= 2.7.0           : 3.10.20 
+DSDL compiler                                  : /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/uavcan/libuavcan/dsdl_compiler/libuavcan_dsdlc 
+Source is git repository                       : yes 
+Update submodules                              : yes 
+Checking for program 'git'                     : /usr/bin/git 
+Checking for program 'size'                    : /usr/bin/size 
+Benchmarks                                     : disabled 
+Unit tests                                     : enabled 
+Scripting                                      : enabled 
+Scripting runtime checks                       : enabled 
+Debug build                                    : disabled 
+Coverage build                                 : disabled 
+SITL 32-bit build                              : disabled 
+Checking for program 'rsync'                   : not found 
+'configure' finished successfully (1.631s)
+
+$ /root/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/bin/python3.10 waf copter
+Waf: Entering directory `/home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl'
+Embedding file locations.txt:Tools/autotest/locations.txt
+Embedding file models/Callisto.json:Tools/autotest/models/Callisto.json
+Embedding file models/plane-3d.parm:Tools/autotest/models/plane-3d.parm
+Embedding file models/plane.parm:Tools/autotest/models/plane.parm
+Embedding file models/xplane_heli.json:Tools/autotest/models/xplane_heli.json
+Embedding file models/xplane_plane.json:Tools/autotest/models/xplane_plane.json
+[3/7] Compiling libraries/AP_Scripting/generator/src/main.c
+[4/7] Processing modules/mavlink/message_definitions/v1.0/all.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/all.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/all.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ardupilotmega.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ardupilotmega.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ASLUAV.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ASLUAV.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/common.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/common.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/development.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/development.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/icarous.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/icarous.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/minimal.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/minimal.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/python_array_test.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/python_array_test.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/standard.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/standard.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/test.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/test.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ualberta.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/ualberta.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/uAvionix.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/uAvionix.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/loweheiser.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/loweheiser.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/storm32.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/storm32.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/AVSSUAS.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/AVSSUAS.xml
+Validation skipped for /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/cubepilot.xml.
+Parsing /home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/mavlink/message_definitions/v1.0/cubepilot.xml
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Found 329 MAVLink message types in 16 XML files
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/all
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/ardupilotmega
+[5/7] Processing uavcangen: modules/DroneCAN/DSDL/.github modules/DroneCAN/DSDL/ardupilot modules/DroneCAN/DSDL/com modules/DroneCAN/DSDL/cuav modules/DroneCAN/DSDL/dronecan modules/DroneCAN/DSDL/mppt modules/DroneCAN/DSDL/tests modules/DroneCAN/DSDL/uavcan
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/ASLUAV
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/common
+Traceback (most recent call last):
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/uavcan/libuavcan/dsdl_compiler/libuavcan_dsdlc", line 59, in <module>
+    from libuavcan_dsdl_compiler import run as dsdlc_run
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/uavcan/libuavcan/dsdl_compiler/libuavcan_dsdl_compiler/__init__.py", line 18, in <module>
+    from dronecan import dsdl
+  File "/home/claude/sitl-long/ardupilot-Copter-4.4.4/modules/uavcan/libuavcan/dsdl_compiler/pyuavcan/dronecan/__init__.py", line 19, in <module>
+    import pkg_resources
+ModuleNotFoundError: No module named 'pkg_resources'
+
+uavcangen returned 1 error code
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/development
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/icarous
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/minimal
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/python_array_test
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/standard
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/test
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/ualberta
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/uAvionix
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/loweheiser
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/storm32
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/AVSSUAS
+Generating C implementation in directory /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0/cubepilot
+Copying fixed headers for protocol 2.0 to /home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl/libraries/GCS_MAVLink/include/mavlink/v2.0
+Waf: Leaving directory `/home/claude/sitl-long/ardupilot-Copter-4.4.4/build/sitl'
+Build failed
+ -> task in 'uavcan' failed (exit status 1): 
+	{task 139701380240032: uavcangen .github,ardupilot,com,cuav,dronecan,mppt,tests,uavcan -> }
+ (run with -v to display more information)

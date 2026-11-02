@@ -110,37 +110,5 @@
         }
       }
     }
-  },
-  "ardupilot:Copter-4.4.4": {
-    "stack": "ardupilot",
-    "ref": "Copter-4.4.4",
-    "started_utc": "2026-11-02T17:31:59Z",
-    "build": "configure failed",
-    "build_seconds": 55,
-    "source_rev": "Copter-4.4.4@db53a28f321d"
-  },
-  "ardupilot:Copter-4.3.8": {
-    "stack": "ardupilot",
-    "ref": "Copter-4.3.8",
-    "started_utc": "2026-11-02T17:32:56Z",
-    "build": "configure failed",
-    "build_seconds": 63,
-    "source_rev": "ArduCopter-beta-4.3,ArduCopter-beta-4.3-heli,Copter-4.3.8@60ebf6fbb915"
-  },
-  "ardupilot:Copter-4.2.4": {
-    "stack": "ardupilot",
-    "ref": "Copter-4.2.4",
-    "started_utc": "2026-11-02T17:34:00Z",
-    "build": "configure failed",
-    "build_seconds": 63,
-    "source_rev": "Copter-4.2.4@245996c8609e"
-  },
-  "ardupilot:Copter-4.1.6": {
-    "stack": "ardupilot",
-    "ref": "Copter-4.1.6",
-    "started_utc": "2026-11-02T17:35:06Z",
-    "build": "configure failed",
-    "build_seconds": 47,
-    "source_rev": "Copter-4.1.6@7898097b0c71"
   }
 }

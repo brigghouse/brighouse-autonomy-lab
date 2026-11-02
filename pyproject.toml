@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mavaudit"
+version = "0.2.0"
+description = "Defensive MAVLink configuration auditor with EU CRA mapping (Brighouse Autonomy Security Lab)"
+requires-python = ">=3.10"
+dependencies = ["pymavlink>=2.4.40"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+mavaudit = "mavaudit.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["mavaudit*"]

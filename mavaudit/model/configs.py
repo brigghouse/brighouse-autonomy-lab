@@ -28,6 +28,7 @@ IDEAL_OOB = Policy(
     allow_unsigned=frozenset({RADIO}),
     open_when_unkeyed=False,
     tofu=False,
+    oob_provision=True,
     unsigned_rekey_on_trusted=False,
 )
 

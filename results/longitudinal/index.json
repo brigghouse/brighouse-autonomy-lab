@@ -54,5 +54,85 @@
         }
       }
     }
+  },
+  "ardupilot:Copter-4.5.7": {
+    "stack": "ardupilot",
+    "ref": "Copter-4.5.7",
+    "started_utc": "2026-11-02T17:22:32Z",
+    "build": "ok",
+    "build_seconds": 516,
+    "source_rev": "Copter-4.5.7@2a3dc4b7bf25",
+    "measurements": {
+      "default-serial0": {
+        "exit_code": 0,
+        "frames": 23,
+        "signed_frames": 0,
+        "v1_frames": 0,
+        "unsigned_types": [
+          "AUTOPILOT_VERSION",
+          "COMMAND_ACK",
+          "HEARTBEAT",
+          "PARAM_VALUE",
+          "TIMESYNC"
+        ],
+        "firmware": "4.5.7 (type 255)",
+        "ftp_advertised": true,
+        "command_ack_result": 0,
+        "unsigned_probe_answered": true,
+        "findings": [
+          "MAV-002",
+          "MAV-004",
+          "MAV-005",
+          "MAV-006",
+          "MAV-007"
+        ]
+      },
+      "provisioned-serial0": {
+        "exit_code": 0,
+        "frames": 25,
+        "signed_frames": 25,
+        "v1_frames": 0,
+        "unsigned_types": [],
+        "firmware": "4.5.7 (type 255)",
+        "ftp_advertised": true,
+        "command_ack_result": 0,
+        "unsigned_probe_answered": true,
+        "findings": [
+          "MAV-004",
+          "MAV-005",
+          "MAV-006",
+          "MAV-007"
+        ],
+        "keyed_check": {
+          "frames_decoded": 11,
+          "valid_signatures": 11,
+          "unknown_msgid_frames_skipped": 0
+        }
+      }
+    }
+  },
+  "ardupilot:Copter-4.4.4": {
+    "stack": "ardupilot",
+    "ref": "Copter-4.4.4",
+    "started_utc": "2026-11-02T17:31:59Z",
+    "build": "configure failed",
+    "build_seconds": 55,
+    "source_rev": "Copter-4.4.4@db53a28f321d"
+  },
+  "ardupilot:Copter-4.3.8": {
+    "stack": "ardupilot",
+    "ref": "Copter-4.3.8",
+    "started_utc": "2026-11-02T17:32:56Z",
+    "build": "configure failed",
+    "build_seconds": 63,
+    "source_rev": "ArduCopter-beta-4.3,ArduCopter-beta-4.3-heli,Copter-4.3.8@60ebf6fbb915"
+  },
+  "ardupilot:Copter-4.2.4": {
+    "stack": "ardupilot",
+    "ref": "Copter-4.2.4",
+    "started_utc": "2026-11-02T17:34:00Z",
+    "build": "configure failed",
+    "build_seconds": 63,
+    "source_rev": "Copter-4.2.4@245996c8609e"
   }
 }

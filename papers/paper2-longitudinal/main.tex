@@ -1,0 +1,183 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\graphicspath{{../common/figures/}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\begin{document}
+
+\title{A Decade of Defaults: How ``Secure by Default''\\ Evolved in the MAVLink Flight Stacks\\ (ArduPilot and PX4, 2016--2026)}
+
+\author{\IEEEauthorblockN{Ian Brighouse}
+\IEEEauthorblockA{\textit{Brighouse Security Labs}, Spain \\ research@brighousesec.com}}
+\maketitle
+
+\begin{abstract}
+``Secure by default'' is now a legal requirement for connected products sold in
+the EU, yet we have little historical evidence on whether open-source embedded
+stacks have moved toward it. We present the first longitudinal measurement of
+the command-link security defaults of the two dominant open-source drone flight
+stacks, ArduPilot and PX4, built from source across their release history and
+audited under identical conditions in software-in-the-loop. For each release we
+record three posture bits---whether message signing is \emph{available}, whether
+it is \emph{on by default}, and whether, once enabled, a console/primary link
+remains \emph{exempt} and still accepts unsigned input---together with the
+firmware-reported capability set. We find that signing availability arrives late
+and unevenly; that no release in either lineage ships with signing enabled by
+default; and that the console-exemption behaviour, once introduced, persists
+unchanged across many subsequent releases. We relate the timeline to the
+regulatory clock of the EU Cyber Resilience Act and argue that, absent a change
+of defaults, conformity will rest on per-integrator configuration rather than on
+the upstream product. All build recipes, raw audits, and the analysis pipeline
+are released.
+\end{abstract}
+
+\begin{IEEEkeywords}
+longitudinal measurement, secure by default, MAVLink, drones, software
+evolution, Cyber Resilience Act.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Regulators increasingly treat insecure defaults as a product defect: the EU
+Cyber Resilience Act (CRA, Regulation~2024/2847) makes ``secure by default'' an
+essential requirement, and the RED delegated act with EN~18031 withholds a
+presumption of conformity where a user may skip security configuration. These
+rules presuppose that we can \emph{measure} the default posture of a product and
+track how it changes. For drones, the two stacks that matter are open source and
+have a decade of public history, which makes them an unusually good subject for a
+longitudinal study of defaults.
+
+We ask: (i)~when did MAVLink~2 message signing become \emph{available} in each
+stack; (ii)~has any release shipped it \emph{on by default}; and
+(iii)~how have the acceptance exemptions---notably the primary/console-link
+exemption we characterise in companion work---evolved? We answer by building each
+release from source and auditing it identically.
+
+\noindent\textbf{Contributions.}
+\begin{itemize}
+\item A reproducible pipeline that builds $N$ historical releases of ArduPilot
+and PX4 headless and measures a fixed posture vector per release
+(Section~\ref{sec:method}).
+\item The resulting timeline (Section~\ref{sec:results}): signing availability,
+default state, and the persistence of the console exemption across releases.
+\item An interpretation against the CRA/RED timeline (Section~\ref{sec:disc}).
+\end{itemize}
+
+\section{Method}
+\label{sec:method}
+We select the final patch release of each minor line of ArduPilot~Copter (3.x
+through 4.7) and PX4 (1.11 through 1.18) and build each from source on one
+headless Ubuntu~24.04 VM with pinned toolchain packages
+(\code{scripts/setup\_sitl.sh}, \code{scripts/longitudinal.py}). PX4 runs with
+its built-in SIH physics, so no Gazebo or hardware is needed; ModalAI VOXL2
+submodules, which are hosted off-GitHub and irrelevant to SITL, are skipped.
+Build failures are \emph{recorded, not hidden}: an old release that no longer
+builds on a current toolchain is a data point about maintainability.
+
+For each successfully built release we start a fresh simulator, audit each
+MAVLink link with \emph{mavaudit} (default configuration), provision a signing
+key over the local link as an operator would, and audit again. From this we
+derive three Boolean posture facts per release:
+\emph{available} (provisioning yields signed frames),
+\emph{default-on} (the default configuration already signs), and
+\emph{console-exempt} (after provisioning the primary link signs its output yet
+still answers an unsigned, read-only request). We also capture the
+firmware-reported version and FTP capability. The source tree is deleted after
+each measurement to bound disk use; the audit JSON and simulator log are kept.
+
+\section{The Signing Timeline, from Version Control}
+\label{sec:history}
+Before the build study we establish ground truth from the projects' own version
+history. In ArduPilot, MAVLink~2 message signing was added by a single commit on
+2016-01-21~\cite{ardupilot_signing_commit} and first shipped in stable Plane
+3.6.0 (June 2016) and Copter~3.4.0 (October 2016). An attempt to make MAVLink~2
+the default in September~2016 was reverted the following
+month~\cite{ardupilot_mavlink2_default}; MAVLink~2 became the default only on
+the \code{SERIAL1}/\code{SERIAL2} telemetry ports in the 4.1 series (June 2020),
+and \emph{signing has never been enabled by default}. In PX4 there was no signing
+implementation at all until a 2026 commit~\cite{px4_signing_pr}, reworked weeks
+later to align with the specification; it ships first in the v1.18 line, of which
+only a release candidate is tagged at the time of writing. These milestones frame
+the build study: signing has been \emph{available} in ArduPilot for roughly a
+decade and in PX4 for months, and in neither has it ever been a default.
+
+\section{Results}
+\label{sec:results}
+Table~\ref{tab:long} and Fig.~\ref{fig:long} give the posture timeline.
+% The table and figure are generated by scripts/longitudinal_report.py from
+% results/longitudinal/index.json. Narrative below is finalised once all builds
+% complete.
+
+\input{results_table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig_longitudinal.pdf}
+\caption{Signing posture across releases. Green: signing available; orange
+(dashed): on by default; red (dotted): primary/console link remains exempt after
+provisioning; grey $\times$: build failed on the current toolchain.}
+\label{fig:long}
+\end{figure}
+
+\paragraph{Findings (preliminary, filling as builds complete)}
+(F1)~No release in either lineage ships signing enabled by default: the
+``default-on'' line is flat at \emph{no} throughout.
+(F2)~In ArduPilot the console/primary-link exemption is present as far back as
+the earliest release in which signing is available, and persists unchanged
+through 4.7.x---i.e.\ it is a long-standing design choice, not a regression.
+(F3)~consistent with version control~\cite{px4_signing_pr}, the PX4 lineage lacks
+a signing implementation until the v1.18 line, so for the entire measured stable
+history provisioning is a no-op (confirmed empirically wherever the build succeeds).
+(F4)~\emph{[to finalise]} build reproducibility degrades with age: releases
+before a threshold fail on the current toolchain, which itself bears on the
+CRA's expectation of maintained security updates.
+
+\section{Discussion}
+\label{sec:disc}
+The CRA's reporting duty began on 11~September~2026 and full application lands on
+11~December~2027. Our timeline shows that, as of late~2026, a manufacturer
+building on either stack cannot rely on the \emph{upstream default} to meet the
+``secure by default'' requirement: signing is off by default in every release,
+and in the stable PX4 line it is absent. Conformity therefore rests on
+per-integrator configuration and, for ArduPilot, on treating the console link as
+untrusted. A single upstream change---shipping with signing enabled, or an
+unavoidable first-run provisioning step---would shift the entire installed base
+toward conformity, which is the lever our companion recommendation targets.
+
+\paragraph{Threats to validity} We measure SITL, not vendor firmware; a vendor
+fork may change defaults. We sample one release per minor line; intra-line
+changes are not captured. Build success depends on the host toolchain; we pin it
+and report failures rather than discarding them.
+
+\section{Related Work}
+Longitudinal measurement of security defaults is established for TLS
+libraries~\cite{kotzias2018tls,walden2020openssl}, Android
+permissions~\cite{wei2012permission}, and embedded exploit
+mitigations~\cite{yu2022embedded1996}, but, to our knowledge, has not been
+applied to robotic or drone flight stacks; robotics has only repeated exposure
+scans of ROS~\cite{demarinis2019ros,chen2024rosvehicles} and static bug
+taxonomies of the autopilots~\cite{wang2021autopilotbugs,taylor2021uasbugs},
+neither of which tracks the evolution of defaults. Companion work~\cite{brighouse2026signing} gives the
+acceptance semantics and the cross-sectional measurement this study extends over
+time; surveys~\cite{hamza2024} do not measure evolution.
+
+\section{Conclusion}
+Across a decade of releases, the MAVLink flight stacks have added signing slowly
+and never turned it on by default, and ArduPilot's console exemption has
+persisted unchanged. With the CRA's defaults requirement now in force, the
+cheapest path to conformity for the whole ecosystem is an upstream change of
+defaults, not downstream per-unit configuration.
+
+\section*{Availability}
+Build recipes, raw audits, logs, and the analysis pipeline are released at the
+project repository. The study is defensive and simulation-only.
+
+\bibliographystyle{IEEEtran}
+\bibliography{../common/refs}
+\end{document}

@@ -21,21 +21,22 @@
 \begin{abstract}
 ``Secure by default'' is now a legal requirement for connected products sold in
 the EU, yet we have little historical evidence on whether open-source embedded
-stacks have moved toward it. We present the first longitudinal measurement of
-the command-link security defaults of the two dominant open-source drone flight
-stacks, ArduPilot and PX4, built from source across their release history and
-audited under identical conditions in software-in-the-loop. For each release we
-record three posture bits---whether message signing is \emph{available}, whether
-it is \emph{on by default}, and whether, once enabled, a console/primary link
-remains \emph{exempt} and still accepts unsigned input---together with the
-firmware-reported capability set. We find that signing availability arrives late
-and unevenly; that no release in either lineage ships with signing enabled by
-default; and that the console-exemption behaviour, once introduced, persists
-unchanged across many subsequent releases. We relate the timeline to the
-regulatory clock of the EU Cyber Resilience Act and argue that, absent a change
-of defaults, conformity will rest on per-integrator configuration rather than on
-the upstream product. All build recipes, raw audits, and the analysis pipeline
-are released.
+stacks have moved toward it. We present the first decade-spanning study of the
+command-link security defaults of the two dominant open-source drone flight
+stacks, ArduPilot and PX4, combining three lines of evidence: the projects'
+version-control history, a measured posture matrix from building and auditing
+releases in software-in-the-loop, and the buildability of each release on a
+current toolchain. Two findings are clear and mutually reinforcing. First,
+\emph{signing is never on by default}: version control shows it was added to
+ArduPilot in 2016 and never defaulted, and absent from PX4 until 2026, and the
+releases we can still build confirm it. Second---and unexpectedly---\emph{the
+binding constraint on auditing old releases is reproducibility, not posture}:
+pre-4.5 ArduPilot no longer builds on a current system through a layered cascade
+of Python and C++ toolchain breaks, and older PX4 builds but will not run under a
+uniform simulator harness. Both bear directly on the Cyber Resilience Act's
+expectation that products remain patchable and testable through their support
+period. All build recipes, raw records, failure reasons, and the analysis
+pipeline are released.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -56,40 +57,45 @@ longitudinal study of defaults.
 We ask: (i)~when did MAVLink~2 message signing become \emph{available} in each
 stack; (ii)~has any release shipped it \emph{on by default}; and
 (iii)~how have the acceptance exemptions---notably the primary/console-link
-exemption we characterise in companion work---evolved? We answer by building each
-release from source and auditing it identically.
+exemption we characterise in companion work---evolved? We answer with three lines of evidence---version control, measured posture where
+releases still build, and buildability on a current toolchain.
 
 \noindent\textbf{Contributions.}
 \begin{itemize}
-\item A reproducible pipeline that builds $N$ historical releases of ArduPilot
-and PX4 headless and measures a fixed posture vector per release
-(Section~\ref{sec:method}).
-\item The resulting timeline (Section~\ref{sec:results}): signing availability,
-default state, and the persistence of the console exemption across releases.
-\item An interpretation against the CRA/RED timeline (Section~\ref{sec:disc}).
+\item A reproducible pipeline that attempts to build each historical release
+headless on a \emph{current} toolchain and audits those that run, recording every
+outcome and its reason (Section~\ref{sec:method}).
+\item A three-way timeline (Sections~\ref{sec:history}--\ref{sec:results}):
+version-control milestones, measured posture where releases build, and
+buildability itself---showing signing was never a default and the console
+exemption is long-standing.
+\item The reproducibility finding (F4): the concrete, layered reasons old
+releases cannot be built or uniformly tested today, and why that matters for CRA
+patchability (Section~\ref{sec:disc}).
 \end{itemize}
 
 \section{Method}
 \label{sec:method}
-We select the final patch release of each minor line of ArduPilot~Copter (3.x
-through 4.7) and PX4 (1.11 through 1.18) and build each from source on one
-headless Ubuntu~24.04 VM with pinned toolchain packages
-(\code{scripts/setup\_sitl.sh}, \code{scripts/longitudinal.py}). PX4 runs with
-its built-in SIH physics, so no Gazebo or hardware is needed; ModalAI VOXL2
-submodules, which are hosted off-GitHub and irrelevant to SITL, are skipped.
-Build failures are \emph{recorded, not hidden}: an old release that no longer
-builds on a current toolchain is a data point about maintainability.
+We target the final patch release of each minor line of ArduPilot~Copter (3.x
+through 4.7) and PX4 (1.11 through 1.18) and attempt to build each from source on
+one \emph{current} headless Ubuntu~24.04 VM with its default toolchain
+(\code{scripts/setup\_sitl.sh}, \code{scripts/longitudinal.py}). Using the current
+toolchain is deliberate: the question a maintainer or regulator faces is whether a
+given release can still be built and patched \emph{today}, not whether it could be
+built with an archived toolchain contemporaneous with its release. Every outcome
+is \emph{recorded, not hidden}; a release that no longer builds is a data point
+about maintainability, and the precise reason is logged
+(\code{results/longitudinal/index.json}).
 
-For each successfully built release we start a fresh simulator, audit each
-MAVLink link with \emph{mavaudit} (default configuration), provision a signing
-key over the local link as an operator would, and audit again. From this we
-derive three Boolean posture facts per release:
-\emph{available} (provisioning yields signed frames),
+For each release that builds and runs, we start a fresh simulator, audit each
+MAVLink link with \emph{mavaudit} (default configuration), provision a signing key
+over the local link as an operator would, and audit again, deriving three Boolean
+posture facts: \emph{available} (provisioning yields signed frames),
 \emph{default-on} (the default configuration already signs), and
 \emph{console-exempt} (after provisioning the primary link signs its output yet
-still answers an unsigned, read-only request). We also capture the
-firmware-reported version and FTP capability. The source tree is deleted after
-each measurement to bound disk use; the audit JSON and simulator log are kept.
+still answers an unsigned read). Together with the version-control timeline
+(Section~\ref{sec:history}) this gives three lines of evidence---code history,
+measured posture, and buildability---over the decade.
 
 \section{The Signing Timeline, from Version Control}
 \label{sec:history}
@@ -109,10 +115,8 @@ decade and in PX4 for months, and in neither has it ever been a default.
 
 \section{Results}
 \label{sec:results}
-Table~\ref{tab:long} and Fig.~\ref{fig:long} give the posture timeline.
-% The table and figure are generated by scripts/longitudinal_report.py from
-% results/longitudinal/index.json. Narrative below is finalised once all builds
-% complete.
+Table~\ref{tab:long} reports the outcome for each release attempted (generated by
+\code{scripts/longitudinal\_report.py} from the raw build/audit records).
 
 \input{results_table}
 
@@ -121,33 +125,47 @@ Table~\ref{tab:long} and Fig.~\ref{fig:long} give the posture timeline.
 \includegraphics[width=\columnwidth]{fig_longitudinal.pdf}
 \caption{Signing posture across releases. Green: signing available; orange
 (dashed): on by default; red (dotted): primary/console link remains exempt after
-provisioning; grey $\times$: build failed on the current toolchain.}
+provisioning; grey $\times$: did not build or run on the current toolchain.}
 \label{fig:long}
 \end{figure}
 
-\paragraph{Findings (preliminary, filling as builds complete)}
-(F1)~No release in either lineage ships signing enabled by default: the
-``default-on'' line is flat at \emph{no} throughout.
-(F2)~In the ArduPilot releases that build on a current toolchain (4.5--4.7) the
-console/primary-link exemption is present and identical, and version control
-shows the governing code (\code{accept\_unsigned\_callback} on
-\code{MAVLINK\_COMM\_0}) unchanged since signing was introduced---i.e.\ it is a
-long-standing design choice, not a regression.
-(F3)~consistent with version control~\cite{px4_signing_pr}, the PX4 lineage lacks
-a signing implementation until the v1.18 line, so for the entire measured stable
-history provisioning is a no-op (confirmed empirically wherever the build succeeds).
-(F4)~build reproducibility degrades sharply, and in \emph{layers}, with age.
-On a current Ubuntu~24.04 toolchain, ArduPilot~Copter releases from 4.5 onward
-build unchanged; 4.4 and earlier do not, for a cascade of Python
-incompatibilities we had to peel back one at a time: the bundled \code{waf}
-imports the \code{imp} module (removed in Python~3.12) and opens files in the
-\code{rU} mode (removed in 3.11), so it needs Python~$\le$3.10; and with
-Python~3.10 the build then fails in the UAVCAN/DroneCAN code generator, which
-uses \code{collections.MutableSequence} (removed in 3.10), so a full build of
-those releases needs Python~$\le$3.9. A security update to a 2018--2021 release
-thus requires reconstructing an archived interpreter chain---a concrete obstacle
-to the CRA's expectation that products remain patchable through their support
-period.
+\paragraph{Findings}
+(F1)~Signing is never on by default. In the ArduPilot releases that build on the
+current toolchain (4.5--4.7, the last measured in companion
+work~\cite{brighouse2026signing}), the default configuration signs no frames; and
+version control confirms this for the whole lineage---MAVLink~2 became a default
+only on the telemetry ports in 4.1, and signing was never defaulted
+(Section~\ref{sec:history}).
+(F2)~The ArduPilot console/primary-link exemption is a long-standing design, not a
+regression: in the releases we could measure (4.5--4.7) it is present and
+identical, and version control shows the governing code
+(\code{accept\_unsigned\_callback} on \code{MAVLINK\_COMM\_0}) unchanged since
+signing was introduced in 2016.
+(F3)~The PX4 lineage has no signing implementation until the v1.18
+line~\cite{px4_signing_pr}, so provisioning is a no-op throughout its stable
+history; the companion measures this directly on v1.17.0 (no signing) and
+v1.18.0-rc1 (signing works)~\cite{brighouse2026signing}.
+(F4)~\emph{Reproducibility, not posture, is the binding constraint on auditing old
+releases}---and it fails in two distinct ways. (a)~\textbf{Build cliff.} On a
+current Ubuntu~24.04 toolchain, ArduPilot~Copter releases from 4.5 onward build
+unchanged; 4.4 and earlier do not, for a cascade we had to peel back one layer at
+a time: the bundled \code{waf} imports the \code{imp} module (removed in
+Python~3.12) and opens files in \code{rU} mode (removed in 3.11), so it needs
+Python~$\le$3.10; with Python~3.10 the build then fails in the UAVCAN code
+generator, which uses \code{collections.MutableSequence} (removed in 3.10), so it
+needs Python~$\le$3.9; and even with Python~3.9 the C++ fails on modern GCC (e.g.\
+\code{std::uint16\_t} used without \code{<cstdint>} in \code{CANSocketIface.cpp}).
+A security update to a 2018--2021 release thus requires reconstructing an archived
+interpreter \emph{and} compiler. (b)~\textbf{Simulator drift.} PX4~v1.16.2
+\emph{builds} on the current toolchain (after a one-line fix to its shallow-clone
+version script) but will not run under the same software-in-the-loop harness as
+v1.17/v1.18: it does not recognise the \code{sihsim\_quadx} built-in-simulation
+model and instead waits for an external simulator, so a uniform, hands-off audit
+captures no telemetry. Both failure modes are concrete obstacles to the CRA's
+expectation that a product remain patchable and testable through its support
+period, and they are the reason a decade-wide \emph{measured} posture matrix
+cannot simply be produced on demand---the version-control timeline
+(Section~\ref{sec:history}) carries the long-range evidence instead.
 
 \section{Discussion}
 \label{sec:disc}

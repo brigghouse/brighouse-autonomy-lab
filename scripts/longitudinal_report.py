@@ -31,6 +31,11 @@ def classify(entry) -> dict:
         return {"stack": stack, "ref": ref, "ver": parse_ver(ref), "status": entry.get("build", "?"),
                 "default_signed": None, "can_sign": None, "ch0_exempt": None}
     m = entry.get("measurements", {})
+    # A build that produced no telemetry (e.g. PX4 SIH-model drift) is "built but not measured".
+    default_probe = next((v for k, v in m.items() if k.startswith("default")), {})
+    if not default_probe.get("frames"):
+        return {"stack": stack, "ref": ref, "ver": parse_ver(ref), "status": "ok (not measured)",
+                "default_signed": None, "can_sign": None, "ch0_exempt": None}
     default_key = next((k for k in m if k.startswith("default")), None)
     prov_key = next((k for k in m if k.startswith("provisioned")), None)
     default = m.get(default_key, {}) if default_key else {}

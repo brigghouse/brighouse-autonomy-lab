@@ -116,6 +116,16 @@ def build_px4(ref, work, log):
         # old releases reference submodule commits that shallow fetch cannot reach: retry unshallow
         sh(["git", "submodule", "update", "--init", "--recursive", "-j", "4"], src, log, 3600)
     sh(["git", "submodule", "foreach", "--recursive", "-q", "git reset -q --hard HEAD"], src, log)
+    # Shallow clones have no NuttX submodule tags, so PX4's version script does
+    # re.findall(...)[-1] on an empty list -> IndexError. Guard it (metadata only; does
+    # not affect the signing behaviour we measure).
+    vh = src / "src/lib/version/px_update_git_header.py"
+    if vh.exists():
+        t = vh.read_text()
+        t = t.replace(
+            "nuttx_git_tag = re.findall(r'nuttx-[0-9]+\\.[0-9]+\\.[0-9]+', nuttx_git_tags)[-1].replace(\"nuttx-\", \"v\")",
+            "_ntags = re.findall(r'nuttx-[0-9]+\\.[0-9]+\\.[0-9]+', nuttx_git_tags)\n    nuttx_git_tag = (_ntags[-1] if _ntags else 'nuttx-0.0.0').replace(\"nuttx-\", \"v\")")
+        vh.write_text(t)
     if sh(["make", "px4_sitl_default"], src, log, timeout=7200) != 0:
         return src, "build failed"
     return src, "ok"

@@ -118,7 +118,7 @@
     "build": "build failed",
     "build_seconds": 294,
     "source_rev": "Copter-4.4.4@db53a28f321d",
-    "failure_reason": "toolchain: pre-4.5 ArduPilot does not build on current Ubuntu 24.04 - its bundled waf needs Python<=3.10 (imp, rU-mode), the UAVCAN code generator needs Python<=3.9 (collections.MutableSequence), and the C++ still fails on modern GCC (e.g. std::uint16_t without <cstdint> in CANSocketIface.cpp)"
+    "failure_reason": "toolchain cliff: pre-4.5 ArduPilot does not build on current Ubuntu 24.04 - the bundled waf needs Python<=3.10 (imp, rU-mode); the UAVCAN code generator needs Python<=3.9 (collections.MutableSequence); and the C++ still fails on modern GCC (e.g. std::uint16_t without <cstdint> in CANSocketIface.cpp)"
   },
   "ardupilot:Copter-4.3.8": {
     "stack": "ardupilot",
@@ -127,7 +127,7 @@
     "build": "build failed",
     "build_seconds": 279,
     "source_rev": "ArduCopter-beta-4.3,ArduCopter-beta-4.3-heli,Copter-4.3.8@60ebf6fbb915",
-    "failure_reason": "toolchain: pre-4.5 ArduPilot does not build on current Ubuntu 24.04 - its bundled waf needs Python<=3.10 (imp, rU-mode), the UAVCAN code generator needs Python<=3.9 (collections.MutableSequence), and the C++ still fails on modern GCC (e.g. std::uint16_t without <cstdint> in CANSocketIface.cpp)"
+    "failure_reason": "toolchain cliff: pre-4.5 ArduPilot does not build on current Ubuntu 24.04 - the bundled waf needs Python<=3.10 (imp, rU-mode); the UAVCAN code generator needs Python<=3.9 (collections.MutableSequence); and the C++ still fails on modern GCC (e.g. std::uint16_t without <cstdint> in CANSocketIface.cpp)"
   },
   "ardupilot:Copter-4.2.4": {
     "stack": "ardupilot",
@@ -136,7 +136,7 @@
     "build": "build failed",
     "build_seconds": 68,
     "source_rev": "Copter-4.2.4@245996c8609e",
-    "failure_reason": "toolchain: pre-4.5 ArduPilot does not build on current Ubuntu 24.04 - its bundled waf needs Python<=3.10 (imp, rU-mode), the UAVCAN code generator needs Python<=3.9 (collections.MutableSequence), and the C++ still fails on modern GCC (e.g. std::uint16_t without <cstdint> in CANSocketIface.cpp)"
+    "failure_reason": "toolchain cliff: pre-4.5 ArduPilot does not build on current Ubuntu 24.04 - the bundled waf needs Python<=3.10 (imp, rU-mode); the UAVCAN code generator needs Python<=3.9 (collections.MutableSequence); and the C++ still fails on modern GCC (e.g. std::uint16_t without <cstdint> in CANSocketIface.cpp)"
   },
   "ardupilot:Copter-4.1.6": {
     "stack": "ardupilot",
@@ -145,6 +145,30 @@
     "build": "build failed",
     "build_seconds": 57,
     "source_rev": "Copter-4.1.6@7898097b0c71",
-    "failure_reason": "toolchain: pre-4.5 ArduPilot does not build on current Ubuntu 24.04 - its bundled waf needs Python<=3.10 (imp, rU-mode), the UAVCAN code generator needs Python<=3.9 (collections.MutableSequence), and the C++ still fails on modern GCC (e.g. std::uint16_t without <cstdint> in CANSocketIface.cpp)"
+    "failure_reason": "toolchain cliff: pre-4.5 ArduPilot does not build on current Ubuntu 24.04 - the bundled waf needs Python<=3.10 (imp, rU-mode); the UAVCAN code generator needs Python<=3.9 (collections.MutableSequence); and the C++ still fails on modern GCC (e.g. std::uint16_t without <cstdint> in CANSocketIface.cpp)"
+  },
+  "px4:v1.16.2": {
+    "stack": "px4",
+    "ref": "v1.16.2",
+    "started_utc": "2026-11-02T18:39:56Z",
+    "build": "ok",
+    "build_seconds": 282,
+    "source_rev": "v1.16.2@54f0455ffcd7",
+    "measurements": {
+      "default-gcs": {
+        "exit_code": 1,
+        "frames": 0,
+        "signed_frames": 0,
+        "v1_frames": 0,
+        "unsigned_types": [],
+        "firmware": null,
+        "ftp_advertised": null,
+        "command_ack_result": null,
+        "unsigned_probe_answered": null,
+        "findings": []
+      },
+      "provision_error": "TimeoutError('no heartbeat')"
+    },
+    "measure_note": "builds on the current toolchain after patching the shallow-clone version script (NuttX-tag IndexError), but the uniform SIH harness (PX4_SIM_MODEL=sihsim_quadx) is not recognised by this release, which waits for an external simulator on TCP 4560 - a cross-version simulator-config drift, so no telemetry was captured"
   }
 }

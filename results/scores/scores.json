@@ -61,6 +61,12 @@
       "ref": "Copter-4.5.7",
       "default_score": 14.0,
       "provisioned_score": 42.0
+    },
+    {
+      "stack": "px4",
+      "ref": "v1.16.2",
+      "default_score": 42.0,
+      "provisioned_score": null
     }
   ]
 }

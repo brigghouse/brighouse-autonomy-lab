@@ -18,12 +18,15 @@ tags: [proyecto, tareas]
 ## Verificar (marcado como incierto)
 
 - [ ] Sintaxis exacta de `signing setup` en MAVProxy y soporte de firma en QGroundControl
-- [ ] Estado del soporte de firma en PX4 (versión y parámetro)
+- [ ] Estado de PX4 v1.18: ¿sigue en beta o ya es estable? (la firma conforme a la especificación llega en la v1.18)
+- [ ] Primera versión estable de QGroundControl con firma
 - [ ] Que el mapeo CRA de mavaudit (anexo I, parte I, punto 2, letras b, d, e, f y j) coincida con el texto oficial del EUR-Lex. Ya contrastado con fuentes secundarias
 
 ## Claude (siguiente sesión)
 
-- [ ] Integrar la revisión bibliográfica en el borrador del paper
+- [x] Integrar la revisión bibliográfica en el borrador del paper (v0.1, 2026-11-02)
+- [ ] Pasar el paper a LaTeX (IEEEtran) cuando haya resultados
+- [ ] Comprobar a mano los GitHub Security Advisories de QGC, Mission Planner, pymavlink y MAVSDK
 - [ ] mavaudit v0.2: comprobación de exposición de MAVLink sobre IP y de parámetros sensibles
 - [ ] Lista de 30-50 fabricantes de drones y robótica en España y la UE
 

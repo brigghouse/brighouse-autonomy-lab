@@ -6,7 +6,7 @@ tags: [index]
 
 # Segundo cerebro — Brighouse Autonomy Security
 
-Entrada principal del vault. Abre esta carpeta (`vault/`) en Obsidian con "Open folder as vault".
+Entrada principal del segundo cerebro. En Obsidian, abre **la raíz del repo** con "Open folder as vault" (ya está configurada: enlaces markdown relativos, sin el código). Así las notas, el paper y el research forman un único grafo.
 
 ## Proyecto
 
@@ -26,9 +26,12 @@ Entrada principal del vault. Abre esta carpeta (`vault/`) en Obsidian con "Open 
 ## Aprendizajes
 
 - [pymavlink y MAVLink 2](aprendizajes/pymavlink-mavlink2.md): trampas técnicas encontradas al construir mavaudit
+- [Estado de la firma MAVLink en 2026](aprendizajes/estado-firma-mavlink-2026.md): datos clave para el paper y para vender
 
 ## Fuera del vault (en el repo)
 
 - [README del repo](../README.md): laboratorio, herramienta y paper
 - [Plan de experimentos](../research/experiment-plan.md): RQ1-RQ4 y la matriz de pruebas
+- [Revisión bibliográfica](../research/literature-review.md): 20 referencias verificadas, CVE, regulación y 12 huecos de investigación
+- [Research de mercado](../research/market/INDEX.md): los 3 sectores, las 13 ideas y el debate completo (el veredicto está en juez.md)
 - [Borrador del Paper 1](../paper/paper1-draft.md): MAVLink + CRA

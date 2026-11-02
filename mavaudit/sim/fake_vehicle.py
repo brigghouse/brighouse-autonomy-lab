@@ -24,8 +24,10 @@ def demo_key(passphrase: str = "brighouse-lab-demo") -> bytes:
 
 
 class FakeVehicle:
-    def __init__(self, port: int, mode: str = "unsigned", autopilot: str = "ardupilot", sysid: int = 1):
+    def __init__(self, port: int, mode: str = "unsigned", autopilot: str = "ardupilot", sysid: int = 1,
+                 version: tuple[int, int, int] = (4, 7, 2)):
         self.mode = mode
+        self.version = version
         self.sysid = sysid
         self.autopilot = (mavlink2.MAV_AUTOPILOT_ARDUPILOTMEGA if autopilot == "ardupilot"
                           else mavlink2.MAV_AUTOPILOT_PX4)
@@ -59,11 +61,24 @@ class FakeVehicle:
                 msg = self.conn.recv_match(blocking=True, timeout=0.05)
             except Exception:
                 msg = None  # e.g. rejected unsigned message in signed mode
-            if msg is not None and msg.get_type() == "PARAM_REQUEST_READ":
+            if msg is None:
+                continue
+            if msg.get_type() == "PARAM_REQUEST_READ":
                 self.answered += 1
                 self.conn.mav.param_value_send(self.param.encode(), float(self.sysid),
                                                mavlink2.MAV_PARAM_TYPE_INT32, 1, 0,
                                                force_mavlink1=(self.mode == "v1"))
+            elif (msg.get_type() == "COMMAND_LONG" and msg.command == mavlink2.MAV_CMD_REQUEST_MESSAGE
+                  and int(msg.param1) == mavlink2.MAVLINK_MSG_ID_AUTOPILOT_VERSION and self.mode != "v1"):
+                self._send_autopilot_version()
+
+    def _send_autopilot_version(self):
+        caps = (mavlink2.MAV_PROTOCOL_CAPABILITY_MAVLINK2 | mavlink2.MAV_PROTOCOL_CAPABILITY_FTP
+                | mavlink2.MAV_PROTOCOL_CAPABILITY_MISSION_INT)
+        major, minor, patch = self.version
+        sw = (major << 24) | (minor << 16) | (patch << 8) | 255  # 255 = FIRMWARE_VERSION_TYPE_OFFICIAL
+        self.conn.mav.autopilot_version_send(caps, sw, 0, 0, 0, b"\x00" * 8, b"\x00" * 8, b"\x00" * 8,
+                                             0, 0, 0, b"\x00" * 18)
 
     def start_background(self):
         t = threading.Thread(target=self.run, daemon=True)

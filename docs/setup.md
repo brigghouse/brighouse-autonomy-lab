@@ -1,86 +1,63 @@
-# Montar el laboratorio virtual (coste cero)
+# Lab setup
 
-Todo corre en tu ordenador: no hace falta ningún dron real ni emitir radio.
-Probado en Ubuntu 22.04/24.04 (en Windows, usa WSL2 con Ubuntu).
+Everything runs on one Linux machine. No drone hardware, no radio, no GUI. Tested on Ubuntu 24.04 with 2 vCPU and 7 GB RAM; on Windows, use WSL2. (Spanish version: [setup.es.md](setup.es.md).)
 
-## 0. Requisitos
-
-- Ubuntu 22.04 o 24.04 (o WSL2), 16 GB de RAM recomendados, unos 15 GB libres
-- Python 3.10 o superior, git
-- Opcional: Docker
-
-## 1. Este repo y mavaudit
+## 1. mavaudit only (2 minutes)
 
 ```bash
-git clone <url-del-repo-privado> brighouse-autonomy-lab
+git clone https://github.com/brigghouse/brighouse-autonomy-lab.git
 cd brighouse-autonomy-lab
-python3 -m pip install -e ".[dev]"
-python3 -m pytest -q          # 5 tests con un vehículo simulado en Python
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+pytest -q                                   # 10 tests against a reference MAVLink vehicle
 ```
 
-Prueba rápida sin instalar ningún autopiloto:
+Try it without any autopilot:
 
 ```bash
-# Terminal 1: vehículo falso sin firma (configuración típica por defecto)
-python3 -m mavaudit.sim.fake_vehicle --mode unsigned --port 14550
-# Terminal 2: auditoría (pasiva + 1 petición de solo lectura)
-python3 -m mavaudit scan --target udpin:127.0.0.1:14550 --duration 10 --active-probe
+python -m mavaudit.sim.fake_vehicle --mode unsigned --port 14550 &   # also: --mode signed | v1
+mavaudit scan --target udpin:127.0.0.1:14550 --duration 10 --active-probe
 ```
 
-Repite con `--mode signed` y `--mode v1` para ver cómo cambian los hallazgos.
-
-## 2. ArduPilot SITL (el firmware real, simulado)
-
-Opción A, nativa (la recomendada por ArduPilot):
+## 2. Real flight stacks in simulation (about 25 minutes of compiling)
 
 ```bash
-git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
-cd ardupilot
-Tools/environment_install/install-prereqs-ubuntu.sh -y
-. ~/.profile
-sim_vehicle.py -v ArduCopter --console --map     # arranca SITL + MAVProxy
+bash scripts/setup_sitl.sh ~/sitl
+source ~/sitl/venv/bin/activate && pip install -e .
 ```
 
-Por defecto MAVProxy reenvía la telemetría a `udp:127.0.0.1:14550` (donde escucha QGroundControl) y a `14551`. Audita con:
+The script builds:
+
+- **ArduPilot Copter 4.7.2 SITL**: `~/sitl/ardupilot/build/sitl/bin/arducopter`
+- **PX4 v1.18.0-rc1 SITL** with the **SIH** simulator, so Gazebo is not needed: `~/sitl/px4/build/px4_sitl_default/bin/px4`
+
+Pick other versions with `AP_REF=Copter-4.6.3 PX4_REF=v1.17.0 bash scripts/setup_sitl.sh ~/sitl-old`.
+
+## 3. Reproduce the published results
 
 ```bash
-python3 -m mavaudit scan --target udpin:127.0.0.1:14551 --duration 15 --active-probe
+python scripts/run_ardupilot.py --ardupilot ~/sitl/ardupilot --out results/ardupilot-4.7.2
+python scripts/run_px4.py      --px4 ~/sitl/px4       --out results/px4-1.18.0-rc1
+python scripts/make_results_table.py
 ```
 
-Opción B, Docker: ver [`docker/ardupilot/Dockerfile`](../docker/ardupilot/Dockerfile) (todavía sin probar en CI).
+Each run takes 2-3 minutes. It starts a fresh simulator, audits each link with the default configuration, provisions the lab signing key, audits again, and verifies signatures with the key. For PX4 it also checks that an unsigned re-keying attempt is rejected.
 
-**Activar la firma de MAVLink en ArduPilot (para el experimento "con firma"):** en la consola de MAVProxy, `module load signing` y `signing setup <frase-secreta>`. Después, en la estación de tierra hay que configurar la misma clave. Comprueba la sintaxis exacta en la documentación de MAVProxy y anota la versión que uses en el diario.
+## 4. Manual exploration
 
-## 3. PX4 SITL
+| Stack | Start | Audit |
+|---|---|---|
+| ArduPilot | `arducopter --model + -I0 -w --defaults Tools/autotest/default_params/copter.parm --serial1 tcp:2` | `mavaudit scan --target tcp:127.0.0.1:5760` (SERIAL0) or `:5762` (SERIAL1) |
+| PX4 | `cd <rootfs> && PX4_SIM_MODEL=sihsim_quadx <px4>/build/px4_sitl_default/bin/px4 -d <px4>/build/px4_sitl_default/etc -w .` | `mavaudit scan --target udpin:127.0.0.1:14550` (GCS link) or `:14540` (onboard link) |
 
-```bash
-git clone https://github.com/PX4/PX4-Autopilot.git --recursive
-cd PX4-Autopilot
-bash ./Tools/setup/ubuntu.sh
-make px4_sitl gz_x500        # Gazebo + cuadricóptero x500
-```
+To use a GUI as well, QGroundControl, Mission Planner and MAVProxy (`mavproxy.py --master tcp:127.0.0.1:5760`) connect to the same ports.
 
-PX4 publica telemetría hacia `udp:127.0.0.1:14550` (estación de tierra) y tiene un enlace "onboard/offboard" en `14540`. Audita con:
+## 5. Docker (optional, not built in CI)
 
-```bash
-python3 -m mavaudit scan --target udpin:127.0.0.1:14540 --duration 15 --active-probe
-```
+[`docker/ardupilot/Dockerfile`](../docker/ardupilot/Dockerfile) builds the ArduPilot SITL image.
 
-Si QGroundControl está abierto en 14550, usa el puerto offboard o cierra QGC. El estado del soporte de firma en PX4 está documentado en [`research/literature-review.md`](../research/literature-review.md).
+## Lab rules
 
-## 4. Estaciones de tierra (GCS)
-
-- **QGroundControl**: AppImage desde qgroundcontrol.com
-- **Mission Planner**: Windows, o Mono en Linux
-
-## 5. Análisis
-
-- **Wireshark** con el disector de MAVLink (genera el plugin Lua con `mavgen --lang=WLua`)
-- **pymavlink / MAVProxy**: `pip install pymavlink MAVProxy`
-- **Ghidra / binwalk**: análisis de firmware compilado (solo builds propias o de código abierto)
-
-## Reglas del laboratorio
-
-1. Solo simulación, banco cableado o jaula de Faraday. **Nunca** emitir RF ni interferir GNSS sin licencia.
-2. Solo sistemas propios o con autorización escrita. mavaudit bloquea por defecto las IP públicas.
-3. Cualquier vulnerabilidad nueva se comunica primero a los mantenedores (divulgación coordinada) y se publica después.
+1. Use simulation, a wired bench or a Faraday enclosure only. Never transmit RF or interfere with GNSS without a licence.
+2. Test only your own systems, or systems you have written authorisation to test. mavaudit refuses public IP addresses by default.
+3. Report new vulnerabilities to the maintainers first (coordinated disclosure). See [SECURITY.md](../SECURITY.md).

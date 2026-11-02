@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict
 from datetime import datetime, timezone
 
@@ -33,24 +34,36 @@ def to_json(report: dict) -> str:
     return json.dumps(report, indent=2, ensure_ascii=False)
 
 
+def write(report: dict, out: str) -> None:
+    d = os.path.dirname(out)
+    if d:
+        os.makedirs(d, exist_ok=True)
+    with open(f"{out}.json", "w", encoding="utf-8") as fh:
+        fh.write(to_json(report))
+    with open(f"{out}.md", "w", encoding="utf-8") as fh:
+        fh.write(to_markdown(report))
+
+
 def to_markdown(report: dict) -> str:
     lines = [
         "# mavaudit report",
         "",
         f"- Target: `{report['target']}`",
         f"- Scope reference: {report['scope_ref'] or 'lab / private network'}",
-        f"- Generated (UTC): {report['generated_utc']}",
-        f"- Observation window: {report['duration_s']} s",
+        f"- Generated (UTC): {report['generated_utc']} by mavaudit {report['version']}",
+        f"- Passive observation window: {report['duration_s']} s",
+        f"- Active read-only probe: {'yes' if report['unsigned_probe'] else 'no'}",
         "",
         "## Endpoints",
         "",
-        "| sysid/compid | autopilot | frames | MAVLink 1 | MAVLink 2 | signed |",
-        "|---|---|---|---|---|---|",
+        "| sysid/compid | autopilot | firmware | frames | MAVLink 1 | MAVLink 2 | signed | FTP advertised |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for ep in report["endpoints"]:
         lines.append(
-            f"| {ep['sysid']}/{ep['compid']} | {ep['autopilot'] or '-'} | {ep['frames']} | "
-            f"{ep['v1_frames']} | {ep['v2_frames']} | {ep['signed_frames']} |"
+            f"| {ep['sysid']}/{ep['compid']} | {ep['autopilot'] or '-'} | {ep['firmware'] or '-'} | "
+            f"{ep['frames']} | {ep['v1_frames']} | {ep['v2_frames']} | {ep['signed_frames']} | "
+            f"{'yes' if ep['ftp_advertised'] else '-'} |"
         )
     lines += ["", "## Findings", ""]
     if not report["findings"]:
@@ -63,7 +76,9 @@ def to_markdown(report: dict) -> str:
             "",
             f"- CRA: {'; '.join(f['cra_refs'])}",
             f"- Recommendation: {f['recommendation']}",
-            "",
         ]
+        for adv in f.get("advisories") or []:
+            lines.append(f"- Related advisory: [{adv['id']}]({adv['ref']}): {adv['summary']}")
+        lines.append("")
     lines += ["---", "", f"_{report['disclaimer']}_", ""]
     return "\n".join(lines)

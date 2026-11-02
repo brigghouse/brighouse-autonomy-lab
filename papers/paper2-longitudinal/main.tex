@@ -128,15 +128,26 @@ provisioning; grey $\times$: build failed on the current toolchain.}
 \paragraph{Findings (preliminary, filling as builds complete)}
 (F1)~No release in either lineage ships signing enabled by default: the
 ``default-on'' line is flat at \emph{no} throughout.
-(F2)~In ArduPilot the console/primary-link exemption is present as far back as
-the earliest release in which signing is available, and persists unchanged
-through 4.7.x---i.e.\ it is a long-standing design choice, not a regression.
+(F2)~In the ArduPilot releases that build on a current toolchain (4.5--4.7) the
+console/primary-link exemption is present and identical, and version control
+shows the governing code (\code{accept\_unsigned\_callback} on
+\code{MAVLINK\_COMM\_0}) unchanged since signing was introduced---i.e.\ it is a
+long-standing design choice, not a regression.
 (F3)~consistent with version control~\cite{px4_signing_pr}, the PX4 lineage lacks
 a signing implementation until the v1.18 line, so for the entire measured stable
 history provisioning is a no-op (confirmed empirically wherever the build succeeds).
-(F4)~\emph{[to finalise]} build reproducibility degrades with age: releases
-before a threshold fail on the current toolchain, which itself bears on the
-CRA's expectation of maintained security updates.
+(F4)~build reproducibility degrades sharply, and in \emph{layers}, with age.
+On a current Ubuntu~24.04 toolchain, ArduPilot~Copter releases from 4.5 onward
+build unchanged; 4.4 and earlier do not, for a cascade of Python
+incompatibilities we had to peel back one at a time: the bundled \code{waf}
+imports the \code{imp} module (removed in Python~3.12) and opens files in the
+\code{rU} mode (removed in 3.11), so it needs Python~$\le$3.10; and with
+Python~3.10 the build then fails in the UAVCAN/DroneCAN code generator, which
+uses \code{collections.MutableSequence} (removed in 3.10), so a full build of
+those releases needs Python~$\le$3.9. A security update to a 2018--2021 release
+thus requires reconstructing an archived interpreter chain---a concrete obstacle
+to the CRA's expectation that products remain patchable through their support
+period.
 
 \section{Discussion}
 \label{sec:disc}

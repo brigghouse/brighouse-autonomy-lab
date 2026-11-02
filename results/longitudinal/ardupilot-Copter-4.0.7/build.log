@@ -37,3 +37,8 @@ github.com[0: 140.82.114.4]: errno=Connection timed out
 
 fatal: clone of 'git://github.com/ArduPilot/libcanard.git' into submodule path '/home/claude/sitl-long/ardupilot-Copter-4.0.7/modules/libcanard' failed
 Failed to clone 'modules/libcanard'. Retry scheduled
+fatal: unable to connect to github.com:
+github.com[0: 140.82.112.3]: errno=Connection timed out
+
+fatal: clone of 'git://github.com/ArduPilot/mavlink' into submodule path '/home/claude/sitl-long/ardupilot-Copter-4.0.7/modules/mavlink' failed
+Failed to clone 'modules/mavlink'. Retry scheduled

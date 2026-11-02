@@ -87,9 +87,8 @@
       }
     },
     "min_edits_to_clear_failures": [
-      "refuse-setup-armed",
-      "enable-replay-check",
       "strict-allowlist",
+      "enable-replay-check",
       "no-unsigned-rekey",
       "close-tofu+oob",
       "drop-trusted-links"

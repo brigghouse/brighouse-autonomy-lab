@@ -192,12 +192,14 @@ hence a trace. $A$-constructibility is enforced by the move generator
 observed frames). \end{proof}
 
 \begin{proposition}[Depth-bounded completeness]
-If a property is violable within $k$ adversary steps from the post-provisioning
-configuration, the search finds a witness of length $\le k$.
+If a property is violable within $k$ adversary steps from a scenario's initial
+configuration (pre-, on-, or post-provisioning, as defined for that property),
+the search finds a witness of length $\le k$.
 \end{proposition}
 \begin{proof}[Proof sketch]
-BFS over the finitely-branching move relation enumerates all sequences of length
-$\le k$; the abstraction makes the per-step frame set finite (bounded kinds,
+For each scenario the search starts from that scenario's initial configuration;
+BFS over the finitely-branching move relation enumerates all adversary sequences
+of length $\le k$ from it. The abstraction makes the per-step frame set finite (bounded kinds,
 links, keys, and a canonical fresh timestamp), so no violating sequence of length
 $\le k$ is missed. \end{proof}
 
@@ -234,7 +236,7 @@ policy & minimal edit set clearing \prop{P1}--\prop{P3} & \prop{L}? \\
 \midrule
 \textsf{spec-strict}     & close TOFU + out-of-band keys & yes \\
 \textsf{px4-1.18}        & close TOFU + out-of-band keys & yes \\
-\textsf{ardupilot-4.7.2} & close TOFU + OOB keys \emph{and} remove unsigned re-key & yes \\
+\textsf{ardupilot-4.7.2} & close TOFU + OOB keys \emph{and} drop the console-link exemption & yes \\
 \textsf{px4-1.17}        & adopt the full mechanism (no incremental fix) & --- \\
 \bottomrule
 \end{tabular}
@@ -312,8 +314,9 @@ general-purpose symbolic prover. A ProVerif or Tamarin encoding of the signing
 and provisioning sub-protocol---capturing unbounded sessions and the truncated-MAC
 abstraction more faithfully---is natural future work; we provide the semantics in
 a form amenable to such an encoding. The value of the lightweight model is that it
-is executable, testable against implementations, and generative. The only prior formal work on MAVLink models the protocol \emph{without} its
-native authentication and verifies an external cipher~\cite{wray2025pave,mak2025evtol},
+is executable, testable against implementations, and generative. Based on their published abstracts, the only prior formal work on MAVLink models
+the protocol \emph{without} its native signing and verifies an external
+cipher~\cite{wray2025pave,mak2025evtol},
 or uses session types and runtime monitors with no
 cryptography~\cite{amorim2025datum,amorim2026platum}; none models the signing
 scheme itself---its truncated MAC, per-stream timestamp window, and

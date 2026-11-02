@@ -26,8 +26,9 @@ import labkit  # noqa: E402
 
 import shutil as _sh
 _OLD_WAF_PYTHON = next((p for p in [
+    "/root/.local/share/uv/python/cpython-3.9-linux-x86_64-gnu/bin/python3.9",
     "/root/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/bin/python3.10",
-    _sh.which("python3.10")] if p and __import__("os").path.exists(p)), None)
+    _sh.which("python3.9"), _sh.which("python3.10")] if p and __import__("os").path.exists(p)), None)
 
 VOXL = ("libmodal-json", "libmodal-pipe", "boards/modalai/voxl2/libfc-sensor-api")
 
@@ -61,17 +62,17 @@ def build_ardupilot(ref, work, log):
     if clone("https://github.com/ArduPilot/ardupilot.git", ref, src, log) != 0:
         return None, "clone failed"
     status = _waf_build(src, log, "python3")
-    # Pre-4.5 ships a waf that uses the `imp` module, removed in Python 3.12. Older
-    # releases therefore fail to configure on a current toolchain (a maintainability
-    # finding); retry with Python 3.11 to recover the measurable posture where possible.
-    if status == "configure failed" and _OLD_WAF_PYTHON:
+    # Pre-4.5 fails on a current toolchain in layers: the bundled waf needs the `imp`
+    # module (removed in Python 3.12) and `rU` open-mode (removed in 3.11), and the UAVCAN
+    # code generator uses `collections.MutableSequence` (removed in 3.10). A full build of
+    # those releases needs Python <= 3.9; retry with the archived interpreter.
+    if status in ("configure failed", "build failed") and _OLD_WAF_PYTHON:
         with open(log) as fh:
             blog = fh.read()
-            if ("No module named 'imp'" in blog or "invalid mode: 'rUb'" in blog) and _OLD_WAF_PYTHON:
-                sh(["git", "clean", "-xfdq", "build"], src, log)
-                status = _waf_build(src, log, _OLD_WAF_PYTHON)
-                if status == "ok":
-                    status = "ok (python3.10)"
+        if any(x in blog for x in ("No module named 'imp'", "invalid mode: 'rUb'", "MutableSequence")):
+            sh(["git", "clean", "-xfdq", "build"], src, log)
+            st2 = _waf_build(src, log, _OLD_WAF_PYTHON)
+            status = ("ok (python3.9)" if st2 == "ok" else st2)
     return src, status
 
 

@@ -24,6 +24,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import labkit  # noqa: E402
 
+import shutil as _sh
+_OLD_WAF_PYTHON = next((p for p in [
+    "/root/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/bin/python3.10",
+    _sh.which("python3.10")] if p and __import__("os").path.exists(p)), None)
+
 VOXL = ("libmodal-json", "libmodal-pipe", "boards/modalai/voxl2/libfc-sensor-api")
 
 
@@ -59,13 +64,14 @@ def build_ardupilot(ref, work, log):
     # Pre-4.5 ships a waf that uses the `imp` module, removed in Python 3.12. Older
     # releases therefore fail to configure on a current toolchain (a maintainability
     # finding); retry with Python 3.11 to recover the measurable posture where possible.
-    if status == "configure failed" and shutil.which("python3.11"):
+    if status == "configure failed" and _OLD_WAF_PYTHON:
         with open(log) as fh:
-            if "No module named 'imp'" in fh.read():
+            blog = fh.read()
+            if ("No module named 'imp'" in blog or "invalid mode: 'rUb'" in blog) and _OLD_WAF_PYTHON:
                 sh(["git", "clean", "-xfdq", "build"], src, log)
-                status = _waf_build(src, log, "python3.11")
+                status = _waf_build(src, log, _OLD_WAF_PYTHON)
                 if status == "ok":
-                    status = "ok (python3.11)"
+                    status = "ok (python3.10)"
     return src, status
 
 

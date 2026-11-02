@@ -1,0 +1,12 @@
+{
+  "tool": "mavaudit",
+  "version": "0.2.0",
+  "generated_utc": "2026-11-02T18:45:15+00:00",
+  "target": "udpin:127.0.0.1:14550",
+  "scope_ref": null,
+  "duration_s": 12.0,
+  "unsigned_probe": null,
+  "endpoints": [],
+  "findings": [],
+  "disclaimer": "CRA references map findings to Regulation (EU) 2024/2847 Annex I as a technical interpretation; they are not legal advice or a conformity assessment."
+}

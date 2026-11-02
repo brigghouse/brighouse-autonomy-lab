@@ -54,11 +54,18 @@ def wait_heartbeat(conn, timeout: float = 30.0):
     return hb
 
 
+def _assert_local(connection: str) -> None:
+    """Lab helpers write configuration (SETUP_SIGNING): only ever to a local simulator."""
+    if "127.0.0.1" not in connection and "localhost" not in connection:
+        raise ValueError(f"labkit only talks to local simulators, refusing {connection!r}")
+
+
 def provision_signing(connection: str, key: bytes, target_system: int = 1, target_component: int = 1,
                       signed: bool = False) -> None:
     """Send SETUP_SIGNING over a local simulated link (defender configuration step).
     If `signed` is true the request itself is signed with `key` (needed by stacks that
     only accept key changes from an already-keyed peer)."""
+    _assert_local(connection)
     conn = mavutil.mavlink_connection(connection, source_system=255, dialect="all")
     wait_heartbeat(conn)
     if signed:
@@ -80,8 +87,14 @@ def audit(target: str, out: Path, duration: float = 15.0) -> dict:
 
 def keyed_check(target: str, key: bytes, seconds: float = 8.0) -> dict:
     """Connect WITH the key and count frames whose signature verifies (sanity check)."""
+    _assert_local(target)
     conn = mavutil.mavlink_connection(target, source_system=254, dialect="all")
-    conn.setup_signing(key, sign_outgoing=True, allow_unsigned_callback=lambda mav, msgid: True)
+    # initial_timestamp=0: pymavlink otherwise rejects a new stream whose timestamp is more than
+    # 1 minute behind *its* wall-clock timestamp. PX4 SITL's signing clock can lag wall time under
+    # load (lockstep), which made valid signatures look invalid. We measure signature validity
+    # here, not replay protection.
+    conn.setup_signing(key, sign_outgoing=False, allow_unsigned_callback=lambda mav, msgid: True,
+                       initial_timestamp=0)
     good = total = unknown = 0
     deadline = time.time() + seconds
     while time.time() < deadline:
@@ -119,6 +132,7 @@ def summarise(report: dict) -> dict:
         "unsigned_types": ep["unsigned_types"] if ep else [],
         "firmware": ep["firmware"] if ep else None,
         "ftp_advertised": ep["ftp_advertised"] if ep else None,
+        "command_ack_result": (report.get("unsigned_probe") or {}).get("command_ack_result"),
         "unsigned_probe_answered": (report.get("unsigned_probe") or {}).get("answered"),
         "findings": sorted({f["id"] for f in report["findings"]}),
     }

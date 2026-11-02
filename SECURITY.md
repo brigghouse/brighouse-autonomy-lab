@@ -13,7 +13,7 @@ If you use this lab to find an issue in PX4, ArduPilot, QGroundControl, Mission 
 mavaudit is a **defensive configuration auditor**:
 
 - It is passive by default. With `--active-probe` it sends two unsigned, read-only requests: one parameter read and one `AUTOPILOT_VERSION` request.
-- It refuses non-loopback, non-private targets unless `--authorized --scope-ref <id>` is given.
-- It never transmits RF. All lab work runs in software-in-the-loop simulation.
+- It refuses non-loopback, non-private targets unless `--authorized --scope-ref <id>` is given. For listening targets (`udpin:`) it also checks the address the traffic came from before probing.
+- It contains no RF code. On a serial port attached to a telemetry radio, however, the active probe would be transmitted, so `--active-probe` on serial targets requires `--authorized --scope-ref <id>`. All published lab work runs in software-in-the-loop simulation.
 
 Only test systems you own, or systems you hold written authorisation to test.

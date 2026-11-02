@@ -2,7 +2,7 @@
 
 - Target: `tcp:127.0.0.1:5762`
 - Scope reference: lab / private network
-- Generated (UTC): 2026-11-02T15:37:52+00:00 by mavaudit 0.2.0
+- Generated (UTC): 2026-11-02T16:31:01+00:00 by mavaudit 0.2.0
 - Passive observation window: 15.0 s
 - Active read-only probe: yes
 
@@ -10,7 +10,7 @@
 
 | sysid/compid | autopilot | firmware | frames | MAVLink 1 | MAVLink 2 | signed | FTP advertised |
 |---|---|---|---|---|---|---|---|
-| 1/1 | ardupilot | - | 24 | 0 | 24 | 24 | - |
+| 1/1 | ardupilot | - | 25 | 0 | 25 | 25 | - |
 
 ## Findings
 

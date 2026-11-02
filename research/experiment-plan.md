@@ -21,7 +21,7 @@ Objetivo: obtener **datos propios y reproducibles** que respalden el paper, todo
 | E4 | PX4 | estable actual | firma activada (si existe) | igual, con `--out reports/E4` |
 | E5 | ArduPilot / PX4 | — | comprobar si QGC / Mission Planner aceptan la firma | manual, con capturas |
 
-En cada prueba se registra: versión exacta (hash de git), sistema operativo, comando usado, informe JSON y una captura de Wireshark (`.pcapng`).
+En cada prueba se registra: versión exacta (hash de git), comando usado, informe JSON/Markdown y log del simulador. (Las capturas `.pcapng` de Wireshark previstas en el diseño original no se han hecho todavía.)
 
 ## Reproducibilidad
 

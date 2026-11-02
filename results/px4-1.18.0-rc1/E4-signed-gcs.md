@@ -2,7 +2,7 @@
 
 - Target: `udpin:127.0.0.1:14550`
 - Scope reference: lab / private network
-- Generated (UTC): 2026-11-02T15:46:36+00:00 by mavaudit 0.2.0
+- Generated (UTC): 2026-11-02T16:34:47+00:00 by mavaudit 0.2.0
 - Passive observation window: 15.0 s
 - Active read-only probe: yes
 
@@ -10,7 +10,7 @@
 
 | sysid/compid | autopilot | firmware | frames | MAVLink 1 | MAVLink 2 | signed | FTP advertised |
 |---|---|---|---|---|---|---|---|
-| 1/1 | px4 | - | 7371 | 0 | 7371 | 7371 | - |
+| 1/1 | px4 | - | 7506 | 0 | 7506 | 7506 | - |
 
 ## Findings
 

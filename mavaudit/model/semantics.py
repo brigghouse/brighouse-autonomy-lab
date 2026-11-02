@@ -45,6 +45,8 @@ class Policy:
     replay_check: bool = True
     #: does the vehicle sign its own outbound frames on link l? (telemetry may stay unsigned)
     sign_outgoing_on_trusted: bool = True
+    #: key is installed out of band (factory), not over MAVLink: V starts keyed, no TOFU window
+    oob_provision: bool = False
 
 
 @dataclass(frozen=True)

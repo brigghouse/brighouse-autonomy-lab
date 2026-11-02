@@ -41,7 +41,11 @@ def decode_version(flight_sw_version: int) -> tuple[int, int, int, int]:
     return (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF
 
 
-def matching(autopilot: str | None, condition: str, version: tuple[int, int, int] | None = None) -> list[dict]:
+OFFICIAL = 255  # FIRMWARE_VERSION_TYPE_OFFICIAL; lower values are dev/alpha/beta/rc builds
+
+
+def matching(autopilot: str | None, condition: str, version: tuple[int, int, int] | None = None,
+             version_type: int | None = None) -> list[dict]:
     out = []
     for adv in ADVISORIES:
         if adv["applies_when"] != condition:
@@ -49,7 +53,10 @@ def matching(autopilot: str | None, condition: str, version: tuple[int, int, int
         if adv["autopilot"] not in ("any", autopilot):
             continue
         fixed = adv.get("fixed_in")
-        if fixed and version and tuple(version[:3]) >= fixed:
-            continue
+        if fixed and version:
+            v = tuple(version[:3])
+            # A pre-release of the fixed version (e.g. 1.17.0-rc1) may predate the fix: keep it.
+            if v > fixed or (v == fixed and version_type in (None, OFFICIAL)):
+                continue
         out.append({k: adv[k] for k in ("id", "ref", "summary")})
     return out

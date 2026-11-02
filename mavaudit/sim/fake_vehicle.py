@@ -3,6 +3,8 @@
 Sends HEARTBEATs and answers PARAM_REQUEST_READ. Modes:
 - unsigned:  MAVLink 2, no signing, answers everyone (typical default config)
 - signed:    signs outgoing frames and rejects unsigned incoming messages
+- signed-exempt: signs outgoing frames but ACCEPTS unsigned input (like a signing-exempt
+             USB / channel-0 link); a passive observer would wrongly think it is protected
 - v1:        MAVLink 1 framing
 
     python -m mavaudit.sim.fake_vehicle --mode unsigned --port 14550
@@ -20,14 +22,17 @@ from pymavlink.dialects.v20 import ardupilotmega as mavlink2
 
 
 def demo_key(passphrase: str = "brighouse-lab-demo") -> bytes:
+    """Demo signing key for the reference vehicle only. Never use for a real vehicle."""
     return hashlib.sha256(passphrase.encode()).digest()
 
 
 class FakeVehicle:
     def __init__(self, port: int, mode: str = "unsigned", autopilot: str = "ardupilot", sysid: int = 1,
-                 version: tuple[int, int, int] = (4, 7, 2)):
+                 version: tuple[int, int, int] = (4, 7, 2), version_type: int = 255, param_error: bool = False):
         self.mode = mode
         self.version = version
+        self.version_type = version_type
+        self.param_error = param_error  # answer parameter reads with PARAM_ERROR instead of PARAM_VALUE
         self.sysid = sysid
         self.autopilot = (mavlink2.MAV_AUTOPILOT_ARDUPILOTMEGA if autopilot == "ardupilot"
                           else mavlink2.MAV_AUTOPILOT_PX4)
@@ -41,6 +46,9 @@ class FakeVehicle:
             # Only RADIO_STATUS may be accepted unsigned (per the signing spec).
             self.conn.setup_signing(demo_key(), sign_outgoing=True,
                                     allow_unsigned_callback=lambda mav, msgid: msgid == mavlink2.MAVLINK_MSG_ID_RADIO_STATUS)
+        elif mode == "signed-exempt":
+            self.conn.setup_signing(demo_key(), sign_outgoing=True,
+                                    allow_unsigned_callback=lambda mav, msgid: True)
         self._stop = threading.Event()
         self.answered = 0
 
@@ -65,18 +73,24 @@ class FakeVehicle:
                 continue
             if msg.get_type() == "PARAM_REQUEST_READ":
                 self.answered += 1
-                self.conn.mav.param_value_send(self.param.encode(), float(self.sysid),
-                                               mavlink2.MAV_PARAM_TYPE_INT32, 1, 0,
-                                               force_mavlink1=(self.mode == "v1"))
+                if self.param_error:
+                    self.conn.mav.param_error_send(msg.get_srcSystem(), msg.get_srcComponent(),
+                                                   msg.param_id.encode() if isinstance(msg.param_id, str) else msg.param_id,
+                                                   msg.param_index, 1)
+                else:
+                    self.conn.mav.param_value_send(self.param.encode(), float(self.sysid),
+                                                   mavlink2.MAV_PARAM_TYPE_INT32, 1, 0,
+                                                   force_mavlink1=(self.mode == "v1"))
             elif (msg.get_type() == "COMMAND_LONG" and msg.command == mavlink2.MAV_CMD_REQUEST_MESSAGE
                   and int(msg.param1) == mavlink2.MAVLINK_MSG_ID_AUTOPILOT_VERSION and self.mode != "v1"):
+                self.conn.mav.command_ack_send(mavlink2.MAV_CMD_REQUEST_MESSAGE, mavlink2.MAV_RESULT_ACCEPTED)
                 self._send_autopilot_version()
 
     def _send_autopilot_version(self):
         caps = (mavlink2.MAV_PROTOCOL_CAPABILITY_MAVLINK2 | mavlink2.MAV_PROTOCOL_CAPABILITY_FTP
                 | mavlink2.MAV_PROTOCOL_CAPABILITY_MISSION_INT)
         major, minor, patch = self.version
-        sw = (major << 24) | (minor << 16) | (patch << 8) | 255  # 255 = FIRMWARE_VERSION_TYPE_OFFICIAL
+        sw = (major << 24) | (minor << 16) | (patch << 8) | self.version_type  # 255 = official release
         self.conn.mav.autopilot_version_send(caps, sw, 0, 0, 0, b"\x00" * 8, b"\x00" * 8, b"\x00" * 8,
                                              0, 0, 0, b"\x00" * 18)
 
@@ -92,7 +106,7 @@ class FakeVehicle:
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--port", type=int, default=14550)
-    p.add_argument("--mode", choices=["unsigned", "signed", "v1"], default="unsigned")
+    p.add_argument("--mode", choices=["unsigned", "signed", "signed-exempt", "v1"], default="unsigned")
     p.add_argument("--autopilot", choices=["ardupilot", "px4"], default="ardupilot")
     p.add_argument("--duration", type=float, default=None)
     a = p.parse_args()

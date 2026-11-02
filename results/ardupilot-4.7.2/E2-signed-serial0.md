@@ -2,7 +2,7 @@
 
 - Target: `tcp:127.0.0.1:5760`
 - Scope reference: lab / private network
-- Generated (UTC): 2026-11-02T15:37:23+00:00 by mavaudit 0.2.0
+- Generated (UTC): 2026-11-02T16:30:32+00:00 by mavaudit 0.2.0
 - Passive observation window: 15.0 s
 - Active read-only probe: yes
 

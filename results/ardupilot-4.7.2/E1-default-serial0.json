@@ -1,7 +1,7 @@
 {
   "tool": "mavaudit",
   "version": "0.2.0",
-  "generated_utc": "2026-11-02T15:36:41+00:00",
+  "generated_utc": "2026-11-02T16:29:49+00:00",
   "target": "tcp:127.0.0.1:5760",
   "scope_ref": null,
   "duration_s": 15.0,
@@ -10,15 +10,17 @@
     "compid": 1,
     "param": "index:0",
     "answered": true,
-    "response": "PARAM_VALUE"
+    "response": "PARAM_VALUE",
+    "command_ack_result": 0,
+    "autopilot_version_received": true
   },
   "endpoints": [
     {
       "sysid": 1,
       "compid": 1,
-      "frames": 35,
+      "frames": 36,
       "v1_frames": 0,
-      "v2_frames": 35,
+      "v2_frames": 36,
       "signed_frames": 0,
       "autopilot": "ardupilot",
       "mav_type": 2,
@@ -43,7 +45,7 @@
         "TIMESYNC"
       ],
       "type_counts": {
-        "HEARTBEAT": 22,
+        "HEARTBEAT": 23,
         "TIMESYNC": 2,
         "PARAM_VALUE": 4,
         "COMMAND_ACK": 1,
@@ -59,6 +61,7 @@
         7,
         2
       ],
+      "firmware_type": 255,
       "ftp_advertised": true
     }
   ],
@@ -67,7 +70,7 @@
       "id": "MAV-002",
       "severity": "high",
       "title": "No signed MAVLink frames",
-      "detail": "0/35 frames carry a MAVLink 2 signature. Commands and telemetry on this link have no cryptographic integrity or origin authentication.",
+      "detail": "0/36 frames carry a MAVLink 2 signature. Commands and telemetry on this link have no cryptographic integrity or origin authentication.",
       "endpoint": "1/1",
       "cra_refs": [
         "Annex I.I.2(b) secure by default",

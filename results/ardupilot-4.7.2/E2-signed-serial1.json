@@ -1,7 +1,7 @@
 {
   "tool": "mavaudit",
   "version": "0.2.0",
-  "generated_utc": "2026-11-02T15:37:52+00:00",
+  "generated_utc": "2026-11-02T16:31:01+00:00",
   "target": "tcp:127.0.0.1:5762",
   "scope_ref": null,
   "duration_s": 15.0,
@@ -10,31 +10,36 @@
     "compid": 1,
     "param": "index:0",
     "answered": false,
-    "response": null
+    "response": null,
+    "command_ack_result": null,
+    "autopilot_version_received": false
   },
   "endpoints": [
     {
       "sysid": 1,
       "compid": 1,
-      "frames": 24,
+      "frames": 25,
       "v1_frames": 0,
-      "v2_frames": 24,
-      "signed_frames": 24,
+      "v2_frames": 25,
+      "signed_frames": 25,
       "autopilot": "ardupilot",
       "mav_type": 2,
       "msg_types": [
         "HEARTBEAT",
+        "PARAM_VALUE",
         "TIMESYNC"
       ],
       "unsigned_types": [],
       "type_counts": {
         "TIMESYNC": 3,
-        "HEARTBEAT": 21
+        "HEARTBEAT": 21,
+        "PARAM_VALUE": 1
       },
       "capabilities": null,
       "firmware": null,
       "firmware_tuple": null,
-      "ftp_advertised": false
+      "firmware_type": null,
+      "ftp_advertised": null
     }
   ],
   "findings": [

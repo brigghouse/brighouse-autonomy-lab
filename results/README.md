@@ -6,29 +6,30 @@ software-in-the-loop simulations on 127.0.0.1.
 
 **Columns.** *signed* = frames sent by the vehicle that carried a MAVLink 2 signature.
 *Unsigned request answered* = the vehicle replied to mavaudit's unsigned, read-only parameter
-request. *Keyed check* = frames whose signature verified with the lab key (decoded frames only).
+request. *FTP advertised* = from `AUTOPILOT_VERSION`; *unknown* when the vehicle ignored the unsigned
+request for it. *Keyed check* = frames whose signature verified with the lab key (decoded frames only).
 **E2/E4** = the same audit repeated after the defender provisioning step (an unsigned `SETUP_SIGNING` with the
 lab key over the local link). On a stack without signing support the step has no effect.
 
 | Run folder | Source | Experiment | Frames | Signed | Unsigned request answered | FTP advertised | Keyed check | Findings |
 |---|---|---|---|---|---|---|---|---|
-| [ardupilot-4.7.2](ardupilot-4.7.2/) | AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960 | E1-default-serial0 | 35 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
-| [ardupilot-4.7.2](ardupilot-4.7.2/) | AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960 | E1-default-serial1 | 31 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
-| [ardupilot-4.7.2](ardupilot-4.7.2/) | AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960 | E2-signed-serial0 | 27 | 27 | yes | yes | 9/9 | MAV-004, MAV-005, MAV-006, MAV-007 |
-| [ardupilot-4.7.2](ardupilot-4.7.2/) | AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960 | E2-signed-serial1 | 24 | 24 | no | no | 9/9 | MAV-004 |
-| [px4-1.17.0](px4-1.17.0/) | v1.17.0@d6f12ad1c4f7 | E3-default-gcs | 7321 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
-| [px4-1.17.0](px4-1.17.0/) | v1.17.0@d6f12ad1c4f7 | E3-default-onboard | 8023 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
-| [px4-1.17.0](px4-1.17.0/) | v1.17.0@d6f12ad1c4f7 | E4-signed-gcs | 7309 | 0 | yes | yes | 0/2906 | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
-| [px4-1.17.0](px4-1.17.0/) | v1.17.0@d6f12ad1c4f7 | E4-signed-onboard | 8058 | 0 | yes | yes | 0/3194 | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
-| [px4-1.18.0-rc1](px4-1.18.0-rc1/) | v1.18.0-rc1@fca3df865af3 | E3-default-gcs | 7355 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
-| [px4-1.18.0-rc1](px4-1.18.0-rc1/) | v1.18.0-rc1@fca3df865af3 | E3-default-onboard | 8470 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
-| [px4-1.18.0-rc1](px4-1.18.0-rc1/) | v1.18.0-rc1@fca3df865af3 | E4-signed-gcs | 7371 | 7371 | no | no | 2911/2911 | MAV-004 |
-| [px4-1.18.0-rc1](px4-1.18.0-rc1/) | v1.18.0-rc1@fca3df865af3 | E4-signed-onboard | 8486 | 8486 | no | no | 3222/3222 | MAV-004 |
+| [ardupilot-4.7.2](ardupilot-4.7.2/) | AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960 | E1-default-serial0 | 36 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
+| [ardupilot-4.7.2](ardupilot-4.7.2/) | AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960 | E1-default-serial1 | 33 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
+| [ardupilot-4.7.2](ardupilot-4.7.2/) | AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960 | E2-signed-serial0 | 27 | 27 | yes | yes | 10/10 | MAV-004, MAV-005, MAV-006, MAV-007 |
+| [ardupilot-4.7.2](ardupilot-4.7.2/) | AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960 | E2-signed-serial1 | 25 | 25 | no | unknown | 9/9 | MAV-004 |
+| [px4-1.17.0](px4-1.17.0/) | v1.17.0@d6f12ad1c4f7 | E3-default-gcs | 7492 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
+| [px4-1.17.0](px4-1.17.0/) | v1.17.0@d6f12ad1c4f7 | E3-default-onboard | 8269 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
+| [px4-1.17.0](px4-1.17.0/) | v1.17.0@d6f12ad1c4f7 | E4-signed-gcs | 7489 | 0 | yes | yes | 0/2913 | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
+| [px4-1.17.0](px4-1.17.0/) | v1.17.0@d6f12ad1c4f7 | E4-signed-onboard | 8263 | 0 | yes | yes | 0/3222 | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
+| [px4-1.18.0-rc1](px4-1.18.0-rc1/) | v1.18.0-rc1@fca3df865af3 | E3-default-gcs | 7551 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
+| [px4-1.18.0-rc1](px4-1.18.0-rc1/) | v1.18.0-rc1@fca3df865af3 | E3-default-onboard | 8672 | 0 | yes | yes | - | MAV-002, MAV-004, MAV-005, MAV-006, MAV-007 |
+| [px4-1.18.0-rc1](px4-1.18.0-rc1/) | v1.18.0-rc1@fca3df865af3 | E4-signed-gcs | 7506 | 7506 | no | unknown | 2900/2900 | MAV-004 |
+| [px4-1.18.0-rc1](px4-1.18.0-rc1/) | v1.18.0-rc1@fca3df865af3 | E4-signed-onboard | 8681 | 8681 | no | unknown | 3219/3219 | MAV-004 |
 
 ## Extra measurements
 
-- **ardupilot-4.7.2** (ArduPilot Copter, 2026-11-02T15:36:20Z): `{"note": "At run time the upstream 'ArduCopter-stable' tag pointed at this commit."}`
-- **px4-1.17.0** (PX4 (SIH), 2026-11-02T15:43:02Z): `{"key_file_present": false, "key_file_size": null, "tofu_unsigned_rekey": {"key_file_changed": false, "original_key_still_valid": {"frames_decoded": 2885, "valid_signatures": 0, "unknown_msgid_frames_skipped": 14}}}`
-- **px4-1.18.0-rc1** (PX4 (SIH), 2026-11-02T15:45:14Z): `{"key_file_present": true, "key_file_size": 40, "tofu_unsigned_rekey": {"key_file_changed": false, "original_key_still_valid": {"frames_decoded": 2915, "valid_signatures": 2915, "unknown_msgid_frames_skipped": 34}}}`
+- **ardupilot-4.7.2** (ArduPilot Copter, 2026-11-02T16:29:27Z): `{"note": "At run time the upstream 'ArduCopter-stable' tag pointed at this commit."}`
+- **px4-1.17.0** (PX4 (SIH), 2026-11-02T16:31:10Z): `{"key_file_present": false, "key_file_size": null, "tofu_unsigned_rekey": {"key_file_changed": false, "original_key_still_valid": {"frames_decoded": 2908, "valid_signatures": 0, "unknown_msgid_frames_skipped": 15}}}`
+- **px4-1.18.0-rc1** (PX4 (SIH), 2026-11-02T16:33:23Z): `{"key_file_present": true, "key_file_size": 40, "tofu_unsigned_rekey": {"key_file_changed": false, "original_key_still_valid": {"frames_decoded": 2917, "valid_signatures": 2917, "unknown_msgid_frames_skipped": 35}}}`
 
 Finding IDs are described in [docs/findings.md](../docs/findings.md).

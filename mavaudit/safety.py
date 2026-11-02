@@ -46,10 +46,23 @@ def is_lab_address(host: str) -> bool:
     return ip.is_loopback or ip.is_private or ip.is_link_local
 
 
-def check_scope(connection: str, authorized: bool = False, scope_ref: str | None = None) -> Target:
-    """Validate the target. Serial links are physical bench connections and allowed."""
+def check_scope(connection: str, authorized: bool = False, scope_ref: str | None = None,
+                active: bool = False) -> Target:
+    """Validate the target.
+
+    Serial links are allowed for passive listening (wired bench). An active probe over a
+    serial port may go out over a telemetry radio, so it needs explicit authorisation.
+    For listening targets (udpin/tcpin/udp) the host is mavaudit's own bind address; the
+    sending peer is checked separately by `check_peer` before any active probe.
+    """
     target = parse_target(connection)
     if target.kind == "serial":
+        if active and (not authorized or not scope_ref):
+            raise ScopeError(
+                "--active-probe on a serial port may be transmitted over a radio link. Re-run with "
+                "--authorized --scope-ref <engagement-id> only if every vehicle that could receive "
+                "it is covered by written authorisation."
+            )
         return target
     assert target.host is not None
     if is_lab_address(target.host):
@@ -61,3 +74,12 @@ def check_scope(connection: str, authorized: bool = False, scope_ref: str | None
             "authorisation from the system owner."
         )
     return target
+
+
+def check_peer(peer_host: str | None, authorized: bool = False, scope_ref: str | None = None) -> bool:
+    """Return True if an active probe may be sent to `peer_host` (the address traffic came from)."""
+    if peer_host is None:
+        return True  # outbound client connection: the target itself was already checked
+    if is_lab_address(peer_host) and peer_host != "0.0.0.0":
+        return True
+    return bool(authorized and scope_ref)

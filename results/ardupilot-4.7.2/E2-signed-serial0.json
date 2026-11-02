@@ -1,7 +1,7 @@
 {
   "tool": "mavaudit",
   "version": "0.2.0",
-  "generated_utc": "2026-11-02T15:37:23+00:00",
+  "generated_utc": "2026-11-02T16:30:32+00:00",
   "target": "tcp:127.0.0.1:5760",
   "scope_ref": null,
   "duration_s": 15.0,
@@ -10,7 +10,9 @@
     "compid": 1,
     "param": "index:0",
     "answered": true,
-    "response": "PARAM_VALUE"
+    "response": "PARAM_VALUE",
+    "command_ack_result": 0,
+    "autopilot_version_received": true
   },
   "endpoints": [
     {
@@ -44,6 +46,7 @@
         7,
         2
       ],
+      "firmware_type": 255,
       "ftp_advertised": true
     }
   ],

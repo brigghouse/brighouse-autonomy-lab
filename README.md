@@ -35,3 +35,4 @@ python3 -m mavaudit scan --target udpin:127.0.0.1:14550 --duration 10 --active-p
 ## Estado
 
 v0.1 (2026-11-02). Siguientes pasos en [`vault/proyecto/pendientes.md`](vault/proyecto/pendientes.md).
+- [research/market/](research/market/INDEX.md)

@@ -7,7 +7,7 @@
 # stable tag from https://github.com/ArduPilot/ardupilot/tags (e.g. Copter-4.x.y).
 FROM ubuntu:22.04
 
-ARG ARDUPILOT_REF=Copter-4.6
+ARG ARDUPILOT_REF=Copter-4.7.2
 ENV DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC
 
 RUN apt-get update && apt-get install -y --no-install-recommends \

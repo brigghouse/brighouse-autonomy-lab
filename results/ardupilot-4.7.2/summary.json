@@ -1,0 +1,99 @@
+{
+  "stack": "ArduPilot Copter",
+  "source_rev": "AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960",
+  "started_utc": "2026-11-02T15:36:20Z",
+  "runs": {
+    "E1-default-serial0": {
+      "exit_code": 0,
+      "frames": 35,
+      "signed_frames": 0,
+      "v1_frames": 0,
+      "unsigned_types": [
+        "AUTOPILOT_VERSION",
+        "COMMAND_ACK",
+        "GPS_GLOBAL_ORIGIN",
+        "HEARTBEAT",
+        "HOME_POSITION",
+        "PARAM_VALUE",
+        "STATUSTEXT",
+        "TIMESYNC"
+      ],
+      "firmware": "4.7.2 (type 255)",
+      "ftp_advertised": true,
+      "unsigned_probe_answered": true,
+      "findings": [
+        "MAV-002",
+        "MAV-004",
+        "MAV-005",
+        "MAV-006",
+        "MAV-007"
+      ]
+    },
+    "E1-default-serial1": {
+      "exit_code": 0,
+      "frames": 31,
+      "signed_frames": 0,
+      "v1_frames": 0,
+      "unsigned_types": [
+        "AUTOPILOT_VERSION",
+        "COMMAND_ACK",
+        "GPS_GLOBAL_ORIGIN",
+        "HEARTBEAT",
+        "HOME_POSITION",
+        "PARAM_VALUE",
+        "SYS_STATUS",
+        "TIMESYNC"
+      ],
+      "firmware": "4.7.2 (type 255)",
+      "ftp_advertised": true,
+      "unsigned_probe_answered": true,
+      "findings": [
+        "MAV-002",
+        "MAV-004",
+        "MAV-005",
+        "MAV-006",
+        "MAV-007"
+      ]
+    },
+    "E2-signed-serial0": {
+      "exit_code": 0,
+      "frames": 27,
+      "signed_frames": 27,
+      "v1_frames": 0,
+      "unsigned_types": [],
+      "firmware": "4.7.2 (type 255)",
+      "ftp_advertised": true,
+      "unsigned_probe_answered": true,
+      "findings": [
+        "MAV-004",
+        "MAV-005",
+        "MAV-006",
+        "MAV-007"
+      ],
+      "keyed_check": {
+        "frames_decoded": 9,
+        "valid_signatures": 9,
+        "unknown_msgid_frames_skipped": 0
+      }
+    },
+    "E2-signed-serial1": {
+      "exit_code": 0,
+      "frames": 24,
+      "signed_frames": 24,
+      "v1_frames": 0,
+      "unsigned_types": [],
+      "firmware": null,
+      "ftp_advertised": false,
+      "unsigned_probe_answered": false,
+      "findings": [
+        "MAV-004"
+      ],
+      "keyed_check": {
+        "frames_decoded": 9,
+        "valid_signatures": 9,
+        "unknown_msgid_frames_skipped": 0
+      }
+    }
+  },
+  "note": "At run time the upstream 'ArduCopter-stable' tag pointed at this commit."
+}

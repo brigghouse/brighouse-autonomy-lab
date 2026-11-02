@@ -1,5 +1,7 @@
 # Plan de experimentos: Paper 1
 
+> **Estado (2026-11-02):** E1-E4 ejecutados en ArduPilot 4.7.2, PX4 1.17.0 y PX4 1.18.0-rc1 → [results/](../results/README.md). E5 queda pendiente (necesita interfaz gráfica). Los comandos reales están en `scripts/run_ardupilot.py` y `scripts/run_px4.py`; la tabla de abajo es el diseño original.
+
 Objetivo: obtener **datos propios y reproducibles** que respalden el paper, todo en simulación.
 
 ## Preguntas
@@ -23,8 +25,8 @@ En cada prueba se registra: versión exacta (hash de git), sistema operativo, co
 
 ## Reproducibilidad
 
-- Cada informe se guarda en `reports/` (excluido de git; se suben solo los resúmenes al paper).
-- Los resultados se anotan en [el diario del vault](../vault/diario/2026-11-02.md).
+- Cada informe se guarda en `results/<ejecución>/` junto con `summary.json` y el log del simulador.
+- Los resultados se anotan en [el cuaderno de laboratorio](../notebook/diario/2026-11-02.md).
 
 ## Ética
 

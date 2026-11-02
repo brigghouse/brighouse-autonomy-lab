@@ -43,7 +43,7 @@
 ### 2.1 PX4
 - **History.**
   - An early proof of concept, PX4/Firmware PR #7530 ("First stab at Mavlink signing", opened July 2017), used a hard-coded key. It was **closed without merging** in March 2021 ([PR #7530](https://github.com/PX4/Firmware/pull/7530)).
-  - PX4 v1.17 shipped a signing implementation configured by a non-standard parameter, `MAV_SIGN_CFG`. In that version `SETUP_SIGNING` was accepted only over USB, as implied by the v1.18 notes.
+  - ~~PX4 v1.17 shipped a signing implementation configured by a non-standard parameter, `MAV_SIGN_CFG`.~~ **Correction (2026-11-02, from our own measurement):** the **v1.17.0 release** contains no signing code in `src/modules/mavlink` and no `MAV_SIGN_CFG` parameter. Provisioning in SITL had no effect (`results/px4-1.17.0/`). The v1.18 release notes' wording ("If you used signing in v1.17") probably refers to development builds between the two releases. **[VERIFY with PX4 maintainers]**
 - **v1.18 (in beta at the cut-off date): spec-compliant signing.** PR [#26894](https://github.com/PX4/PX4-Autopilot/pull/26894) is "fix(mavlink)!: align signing with MAVLink spec and fix performance regression", authored by mrpollo and opened 27 March 2026. The v1.18 release notes record the change as breaking ([v1.18 release notes](https://docs.px4.io/main/en/releases/1.18.html)):
   - Signing is active only when a valid key file is present on the SD card (`/mavlink/mavlink-signing-key.bin`, 40 bytes, mode 0600).
   - `SETUP_SIGNING` is accepted on **any** link but rejected while the vehicle is armed.

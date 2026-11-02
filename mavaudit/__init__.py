@@ -11,4 +11,4 @@ import os
 # The MAVLink 2 parser also accepts MAVLink 1 frames, so always enable it.
 os.environ.setdefault("MAVLINK20", "1")
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

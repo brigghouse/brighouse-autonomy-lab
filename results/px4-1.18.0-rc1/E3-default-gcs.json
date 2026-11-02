@@ -1,0 +1,217 @@
+{
+  "tool": "mavaudit",
+  "version": "0.2.0",
+  "generated_utc": "2026-11-02T15:45:54+00:00",
+  "target": "udpin:127.0.0.1:14550",
+  "scope_ref": null,
+  "duration_s": 15.0,
+  "unsigned_probe": {
+    "sysid": 1,
+    "compid": 1,
+    "param": "index:0",
+    "answered": true,
+    "response": "PARAM_VALUE"
+  },
+  "endpoints": [
+    {
+      "sysid": 1,
+      "compid": 1,
+      "frames": 7355,
+      "v1_frames": 0,
+      "v2_frames": 7355,
+      "signed_frames": 0,
+      "autopilot": "px4",
+      "mav_type": 2,
+      "msg_types": [
+        "ALTITUDE",
+        "ATTITUDE",
+        "ATTITUDE_QUATERNION",
+        "ATTITUDE_TARGET",
+        "AUTOPILOT_VERSION",
+        "BATTERY_STATUS",
+        "COMMAND_ACK",
+        "CURRENT_MODE",
+        "DISTANCE_SENSOR",
+        "ESTIMATOR_STATUS",
+        "EXTENDED_SYS_STATE",
+        "GLOBAL_POSITION_INT",
+        "GNSS_INTEGRITY",
+        "GPS_RAW_INT",
+        "HEARTBEAT",
+        "HOME_POSITION",
+        "LOCAL_POSITION_NED",
+        "MISSION_CURRENT",
+        "OPEN_DRONE_ID_LOCATION",
+        "OPEN_DRONE_ID_SYSTEM",
+        "PARAM_VALUE",
+        "PING",
+        "POSITION_TARGET_LOCAL_NED",
+        "SCALED_PRESSURE",
+        "SERVO_OUTPUT_RAW",
+        "SYS_STATUS",
+        "UNKNOWN_290",
+        "UNKNOWN_291",
+        "UNKNOWN_380",
+        "UNKNOWN_411",
+        "UNKNOWN_514",
+        "UNKNOWN_8",
+        "VFR_HUD",
+        "VIBRATION"
+      ],
+      "unsigned_types": [
+        "ALTITUDE",
+        "ATTITUDE",
+        "ATTITUDE_QUATERNION",
+        "ATTITUDE_TARGET",
+        "AUTOPILOT_VERSION",
+        "BATTERY_STATUS",
+        "COMMAND_ACK",
+        "CURRENT_MODE",
+        "DISTANCE_SENSOR",
+        "ESTIMATOR_STATUS",
+        "EXTENDED_SYS_STATE",
+        "GLOBAL_POSITION_INT",
+        "GNSS_INTEGRITY",
+        "GPS_RAW_INT",
+        "HEARTBEAT",
+        "HOME_POSITION",
+        "LOCAL_POSITION_NED",
+        "MISSION_CURRENT",
+        "OPEN_DRONE_ID_LOCATION",
+        "OPEN_DRONE_ID_SYSTEM",
+        "PARAM_VALUE",
+        "PING",
+        "POSITION_TARGET_LOCAL_NED",
+        "SCALED_PRESSURE",
+        "SERVO_OUTPUT_RAW",
+        "SYS_STATUS",
+        "UNKNOWN_290",
+        "UNKNOWN_291",
+        "UNKNOWN_380",
+        "UNKNOWN_411",
+        "UNKNOWN_514",
+        "UNKNOWN_8",
+        "VFR_HUD",
+        "VIBRATION"
+      ],
+      "type_counts": {
+        "SERVO_OUTPUT_RAW": 982,
+        "ATTITUDE_TARGET": 981,
+        "LOCAL_POSITION_NED": 981,
+        "POSITION_TARGET_LOCAL_NED": 981,
+        "ATTITUDE": 981,
+        "ATTITUDE_QUATERNION": 981,
+        "GLOBAL_POSITION_INT": 981,
+        "GPS_RAW_INT": 98,
+        "VFR_HUD": 78,
+        "HEARTBEAT": 19,
+        "ALTITUDE": 19,
+        "BATTERY_STATUS": 10,
+        "CURRENT_MODE": 10,
+        "DISTANCE_SENSOR": 10,
+        "UNKNOWN_290": 19,
+        "UNKNOWN_291": 19,
+        "ESTIMATOR_STATUS": 10,
+        "UNKNOWN_514": 10,
+        "EXTENDED_SYS_STATE": 19,
+        "GNSS_INTEGRITY": 19,
+        "HOME_POSITION": 10,
+        "OPEN_DRONE_ID_LOCATION": 19,
+        "OPEN_DRONE_ID_SYSTEM": 19,
+        "PING": 2,
+        "SCALED_PRESSURE": 19,
+        "SYS_STATUS": 19,
+        "VIBRATION": 2,
+        "UNKNOWN_8": 19,
+        "MISSION_CURRENT": 19,
+        "UNKNOWN_380": 10,
+        "UNKNOWN_411": 6,
+        "PARAM_VALUE": 1,
+        "AUTOPILOT_VERSION": 1,
+        "COMMAND_ACK": 1
+      },
+      "capabilities": 59647,
+      "firmware": "1.18.0 (type 192)",
+      "firmware_tuple": [
+        1,
+        18,
+        0
+      ],
+      "ftp_advertised": true
+    }
+  ],
+  "findings": [
+    {
+      "id": "MAV-002",
+      "severity": "high",
+      "title": "No signed MAVLink frames",
+      "detail": "0/7355 frames carry a MAVLink 2 signature. Commands and telemetry on this link have no cryptographic integrity or origin authentication.",
+      "endpoint": "1/1",
+      "cra_refs": [
+        "Annex I.I.2(b) secure by default",
+        "Annex I.I.2(d) protection from unauthorised access",
+        "Annex I.I.2(f) integrity of data and commands"
+      ],
+      "recommendation": "Enable MAVLink 2 message signing with a per-vehicle key and a key-provisioning process.",
+      "advisories": [
+        {
+          "id": "CVE-2026-1579",
+          "ref": "https://www.cisa.gov/news-events/ics-advisories/icsa-26-090-02",
+          "summary": "CISA ICSA-26-090-02: missing authentication for critical function in PX4 MAVLink (CWE-306, CVSS v3 9.8). Remediation: enable MAVLink 2 signing on non-USB links."
+        }
+      ]
+    },
+    {
+      "id": "MAV-006",
+      "severity": "high",
+      "title": "MAVLink FTP advertised on an unsigned link",
+      "detail": "The vehicle advertises MAV_PROTOCOL_CAPABILITY_FTP and this link accepts unauthenticated peers, so the file-transfer service is reachable without the signing key.",
+      "endpoint": "1/1",
+      "cra_refs": [
+        "Annex I.I.2(d) protection from unauthorised access",
+        "Annex I.I.2(j) limit attack surface"
+      ],
+      "recommendation": "Enable signing; disable or restrict MAVLink FTP in production builds where not needed.",
+      "advisories": []
+    },
+    {
+      "id": "MAV-007",
+      "severity": "info",
+      "title": "Firmware version identified",
+      "detail": "px4 firmware 1.18.0 (type 192). Track it against vendor advisories and the SBOM.",
+      "endpoint": "1/1",
+      "cra_refs": [
+        "Annex I.I.2(a) no known exploitable vulnerabilities",
+        "Annex I.II.1 SBOM"
+      ],
+      "recommendation": "Keep firmware on a supported release and monitor advisories (NVD, vendor GHSA).",
+      "advisories": []
+    },
+    {
+      "id": "MAV-004",
+      "severity": "info",
+      "title": "No link-layer confidentiality",
+      "detail": "MAVLink signing provides integrity only; payloads (position, mission, parameters) are sent in clear unless the radio link is encrypted.",
+      "endpoint": "1/1",
+      "cra_refs": [
+        "Annex I.I.2(e) confidentiality"
+      ],
+      "recommendation": "Use an encrypted datalink (e.g. AES-capable radio) or a VPN/tunnel for IP links; assess per threat model.",
+      "advisories": []
+    },
+    {
+      "id": "MAV-005",
+      "severity": "high",
+      "title": "Vehicle answers unsigned requests",
+      "detail": "An unsigned PARAM_REQUEST_READ (index:0) was answered by system 1 with PARAM_VALUE. Unsigned peers are served by the parameter protocol, so they can at least read configuration.",
+      "endpoint": "1/1",
+      "cra_refs": [
+        "Annex I.I.2(d) protection from unauthorised access",
+        "Annex I.I.2(j) limit attack surface"
+      ],
+      "recommendation": "Enable signing on the vehicle so unsigned messages are rejected.",
+      "advisories": []
+    }
+  ],
+  "disclaimer": "CRA references map findings to Regulation (EU) 2024/2847 Annex I as a technical interpretation; they are not legal advice or a conformity assessment."
+}

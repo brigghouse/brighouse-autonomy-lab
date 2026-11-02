@@ -1,0 +1,66 @@
+{
+  "cross_section": [
+    {
+      "label": "IDEAL (model target)",
+      "score": 100.0,
+      "grade": "A",
+      "policy": "ideal-oob-provisioning"
+    },
+    {
+      "label": "ArduPilot 4.7.2 SERIAL1 signed",
+      "score": 70.0,
+      "grade": "C",
+      "policy": "ardupilot-4.7.2"
+    },
+    {
+      "label": "PX4 1.18 GCS signed",
+      "score": 70.0,
+      "grade": "C",
+      "policy": "px4-1.18"
+    },
+    {
+      "label": "ArduPilot 4.7.2 ch0 signed",
+      "score": 42.0,
+      "grade": "D",
+      "policy": "ardupilot-4.7.2"
+    },
+    {
+      "label": "PX4 1.17 GCS default",
+      "score": 20.0,
+      "grade": "E",
+      "policy": "px4-1.17"
+    },
+    {
+      "label": "PX4 1.17 GCS provisioned",
+      "score": 20.0,
+      "grade": "E",
+      "policy": "px4-1.17"
+    },
+    {
+      "label": "ArduPilot 4.7.2 ch0 default",
+      "score": 14.0,
+      "grade": "E",
+      "policy": "ardupilot-4.7.2"
+    },
+    {
+      "label": "PX4 1.18 GCS default",
+      "score": 14.0,
+      "grade": "E",
+      "policy": "px4-1.18"
+    }
+  ],
+  "longitudinal": [
+    {
+      "stack": "ardupilot",
+      "ref": "Copter-4.6.3",
+      "default_score": 14.0,
+      "provisioned_score": 42.0
+    },
+    {
+      "stack": "ardupilot",
+      "ref": "Copter-4.5.7",
+      "default_score": 14.0,
+      "provisioned_score": 42.0
+    }
+  ]
+}

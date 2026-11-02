@@ -22,3 +22,18 @@ github.com[0: 140.82.114.4]: errno=Connection timed out
 
 fatal: clone of 'git://github.com/ArduPilot/ChibiOS.git' into submodule path '/home/claude/sitl-long/ardupilot-Copter-4.0.7/modules/ChibiOS' failed
 Failed to clone 'modules/ChibiOS'. Retry scheduled
+fatal: unable to connect to github.com:
+github.com[0: 140.82.112.4]: errno=Connection timed out
+
+fatal: clone of 'git://github.com/google/benchmark.git' into submodule path '/home/claude/sitl-long/ardupilot-Copter-4.0.7/modules/gbenchmark' failed
+Failed to clone 'modules/gbenchmark'. Retry scheduled
+fatal: unable to connect to github.com:
+github.com[0: 140.82.114.3]: errno=Connection timed out
+
+fatal: clone of 'git://github.com/ArduPilot/googletest' into submodule path '/home/claude/sitl-long/ardupilot-Copter-4.0.7/modules/gtest' failed
+Failed to clone 'modules/gtest'. Retry scheduled
+fatal: unable to connect to github.com:
+github.com[0: 140.82.114.4]: errno=Connection timed out
+
+fatal: clone of 'git://github.com/ArduPilot/libcanard.git' into submodule path '/home/claude/sitl-long/ardupilot-Copter-4.0.7/modules/libcanard' failed
+Failed to clone 'modules/libcanard'. Retry scheduled

@@ -1,7 +1,75 @@
 {
   "generated": "2026-11-02",
-  "versions": 1,
+  "versions": 6,
   "rows": [
+    {
+      "stack": "ardupilot",
+      "ref": "Copter-4.1.6",
+      "ver": [
+        4,
+        1,
+        6
+      ],
+      "status": "configure failed",
+      "default_signed": null,
+      "can_sign": null,
+      "ch0_exempt": null
+    },
+    {
+      "stack": "ardupilot",
+      "ref": "Copter-4.2.4",
+      "ver": [
+        4,
+        2,
+        4
+      ],
+      "status": "configure failed",
+      "default_signed": null,
+      "can_sign": null,
+      "ch0_exempt": null
+    },
+    {
+      "stack": "ardupilot",
+      "ref": "Copter-4.3.8",
+      "ver": [
+        4,
+        3,
+        8
+      ],
+      "status": "configure failed",
+      "default_signed": null,
+      "can_sign": null,
+      "ch0_exempt": null
+    },
+    {
+      "stack": "ardupilot",
+      "ref": "Copter-4.4.4",
+      "ver": [
+        4,
+        4,
+        4
+      ],
+      "status": "configure failed",
+      "default_signed": null,
+      "can_sign": null,
+      "ch0_exempt": null
+    },
+    {
+      "stack": "ardupilot",
+      "ref": "Copter-4.5.7",
+      "ver": [
+        4,
+        5,
+        7
+      ],
+      "status": "ok",
+      "firmware": "4.5.7 (type 255)",
+      "default_signed": false,
+      "can_sign": true,
+      "ch0_exempt": true,
+      "valid_sig": 11,
+      "frames_decoded": 11
+    },
     {
       "stack": "ardupilot",
       "ref": "Copter-4.6.3",

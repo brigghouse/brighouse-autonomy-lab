@@ -17,3 +17,25 @@ Or undo this operation with:
 
 Turn off this advice by setting config variable advice.detachedHead to false
 
+
+$ ./waf configure --board sitl
+/home/claude/sitl-long/ardupilot-Copter-4.1.6/modules/waf/waflib/Utils.py:733: SyntaxWarning: invalid escape sequence '\d'
+  return re.split('\d+$', s)[0]
+/home/claude/sitl-long/ardupilot-Copter-4.1.6/modules/waf/waflib/ConfigSet.py:14: SyntaxWarning: invalid escape sequence '\ '
+  re_imp = re.compile('^(#)*?([^#=]*?)\ =\ (.*?)$', re.M)
+/home/claude/sitl-long/ardupilot-Copter-4.1.6/modules/waf/waflib/ansiterm.py:267: SyntaxWarning: invalid escape sequence '\['
+  ansi_tokens = re.compile('(?:\x1b\[([0-9?;]*)([a-zA-Z])|([^\x1b]+))')
+/home/claude/sitl-long/ardupilot-Copter-4.1.6/modules/waf/waflib/Context.py:616: SyntaxWarning: invalid escape sequence '\_'
+  :param var: glob expression, for example 'cxx\_\*.py'
+Traceback (most recent call last):
+  File "/home/claude/sitl-long/ardupilot-Copter-4.1.6/modules/waf/waf-light", line 166, in <module>
+    from waflib import Scripting
+  File "/home/claude/sitl-long/ardupilot-Copter-4.1.6/modules/waf/waflib/Scripting.py", line 10, in <module>
+    from waflib import Utils, Configure, Logs, Options, ConfigSet, Context, Errors, Build, Node
+  File "/home/claude/sitl-long/ardupilot-Copter-4.1.6/modules/waf/waflib/Configure.py", line 16, in <module>
+    from waflib import ConfigSet, Utils, Options, Logs, Context, Build, Errors
+  File "/home/claude/sitl-long/ardupilot-Copter-4.1.6/modules/waf/waflib/Options.py", line 14, in <module>
+    from waflib import Logs, Utils, Context, Errors
+  File "/home/claude/sitl-long/ardupilot-Copter-4.1.6/modules/waf/waflib/Context.py", line 9, in <module>
+    import os, re, imp, sys
+ModuleNotFoundError: No module named 'imp'

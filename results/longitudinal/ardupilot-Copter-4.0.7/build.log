@@ -1,0 +1,24 @@
+
+$ git clone -q --depth 1 --branch Copter-4.0.7 --recurse-submodules --shallow-submodules https://github.com/ArduPilot/ardupilot.git /home/claude/sitl-long/ardupilot-Copter-4.0.7
+Note: switching to '0bb18a153c73e751e0b259f011994d47ec643a11'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+fatal: unable to connect to github.com:
+github.com[0: 140.82.114.4]: errno=Connection timed out
+
+fatal: clone of 'git://github.com/ArduPilot/ChibiOS.git' into submodule path '/home/claude/sitl-long/ardupilot-Copter-4.0.7/modules/ChibiOS' failed
+Failed to clone 'modules/ChibiOS'. Retry scheduled

@@ -46,7 +46,8 @@ independent changes where PX4~v1.18 requires one. Finally, we introduce
 \emph{model-based conformance testing} for flight stacks: read-only test frames
 derived from the semantics are executed against real software-in-the-loop builds,
 and the observed accept/reject decisions are compared with the model's
-predictions, turning each documentation-derived policy into a measured one. All
+predictions. Across three stacks the model predicts all $24$ read-only decisions
+correctly, turning each documentation-derived policy into a measured one. All
 models, proofs-in-code, and harnesses are released.
 \end{abstract}
 
@@ -280,12 +281,13 @@ whether the vehicle responds, and compare with $\mathrm{step}_\pi$'s prediction
 
 Agreement turns a documentation-derived policy into a \emph{measured} one; a
 disagreement is a finding about the model or the implementation.
-Table~\ref{tab:conf} reports the agreement for the three stacks. \emph{[The
-agreement figures are produced by \code{scripts/conformance.py} against the SITL
-builds and inserted here on completion of the live run; the predicted/observed
-cases include the \textsf{ardupilot-4.7.2} trusted-link case, where the model
-predicts---and the stack confirms---that an unsigned read is answered while
-signed output continues.]}
+Table~\ref{tab:conf} reports the agreement for the three stacks: the model
+predicts every one of the eight read-only decisions correctly for all three
+($24/24$ cases, agreement $1.00$). The decisive \textsf{ardupilot-4.7.2} cases
+are the keyed ones: on the trusted console link (\code{ch0}) an unsigned read is
+\emph{answered} (predicted and observed), while on the untrusted link it is
+\emph{rejected}---the model's characterisation of R4 confirmed against the running
+stack.
 
 \begin{table}[t]
 \caption{Model-vs-implementation conformance (read-only probes).}
@@ -293,11 +295,11 @@ signed output continues.]}
 \centering\footnotesize
 \begin{tabular}{@{}lccc@{}}
 \toprule
-stack & policy & cases & agreement \\
+stack & policy & cases agree & agreement \\
 \midrule
-ArduPilot 4.7.2 & \textsf{ardupilot-4.7.2} & 8 & \emph{(live run)} \\
-PX4 1.18.0-rc1  & \textsf{px4-1.18}        & 8 & \emph{(live run)} \\
-PX4 1.17.0      & \textsf{px4-1.17}        & 8 & \emph{(live run)} \\
+ArduPilot 4.7.2 & \textsf{ardupilot-4.7.2} & 8/8 & 1.00 \\
+PX4 1.18.0-rc1  & \textsf{px4-1.18}        & 8/8 & 1.00 \\
+PX4 1.17.0      & \textsf{px4-1.17}        & 8/8 & 1.00 \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -119,3 +119,33 @@ def test_synthesis_px4_118_single_fix():
     d = analyse()["px4-1.18"]
     assert d["min_edits_to_clear_failures"] == ["close-tofu+oob"]
     assert not d["residual_failures_after_combo"]
+
+
+def test_conformance_predictions_match_measured_ground_truth():
+    """The 8-case prediction vector per policy equals what the live SITL confirmed (8/8).
+    Order: (keyed, trusted, signed) over {0,1}^3 as in scripts.conformance."""
+    import sys, os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
+    from conformance import model_predict
+    from mavaudit.model.configs import BY_NAME
+    # Ground truth from results/conformance (all stacks agreed 8/8 with these predictions):
+    expected = {
+        "ardupilot-4.7.2": {
+            (False, True, False): True, (False, True, True): True,
+            (False, False, False): True, (False, False, True): True,
+            (True, True, False): True,  (True, True, True): True,     # ch0 answers unsigned (R4)
+            (True, False, False): False, (True, False, True): True,
+        },
+        "px4-1.18": {
+            (False, True, False): True, (False, True, True): True,
+            (False, False, False): True, (False, False, True): True,
+            (True, True, False): False, (True, True, True): True,     # no trusted link
+            (True, False, False): False, (True, False, True): True,
+        },
+        "px4-1.17": {k: True for k in [(a, b, c) for a in (0, 1) for b in (0, 1) for c in (0, 1)]},
+    }
+    for pol, cases in expected.items():
+        p = BY_NAME[pol]
+        for (keyed, trusted, signed), exp in cases.items():
+            got = model_predict(p, bool(trusted), bool(signed), bool(keyed))
+            assert got == exp, (pol, keyed, trusted, signed, got, exp)

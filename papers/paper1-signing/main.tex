@@ -392,7 +392,10 @@ This is by design: \code{accept\_unsigned\_callback} returns true on
 boards.'' An auditor watching only traffic would conclude the link is protected.
 The model named this case (\prop{P5}; Fig.~\ref{fig:automaton}, red
 link-exemption sink), which is why mavaudit's finding relies on an active
-read-only probe and states the discrepancy explicitly.
+read-only probe and states the discrepancy explicitly. A model-based conformance
+run~\cite{brighouse2026formal} confirms it: over eight read-only probe cases the
+stack's behaviour matches the model exactly ($8/8$), including the keyed
+trusted-link case in which an unsigned read is answered.
 
 \begin{figure}[t]
 \centering

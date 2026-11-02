@@ -1,0 +1,17 @@
+{
+  "ardupilot-4.7.2": {
+    "agreement": 1.0,
+    "cases_total": 8,
+    "cases_agree": 8
+  },
+  "px4-1.18": {
+    "agreement": 1.0,
+    "cases_total": 8,
+    "cases_agree": 8
+  },
+  "px4-1.17": {
+    "agreement": 1.0,
+    "cases_total": 8,
+    "cases_agree": 8
+  }
+}

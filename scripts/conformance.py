@@ -32,20 +32,25 @@ from mavaudit.model.configs import BY_NAME  # noqa: E402
 from mavaudit.model.semantics import READ, SETUP, Frame, State, step  # noqa: E402
 
 
-def _probe_read(conn, signed: bool, key: bytes | None, sysid=1, compid=1, timeout=3.0) -> bool:
-    """Send one PARAM_REQUEST_READ (index 0); return True if answered. Read-only."""
+def _probe_read(target: str, signed: bool, key: bytes | None, sysid=1, compid=1, timeout=3.0) -> bool:
+    """Open a fresh connection, send one PARAM_REQUEST_READ (index 0), return True if
+    answered. Read-only. Signed probes are signed with the key and a CURRENT timestamp
+    (initial_timestamp defaults to now) so the vehicle does not reject them as stale.
+    An unsigned-key callback lets us read the vehicle's signed replies regardless."""
+    conn = mavutil.mavlink_connection(target, source_system=251, dialect="all")
+    conn.wait_heartbeat(timeout=15)
     if signed and key is not None:
-        conn.setup_signing(key, sign_outgoing=True, initial_timestamp=0)
-    else:
-        conn.signing.secret_key = None
-        conn.signing.sign_outgoing = False
+        conn.setup_signing(key, sign_outgoing=True, allow_unsigned_callback=lambda m, i: True)
     conn.mav.param_request_read_send(sysid, compid, b"", 0)
     deadline = time.time() + timeout
+    answered = False
     while time.time() < deadline:
         m = conn.recv_match(type=["PARAM_VALUE", "PARAM_ERROR"], blocking=True, timeout=0.5)
         if m is not None and m.get_srcSystem() == sysid and int(getattr(m, "param_index", -2)) == 0:
-            return True
-    return False
+            answered = True
+            break
+    conn.close()
+    return answered
 
 
 def model_predict(policy, link_trusted: bool, signed: bool, keyed: bool) -> bool:
@@ -61,21 +66,14 @@ def run(stack: str, trusted: str, untrusted: str, policy_name: str, out: Path, d
     key = labkit.lab_key()
     cases, agree = [], 0
 
-    def connect(target):
-        c = mavutil.mavlink_connection(target, source_system=252, dialect="all")
-        c.wait_heartbeat(timeout=20)
-        return c
-
     # --- State 1: UNKEYED. Both links should answer both signed and unsigned reads ---
     for link_name, target, trustedlink in (("trusted", trusted, True), ("untrusted", untrusted, False)):
-        c = connect(target)
         for signed in (False, True):
-            obs = _probe_read(c, signed, key if signed else None, timeout=duration_wait)
+            obs = _probe_read(target, signed, key if signed else None, timeout=duration_wait)
             pred = model_predict(policy, trustedlink, signed, keyed=False)
             cases.append({"state": "unkeyed", "link": link_name, "signed": signed,
                           "predicted": pred, "observed": obs, "agree": pred == obs})
             agree += pred == obs
-        c.close()
 
     # --- Provision the key over the trusted link (operator step) ---
     try:
@@ -88,14 +86,12 @@ def run(stack: str, trusted: str, untrusted: str, policy_name: str, out: Path, d
     # --- State 2: KEYED. Unsigned reads: trusted link may still answer (R4); untrusted must not ---
     if provisioned:
         for link_name, target, trustedlink in (("trusted", trusted, True), ("untrusted", untrusted, False)):
-            c = connect(target)
             for signed in (False, True):
-                obs = _probe_read(c, signed, key if signed else None, timeout=duration_wait)
+                obs = _probe_read(target, signed, key if signed else None, timeout=duration_wait)
                 pred = model_predict(policy, trustedlink, signed, keyed=True)
                 cases.append({"state": "keyed", "link": link_name, "signed": signed,
                               "predicted": pred, "observed": obs, "agree": pred == obs})
                 agree += pred == obs
-            c.close()
 
     checked = [c for c in cases if "agree" in c]
     result = {

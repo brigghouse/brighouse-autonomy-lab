@@ -1,0 +1,58 @@
+{
+  "ardupilot:Copter-4.6.3": {
+    "stack": "ardupilot",
+    "ref": "Copter-4.6.3",
+    "started_utc": "2026-11-02T17:13:02Z",
+    "build": "ok",
+    "build_seconds": 517,
+    "source_rev": "Copter-4.6.3@92b0cd788ec2",
+    "measurements": {
+      "default-serial0": {
+        "exit_code": 0,
+        "frames": 24,
+        "signed_frames": 0,
+        "v1_frames": 0,
+        "unsigned_types": [
+          "AUTOPILOT_VERSION",
+          "COMMAND_ACK",
+          "HEARTBEAT",
+          "PARAM_VALUE",
+          "TIMESYNC"
+        ],
+        "firmware": "4.6.3 (type 255)",
+        "ftp_advertised": true,
+        "command_ack_result": 0,
+        "unsigned_probe_answered": true,
+        "findings": [
+          "MAV-002",
+          "MAV-004",
+          "MAV-005",
+          "MAV-006",
+          "MAV-007"
+        ]
+      },
+      "provisioned-serial0": {
+        "exit_code": 0,
+        "frames": 23,
+        "signed_frames": 23,
+        "v1_frames": 0,
+        "unsigned_types": [],
+        "firmware": "4.6.3 (type 255)",
+        "ftp_advertised": true,
+        "command_ack_result": 0,
+        "unsigned_probe_answered": true,
+        "findings": [
+          "MAV-004",
+          "MAV-005",
+          "MAV-006",
+          "MAV-007"
+        ],
+        "keyed_check": {
+          "frames_decoded": 11,
+          "valid_signatures": 11,
+          "unknown_msgid_frames_skipped": 0
+        }
+      }
+    }
+  }
+}

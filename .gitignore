@@ -14,3 +14,11 @@ demo/
 .obsidian/workspace-mobile.json
 .obsidian/cache
 .obsidian/plugins/*/data.json
+papers/**/*.aux
+papers/**/*.bbl
+papers/**/*.blg
+papers/**/*.fls
+papers/**/*.fdb_latexmk
+papers/**/*.log
+papers/**/*.out
+papers/**/*.synctex.gz

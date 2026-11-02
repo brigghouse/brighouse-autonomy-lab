@@ -1,0 +1,367 @@
+{
+  "depth": 3,
+  "properties": {
+    "P1": "command-integrity (A-command accepted off trusted link)",
+    "P2": "key-integrity (A changes V's key)",
+    "P3": "replay-resistance (accepted command replayed)",
+    "P4": "first-use window (A installs key before provisioning)",
+    "P5": "trusted-link exemption (A-command accepted on trusted link)",
+    "P6": "key exposure (A on provisioning link forges after key leak)"
+  },
+  "rows": [
+    {
+      "policy": "spec-strict",
+      "scenario": "pre-provisioning",
+      "a_link": "ch1",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": true,
+      "P5": false,
+      "P6": false,
+      "witnesses": {
+        "P4": [
+          "A:inject SETUP(K_adv) unsigned@ch1 -> TOFU: first key accepted unsigned"
+        ]
+      }
+    },
+    {
+      "policy": "spec-strict",
+      "scenario": "post-provisioning, A on untrusted link",
+      "a_link": "ch1",
+      "p_link": "ch0",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": false,
+      "witnesses": {}
+    },
+    {
+      "policy": "spec-strict",
+      "scenario": "post-provisioning, A on trusted/console link",
+      "a_link": "ch0",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": false,
+      "witnesses": {}
+    },
+    {
+      "policy": "spec-strict",
+      "scenario": "on-provisioning-link",
+      "a_link": "ch1",
+      "p_link": "ch1",
+      "P1": true,
+      "P2": true,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": true,
+      "witnesses": {
+        "P1": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject CMD signed(K)@ch1 -> valid signature"
+        ],
+        "P2": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject SETUP(K_adv) signed(K)@ch1 -> signed re-key"
+        ],
+        "P6": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject CMD signed(K)@ch1 -> valid signature"
+        ]
+      }
+    },
+    {
+      "policy": "ideal-oob-provisioning",
+      "scenario": "pre-provisioning",
+      "a_link": "ch1",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": false,
+      "witnesses": {}
+    },
+    {
+      "policy": "ideal-oob-provisioning",
+      "scenario": "post-provisioning, A on untrusted link",
+      "a_link": "ch1",
+      "p_link": "ch0",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": false,
+      "witnesses": {}
+    },
+    {
+      "policy": "ideal-oob-provisioning",
+      "scenario": "post-provisioning, A on trusted/console link",
+      "a_link": "ch0",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": false,
+      "witnesses": {}
+    },
+    {
+      "policy": "ideal-oob-provisioning",
+      "scenario": "on-provisioning-link",
+      "a_link": "ch1",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": false,
+      "witnesses": {}
+    },
+    {
+      "policy": "px4-1.18",
+      "scenario": "pre-provisioning",
+      "a_link": "ch1",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": true,
+      "P5": false,
+      "P6": false,
+      "witnesses": {
+        "P4": [
+          "A:inject SETUP(K_adv) unsigned@ch1 -> TOFU: first key accepted unsigned"
+        ]
+      }
+    },
+    {
+      "policy": "px4-1.18",
+      "scenario": "post-provisioning, A on untrusted link",
+      "a_link": "ch1",
+      "p_link": "ch0",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": false,
+      "witnesses": {}
+    },
+    {
+      "policy": "px4-1.18",
+      "scenario": "post-provisioning, A on trusted/console link",
+      "a_link": "ch0",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": false,
+      "witnesses": {}
+    },
+    {
+      "policy": "px4-1.18",
+      "scenario": "on-provisioning-link",
+      "a_link": "ch1",
+      "p_link": "ch1",
+      "P1": true,
+      "P2": true,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": true,
+      "witnesses": {
+        "P1": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject CMD signed(K)@ch1 -> valid signature"
+        ],
+        "P2": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject SETUP(K_adv) signed(K)@ch1 -> signed re-key"
+        ],
+        "P6": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject CMD signed(K)@ch1 -> valid signature"
+        ]
+      }
+    },
+    {
+      "policy": "px4-1.17",
+      "scenario": "pre-provisioning",
+      "a_link": "ch1",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": false,
+      "witnesses": {}
+    },
+    {
+      "policy": "px4-1.17",
+      "scenario": "post-provisioning, A on untrusted link",
+      "a_link": "ch1",
+      "p_link": "ch0",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": true,
+      "P6": false,
+      "witnesses": {
+        "P5": [
+          "G:SETUP(unsigned)@ch0 -> no TOFU",
+          "G:CMD@ch0 -> unkeyed: everything accepted",
+          "A:inject CMD unsigned@ch1 -> unkeyed: everything accepted"
+        ]
+      }
+    },
+    {
+      "policy": "px4-1.17",
+      "scenario": "post-provisioning, A on trusted/console link",
+      "a_link": "ch0",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": true,
+      "P6": false,
+      "witnesses": {
+        "P5": [
+          "G:SETUP(unsigned)@ch1 -> no TOFU",
+          "G:CMD@ch1 -> unkeyed: everything accepted",
+          "A:inject CMD unsigned@ch0 -> unkeyed: everything accepted"
+        ]
+      }
+    },
+    {
+      "policy": "px4-1.17",
+      "scenario": "on-provisioning-link",
+      "a_link": "ch1",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": true,
+      "P4": false,
+      "P5": true,
+      "P6": false,
+      "witnesses": {
+        "P3": [
+          "G:SETUP(unsigned)@ch1 -> no TOFU",
+          "G:CMD@ch1 -> unkeyed: everything accepted",
+          "A:replay obs[1](CMD,unsigned)@ch1 -> unkeyed: everything accepted"
+        ],
+        "P5": [
+          "G:SETUP(unsigned)@ch1 -> no TOFU",
+          "G:CMD@ch1 -> unkeyed: everything accepted",
+          "A:inject CMD unsigned@ch1 -> unkeyed: everything accepted"
+        ]
+      }
+    },
+    {
+      "policy": "ardupilot-4.7.2",
+      "scenario": "pre-provisioning",
+      "a_link": "ch1",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": true,
+      "P5": false,
+      "P6": false,
+      "witnesses": {
+        "P4": [
+          "A:inject SETUP(K_adv) unsigned@ch1 -> TOFU: first key accepted unsigned"
+        ]
+      }
+    },
+    {
+      "policy": "ardupilot-4.7.2",
+      "scenario": "post-provisioning, A on untrusted link",
+      "a_link": "ch1",
+      "p_link": "ch0",
+      "P1": false,
+      "P2": false,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": false,
+      "witnesses": {}
+    },
+    {
+      "policy": "ardupilot-4.7.2",
+      "scenario": "post-provisioning, A on trusted/console link",
+      "a_link": "ch0",
+      "p_link": "ch1",
+      "P1": false,
+      "P2": true,
+      "P3": false,
+      "P4": false,
+      "P5": true,
+      "P6": false,
+      "witnesses": {
+        "P2": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject SETUP(K_adv) unsigned@ch0 -> unsigned re-key on trusted link"
+        ],
+        "P5": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject CMD unsigned@ch0 -> trusted link: unsigned accepted"
+        ]
+      }
+    },
+    {
+      "policy": "ardupilot-4.7.2",
+      "scenario": "on-provisioning-link",
+      "a_link": "ch1",
+      "p_link": "ch1",
+      "P1": true,
+      "P2": true,
+      "P3": false,
+      "P4": false,
+      "P5": false,
+      "P6": true,
+      "witnesses": {
+        "P1": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject CMD signed(K)@ch1 -> valid signature"
+        ],
+        "P2": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject SETUP(K_adv) signed(K)@ch1 -> signed re-key"
+        ],
+        "P6": [
+          "G:SETUP(unsigned)@ch1 -> TOFU: first key accepted unsigned",
+          "G:CMD@ch1 -> valid signature",
+          "A:inject CMD signed(K)@ch1 -> valid signature"
+        ]
+      }
+    }
+  ]
+}

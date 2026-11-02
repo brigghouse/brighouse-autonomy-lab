@@ -2,7 +2,7 @@
 title: "MAVLink Security in 2026: Message Signing in PX4 and ArduPilot and What the EU Cyber Resilience Act Means for Drone Manufacturers"
 author: "Ian Brighouse, Brighouse Security Labs"
 date: 2026-11-02
-status: DRAFT v0.1. Results sections are placeholders until experiments E1–E5 are run.
+status: DRAFT v0.2. Results from SITL runs on 2026-11-02 (see results/). GCS interoperability (E5) is still pending.
 ---
 
 # MAVLink Security in 2026: Message Signing in PX4 and ArduPilot and What the EU Cyber Resilience Act Means for Drone Manufacturers
@@ -12,11 +12,11 @@ status: DRAFT v0.1. Results sections are placeholders until experiments E1–E5 
 > **Draft notes (remove before publication)**
 > - `[cite:key]` refers to the BibTeX entries in `research/literature-review.md` §8.
 > - `[VERIFY]` marks a claim that must be checked against the primary source. Legal text must be checked against the Official Journal PDF.
-> - `[RESULT]` marks a value that comes from our own SITL experiments (`research/experiment-plan.md`). Do not fill these in by hand.
+> - All numbers in §7 come from `results/*/summary.json`, produced by `scripts/run_*.py`. Do not edit them by hand.
 
 ## Abstract
 
-MAVLink is the de facto command-and-control (C2) and telemetry protocol of the open-source drone ecosystem, used by PX4, ArduPilot and the ground control stations (GCS) built around them. Since 2016, MAVLink 2 has offered optional message signing, which authenticates frames and resists replay, but adoption has been left to integrators. In 2026 two developments made this gap pressing. First, a CISA advisory rated unauthenticated MAVLink in PX4 at CVSS 9.8 (CVE-2026-1579), and a cluster of 2026 CVEs showed that memory-safety bugs in MAVLink FTP, shell and log handlers are reachable by *any* peer when signing is off. Second, the EU Cyber Resilience Act (CRA) began applying its vulnerability-reporting duty on 11 September 2026, ahead of full application on 11 December 2027. We review the state of MAVLink signing in PX4, ArduPilot, QGroundControl, Mission Planner and MAVProxy as of November 2026. We map MAVLink security properties to CRA Annex I and to the C2-link requirement of Delegated Regulation (EU) 2019/945, and we release *mavaudit*, a passive, key-less auditor that measures signing posture and produces CRA-mapped evidence. Simulator measurements across default and hardened configurations show `[RESULT]`. We conclude with a minimum security baseline for EU drone manufacturers building on open-source flight stacks.
+MAVLink is the de facto command-and-control (C2) and telemetry protocol of the open-source drone ecosystem, used by PX4, ArduPilot and the ground control stations (GCS) built around them. Since 2016, MAVLink 2 has offered optional message signing, which authenticates frames and resists replay, but adoption has been left to integrators. In 2026 two developments made this gap pressing. First, a CISA advisory rated unauthenticated MAVLink in PX4 at CVSS 9.8 (CVE-2026-1579), and a cluster of 2026 CVEs showed that memory-safety bugs in MAVLink FTP, shell and log handlers are reachable by *any* peer when signing is off. Second, the EU Cyber Resilience Act (CRA) began applying its vulnerability-reporting duty on 11 September 2026, ahead of full application on 11 December 2027. We review the state of MAVLink signing in PX4, ArduPilot, QGroundControl, Mission Planner and MAVProxy as of November 2026. We map MAVLink security properties to CRA Annex I and to the C2-link requirement of Delegated Regulation (EU) 2019/945, and we release *mavaudit*, a passive, key-less auditor that measures signing posture and produces CRA-mapped evidence. Simulator measurements on ArduPilot Copter 4.7.2, PX4 v1.17.0 and PX4 v1.18.0-rc1 show three things. First, all six default links tested send no signed frames, answer unauthenticated parameter reads and advertise MAVLink FTP to unauthenticated peers. Second, the current PX4 stable release (v1.17.0) contains no signing implementation at all. Third, ArduPilot keeps accepting unsigned input on MAVLink channel 0 even while it signs everything it sends, so passive observation alone overstates protection. We conclude with a minimum security baseline for EU drone manufacturers building on open-source flight stacks.
 
 ## 1. Introduction
 
@@ -29,7 +29,7 @@ MAVLink 2 introduced a signing mechanism that addresses the integrity and authen
 3. **Regulatory meaning.** How does signing, or its absence, relate to the obligations EU manufacturers now face under the CRA and the UAS product rules?
 
 **Contributions.**
-- **C1.** An up-to-date (November 2026) review of MAVLink signing in PX4 (including the spec-aligned implementation in v1.18 `[VERIFY: release status]`), ArduPilot and the main GCS (§3).
+- **C1.** An up-to-date (November 2026) review of MAVLink signing in PX4 (including the spec-aligned implementation in v1.18, at release-candidate stage when measured), ArduPilot and the main GCS (§3).
 - **C2.** A synthesis of the 2020–2026 CVE landscape that links signing to the *reachability* of memory-safety bugs (§4).
 - **C3.** A regulatory crosswalk from MAVLink security properties to CRA Annex I, Delegated Regulation 2019/945 and RED/EN 18031 (§5). To our knowledge no such crosswalk has been published.
 - **C4.** *mavaudit*, an open, passive auditor with CRA-mapped output, and simulator measurements of default and hardened configurations (§6–7).
@@ -52,9 +52,9 @@ These properties matter for the regulatory analysis in §5. Signing is evidence 
 
 | Stack | Signing support | Default | Notable exemptions and caveats |
 |---|---|---|---|
-| **PX4 ≤ v1.17** | Non-standard (`MAV_SIGN_CFG`); `SETUP_SIGNING` only over USB `[VERIFY]` | Off | Replaced in v1.18 |
-| **PX4 v1.18** (beta at cut-off) | Spec-aligned (PR #26894); key on SD card | Off (no key → everything unsigned, everything accepted) | Unsigned allowlist: HEARTBEAT, RADIO_STATUS (+ADS-B on traffic links); **trust-on-first-use** provisioning on any link; key change refused while armed |
-| **ArduPilot** | Via Mission Planner or MAVProxy `signing setup` | Off until configured `[VERIFY in SITL]` | **USB exempt**; downlink telemetry stays unsigned; MAVLink 1 ports unprotected |
+| **PX4 v1.17.0** (latest stable) | **None in the release.** No signing code in the v1.17.0 MAVLink module and no `MAV_SIGN_CFG` parameter (source inspection and measurement, §7). The v1.18 notes mention "signing in v1.17", which probably refers to pre-release builds `[VERIFY with maintainers]` | n/a | Signing cannot be enabled on stable PX4 |
+| **PX4 v1.18** (rc1 measured) | Spec-aligned (PR #26894); key on SD card | Off (no key → everything unsigned, everything accepted) | Unsigned allowlist: HEARTBEAT, RADIO_STATUS (+ADS-B on traffic links); **trust-on-first-use** provisioning on any link; key change refused while armed |
+| **ArduPilot 4.7.2** | Via Mission Planner or MAVProxy `signing setup` | Off (measured, §7) | **MAVLink channel 0 always accepts unsigned input** ("assumed to be secure channel. This is USB on ChibiOS boards", `GCS_Signing.cpp`); RADIO_STATUS/RADIO allowed unsigned; MAVLink 1 ports unprotected |
 | **QGroundControl** | Documented in master (Telemetry → MAVLink 2 Signing) | — | First stable release with signing not confirmed `[VERIFY]`; QGC issue #14250 (setup rejection not handled) |
 | **Mission Planner** | Native key management and push | — | — |
 | **MAVProxy** | `signing` module | — | Key sent in cleartext; docs mention SHA-512 vs spec SHA-256 `[VERIFY]` |
@@ -103,39 +103,74 @@ The Art. 14 reporting of actively exploited vulnerabilities and severe incidents
 
 ## 6. Methodology: mavaudit and the SITL testbed
 
-**mavaudit** (released in this repository) is a passive auditor that **never needs the signing key**. It classifies every observed frame as MAVLink 1 (`0xFE`), unsigned MAVLink 2, or signed MAVLink 2 (incompatibility flag `0x01`), and it identifies the autopilot from HEARTBEAT messages. An optional active check sends **one unsigned, read-only** `PARAM_REQUEST_READ` (for a harmless system-ID parameter) and records whether it is answered. Findings MAV-001 to MAV-005 are mapped to the crosswalk in §5.4. A scope guard restricts targets to loopback and private addresses unless an authorisation reference is supplied. The tool is validated against a Python reference vehicle that runs in unsigned, signed and MAVLink 1 modes (5 automated tests).
+**mavaudit** (released in this repository, v0.2.0) is a passive auditor that **never needs the signing key**. It classifies every frame it observes from the raw header bytes: MAVLink 1 (`0xFE`), unsigned MAVLink 2, or signed MAVLink 2 (incompatibility flag `0x01`). It identifies the autopilot from HEARTBEAT.
 
-**Testbed.** ArduPilot SITL (current Copter stable) and PX4 SITL (v1.16 or v1.17 stable and v1.18 beta), with QGroundControl, Mission Planner and MAVProxy. All work is local simulation: no RF emission, no third-party systems.
+With `--active-probe` it sends two **unsigned, read-only** requests:
+- a `PARAM_REQUEST_READ` by index 0, so it does not depend on parameter names that change between releases (ArduPilot 4.7 renamed `SYSID_THISMAV` to `MAV_SYSID`);
+- a `MAV_CMD_REQUEST_MESSAGE` for `AUTOPILOT_VERSION`, which gives the firmware version and capability flags.
 
-**Experiments** (`research/experiment-plan.md`):
+Findings MAV-001 to MAV-007 (`docs/findings.md`) map to the crosswalk in §5.4. A scope guard limits targets to loopback and private addresses. The tool is validated against a Python reference vehicle in unsigned, signed and MAVLink 1 modes (10 automated tests in CI).
 
-| ID | Configuration | Question |
-|---|---|---|
-| E1 | ArduPilot default | RQ1: default signing posture |
-| E2 | ArduPilot with signing | RQ2: unsigned rejection and exemptions |
-| E3 | PX4 default | RQ1 |
-| E4 | PX4 v1.18 with signing | RQ2, including the allowlist |
-| E5 | GCS × stack interoperability | RQ3: provisioning UX and failure handling |
-| E-reach | Signed vs unsigned × unkeyed peer | Reachability reduction (yes/no, no exploitation) |
+**Testbed.** One headless Ubuntu 24.04 VM (2 vCPU, 7 GB). We built from source:
+- ArduPilot Copter 4.7.2 (`fb7735678960`, the upstream `ArduCopter-stable` tag at run time);
+- PX4 v1.17.0 (`d6f12ad1c4f7`, the latest stable release);
+- PX4 v1.18.0-rc1 (`fca3df865af3`).
+
+PX4 runs with its SIH physics, so no Gazebo is needed. There is no RF emission and no third-party system; `scripts/setup_sitl.sh` reproduces the build.
+
+**Procedure** (`scripts/run_ardupilot.py`, `scripts/run_px4.py`):
+1. Start a fresh simulator with its parameters wiped.
+2. Audit each link for 15 s with the active probe.
+3. Provision a lab key the way an operator would: an unsigned `SETUP_SIGNING` over the local link.
+4. Audit again.
+5. Verify signatures with the key.
+6. On PX4, check that an unsigned attempt to replace the key is rejected (the documented trust-on-first-use rule).
+
+Links audited: ArduPilot SERIAL0 (MAVLink channel 0) and SERIAL1; PX4 "GCS" (udp 14550) and "Onboard" (udp 14540).
 
 ## 7. Results
 
-`[RESULT]` Table: per configuration, the frames observed, the % signed, whether MAVLink 1 was present, the unsigned-probe outcome, and the mavaudit findings.
+Full table: `results/README.md`. Raw reports and logs are in each `results/<run>/` folder.
 
-`[RESULT]` Provisioning observations per GCS (steps, failure modes, whether the key ever transits an unsecured link).
+| Stack | Link | Default: signed frames | Default: unsigned read answered | After provisioning: signed frames | After provisioning: unsigned read answered | Signatures verified with key |
+|---|---|---|---|---|---|---|
+| ArduPilot 4.7.2 | SERIAL0 (chan 0) | 0/35 | yes | 27/27 | **yes** | 9/9 |
+| ArduPilot 4.7.2 | SERIAL1 | 0/31 | yes | 24/24 | no | 9/9 |
+| PX4 v1.17.0 | GCS | 0/7321 | yes | 0/7309 | yes | 0/2906 |
+| PX4 v1.17.0 | Onboard | 0/8023 | yes | 0/8058 | yes | 0/3194 |
+| PX4 v1.18.0-rc1 | GCS | 0/7355 | yes | 7371/7371 | no | 2911/2911 |
+| PX4 v1.18.0-rc1 | Onboard | 0/8470 | yes | 8486/8486 | no | 3222/3222 |
 
-`[RESULT]` Performance overhead of signing in SITL (optional).
+Frame counts differ between stacks because ArduPilot SITL streams telemetry only when a GCS requests it, while PX4 streams by default. "Signatures verified" counts only frames that pymavlink could decode; frames with message IDs missing from its dialect are skipped and reported in the summaries.
+
+**R1: insecure by default, everywhere.** On all 6 default links: 0 signed frames, unauthenticated parameter reads answered, and MAVLink FTP advertised (`MAV_PROTOCOL_CAPABILITY_FTP`) to an unauthenticated peer. A manufacturer that ships either stack unchanged ships a C2 link with no integrity or access control (findings MAV-002, -005 and -006 on every default run).
+
+**R2: stable PX4 cannot sign.** In v1.17.0 the provisioning step had no effect: no key file, 0 valid signatures, unsigned reads still answered. Source inspection agrees: the v1.17.0 MAVLink module has no signing implementation and no `MAV_SIGN_CFG` parameter. The CISA remediation for CVE-2026-1579 (enable signing) is therefore only available from the v1.18 line. This corrects a claim from our own literature review.
+
+**R3: PX4 v1.18 signing works as documented.** After unsigned first-use provisioning:
+- a 40-byte key file appeared;
+- 100 % of outbound frames were signed on both links, and every decodable frame verified with the key;
+- unsigned reads, and the `AUTOPILOT_VERSION` request, went unanswered;
+- a later **unsigned** attempt to install a different key was rejected and the original key stayed valid.
+
+The trust-on-first-use window before the first key is installed remains a provisioning risk (§8).
+
+**R4: ArduPilot's channel-0 exemption hides from passive observers.** With a key installed, SERIAL1 signs everything and ignores unsigned input. SERIAL0 also signs **every frame it sends (27/27), yet still answers unsigned requests**. This is by design: `accept_unsigned_callback` accepts all unsigned traffic on MAVLINK_COMM_0, which is assumed to be a secure channel (USB on ChibiOS boards). An auditor that only watches traffic would conclude this link is protected. That is why mavaudit's MAV-005 relies on an active read-only probe and states the discrepancy explicitly. Integrators must make sure that whatever ends up as MAVLink channel 0 is physically trusted.
+
+**Not yet measured.** E5 (GCS × stack interoperability and the provisioning UX in QGroundControl, Mission Planner and MAVProxy), replay behaviour across reboots, and ArduPilot versions other than 4.7.2.
 
 ## 8. Recommendations: a minimum baseline for EU drone manufacturers
 
 1. **Ship with signing enabled, or with an unavoidable first-run provisioning step.** Under the CRA's "secure by default" requirement, an opt-in control that customers rarely enable is hard to defend.
-2. **Provision keys in production, over a trusted channel.** This avoids trust-on-first-use. Use per-vehicle keys generated by a CSPRNG and document rotation, revocation and lost-key recovery.
-3. **Disable MAVLink 1 on every radio port.**
-4. **Add link confidentiality** (an AEAD radio or VPN) where the risk assessment requires it, and say why in the technical file.
-5. **Gate or disable high-risk services** (the `SERIAL_CONTROL` shell, MAVLink FTP) in production builds.
-6. **Use secure boot and signed firmware.**
-7. **Run fuzzing and policy checks in CI.** Authentication does not stop harmful but legal inputs.
-8. **Operate vulnerability handling now.** Maintain an SBOM (PX4 v1.18 generates SPDX), a CVD policy and an Art. 14 ENISA reporting runbook. The reporting duty is already live.
+2. **Pick a stack version that can sign.** For PX4, that means the v1.18 line (R2). On ArduPilot, treat MAVLink channel 0 as an unauthenticated link and make sure it is only ever a physically trusted port (R4).
+3. **Provision keys in production, over a trusted channel.** This avoids trust-on-first-use. Use per-vehicle keys generated by a CSPRNG and document rotation, revocation and lost-key recovery.
+4. **Disable MAVLink 1 on every radio port.**
+5. **Add link confidentiality** (an AEAD radio or VPN) where the risk assessment requires it, and say why in the technical file.
+6. **Gate or disable high-risk services** (the `SERIAL_CONTROL` shell, MAVLink FTP) in production builds.
+7. **Use secure boot and signed firmware.**
+8. **Run fuzzing and policy checks in CI.** Authentication does not stop harmful but legal inputs.
+9. **Operate vulnerability handling now.** Maintain an SBOM (PX4 v1.18 generates SPDX), a CVD policy and an Art. 14 ENISA reporting runbook. The reporting duty is already live.
+10. **Audit actively as well as passively.** A link that signs everything it sends may still accept unsigned input (R4). Run a read-only active probe such as `mavaudit --active-probe --fail-on high` in CI against SITL builds of your configuration.
 
 ## 9. Limitations and ethics
 
@@ -143,7 +178,7 @@ The study covers simulation only; vendor firmware and hardware radios may behave
 
 ## 10. Conclusion
 
-`[After results]` MAVLink signing has matured, and in 2026 both major stacks support spec-aligned signing. Yet it stays off by default, it is integrator-owned, and the GCS side remains thinly studied. For EU manufacturers, the CRA turns that integrator responsibility into a legal obligation with live reporting duties. mavaudit provides a low-cost, reproducible way to produce the first piece of evidence.
+MAVLink signing works when it is turned on. In our measurements PX4 v1.18.0-rc1 and ArduPilot 4.7.2 telemetry ports enforce it exactly as documented. But it is off by default in every stack we tested. It is **absent from the current stable PX4 release**. And on ArduPilot it is bypassed by design on channel 0, which a passive observer cannot see. For EU manufacturers, the CRA turns this integrator responsibility into a legal obligation, with reporting duties already live. A reproducible audit that combines passive observation with a read-only active probe, such as mavaudit, is a cheap first piece of evidence, and the lab in this repository lets anyone reproduce ours in about 30 minutes.
 
 ## References
 

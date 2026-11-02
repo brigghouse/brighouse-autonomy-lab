@@ -76,4 +76,55 @@ def test_mavlink1_vehicle(tmp_path):
 
 def test_px4_probe_param(tmp_path):
     rc, report = run_scan(tmp_path, "unsigned", autopilot="px4")
-    assert report["unsigned_probe"]["param"] == "MAV_SYS_ID"
+    assert report["unsigned_probe"]["param"] == "index:0"
+    assert report["unsigned_probe"]["response"] == "PARAM_VALUE"
+
+
+def run_scan_vehicle(tmp_path, vehicle_kwargs, extra=()):
+    port = free_port()
+    vehicle = FakeVehicle(port, **vehicle_kwargs)
+    vehicle.start_background()
+    out = tmp_path / "report"
+    try:
+        rc = cli.main(["scan", "--target", f"udpin:127.0.0.1:{port}", "--duration", "2",
+                       "--active-probe", "--out", str(out), *extra])
+    finally:
+        vehicle.stop()
+        time.sleep(0.1)
+    import json
+    return rc, json.loads(out.with_suffix(".json").read_text())
+
+
+def test_firmware_and_ftp_on_unsigned_px4(tmp_path):
+    rc, report = run_scan_vehicle(tmp_path, {"mode": "unsigned", "autopilot": "px4", "version": (1, 16, 0)})
+    ep = next(e for e in report["endpoints"] if e["sysid"] == 1)
+    assert ep["firmware_tuple"] == [1, 16, 0]
+    assert ep["ftp_advertised"] is True
+    f6 = next(f for f in report["findings"] if f["id"] == "MAV-006")
+    assert any(a["id"] == "CVE-2026-32709" for a in f6["advisories"])
+    f2 = next(f for f in report["findings"] if f["id"] == "MAV-002")
+    assert any(a["id"] == "CVE-2026-1579" for a in f2["advisories"])
+    assert "MAV-007" in ids(report)
+
+
+def test_fixed_px4_version_drops_ftp_advisory(tmp_path):
+    rc, report = run_scan_vehicle(tmp_path, {"mode": "unsigned", "autopilot": "px4", "version": (1, 17, 0)})
+    f6 = next(f for f in report["findings"] if f["id"] == "MAV-006")
+    assert f6["advisories"] == []
+
+
+def test_signed_vehicle_hides_version_and_ftp(tmp_path):
+    rc, report = run_scan_vehicle(tmp_path, {"mode": "signed"})
+    assert "MAV-006" not in ids(report) and "MAV-007" not in ids(report)
+
+
+def test_fail_on_high_exit_code(tmp_path):
+    rc, _ = run_scan_vehicle(tmp_path, {"mode": "unsigned"}, extra=("--fail-on", "high"))
+    assert rc == 3
+    rc, _ = run_scan_vehicle(tmp_path, {"mode": "signed"}, extra=("--fail-on", "high"))
+    assert rc == 0
+
+
+def test_version_decoding():
+    from mavaudit.advisories import decode_version
+    assert decode_version((4 << 24) | (7 << 16) | (2 << 8) | 255) == (4, 7, 2, 255)

@@ -22,8 +22,25 @@ This repository contains:
 | Signing can be enabled | yes | **no: not in the release** | yes |
 | After provisioning: unsigned input rejected | SERIAL1 yes; **SERIAL0 / channel 0 no, by design** | n/a | yes, on both links |
 | Unsigned re-key after first key rejected | not tested | n/a | yes |
+| Read-only FTP directory listing answered (default) | yes (25 B) | yes (101 B) | yes (110 B) |
+| `mavlink_shell` present in the build (static check) | no | yes | yes |
+| Unauthenticated second control plane (uXRCE-DDS) | none in this build | **yes** | **yes** |
 
-Details and raw data: [results/](results/README.md)
+Two of those rows need a word of care. The FTP row says *answered*, not merely advertised:
+we asked for a directory listing and got one. The second-plane row is a measurement of a
+build, not of a project — ArduPilot's source defaults `DDS_ENABLE` to 1 where the subsystem
+is compiled in, and this SITL build does not compile it.
+
+Details and raw data: [results/](results/README.md). Per-campaign write-ups, each with its
+own limits section:
+
+| | What it measures |
+|---|---|
+| [`results/ch0-configs/`](results/ch0-configs/README.md) | Whether ArduPilot's unsigned-accept exemption follows the channel index or the transport (it follows the index) |
+| [`results/dds/`](results/dds/README.md) | The second control plane, and whether a MAVLink key reaches it (it does not) |
+| [`results/surface/`](results/surface/README.md) | What each release answers to a peer that has presented no credential |
+| [`results/allowlists/`](results/allowlists/README.md) | The exceptions to signing, extracted from source with file and line |
+| [`results/scores/`](results/scores/README.md) | The secure-by-default score per configuration, criteria v2 |
 
 ## Research papers
 
@@ -32,7 +49,7 @@ Four reproducible IEEE-format papers build on this data and model (see [papers/]
 1. **Signed but Unprotected** — measurement + a formal acceptance model + a CRA conformance crosswalk. The model, derived from reading `GCS_Signing.cpp`, reproduces the ArduPilot ch0 "signed yet unprotected" behaviour that the SITL measurement then confirms. (That behaviour is tracked upstream as [ArduPilot#34489](https://github.com/ArduPilot/ardupilot/issues/34489) with fix PR [#34780](https://github.com/ArduPilot/ardupilot/pull/34780), unmerged as of Nov 2026; our contribution is the independent measurement, the formal model and the CRA mapping, not the discovery. `results/ch0-configs/` adds the discriminating runs: the exemption follows the channel *index*, not the transport — SERIAL0 over UDP still accepts unsigned commands, SERIAL1 over the same UDP does not; 23/23 observations match the model.)
 2. **A Decade of Defaults** — longitudinal study: signing was added to ArduPilot in 2016 and PX4 in 2026, and *never* shipped on by default.
 3. **Acceptance Semantics for MAVLink 2 Signing** — bounded symbolic analysis + model-based conformance testing; a liveness-constrained search shows ArduPilot needs two independent fixes where PX4 1.18 needs one.
-4. **Scoring Secure by Default** — a reproducible, CRA-grounded 0–100 metric that prices the ch0 pitfall numerically (42 vs 70).
+4. **Scoring Secure by Default** — a reproducible, CRA-grounded 0–100 metric that prices the ch0 pitfall numerically (50 vs 74) and states the bound plainly: a link configured as well as MAVLink 2 signing alone allows scores **82, grade B**, never higher. The last 18 points need out-of-band key provisioning (12) and link encryption (6), neither of which the protocol provides.
 
 To our knowledge, no prior work gives a formal model of MAVLink signing, a decade-long measurement of flight-stack defaults, or a measurable CRA conformance score (see [research/](research/)). · Discussion: [paper draft](paper/paper1-draft.md) §7.
 

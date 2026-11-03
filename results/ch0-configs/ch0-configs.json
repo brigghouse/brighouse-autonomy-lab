@@ -1,0 +1,280 @@
+{
+  "stack": "ArduPilot Copter SITL",
+  "source_rev": "AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960",
+  "policy": "ardupilot-4.7.2",
+  "started_utc": "2026-11-03T21:06:10Z",
+  "configs": [
+    {
+      "config": "A-ch0tcp-ch1tcp",
+      "serial0": "tcp:0 (default)",
+      "serial1": "tcp:2",
+      "extra_params": {},
+      "cases": [
+        {
+          "state": "unkeyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "unkeyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": false,
+          "predicted": false,
+          "observed": false,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        }
+      ],
+      "agree": 6,
+      "total": 6
+    },
+    {
+      "config": "B-ch0udp-ch1tcp",
+      "serial0": "udpclient:127.0.0.1:14600",
+      "serial1": "tcp:2",
+      "extra_params": {},
+      "cases": [
+        {
+          "state": "unkeyed",
+          "link": "ch0",
+          "transport": "udpin",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "unkeyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "udpin",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "udpin",
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": false,
+          "predicted": false,
+          "observed": false,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        }
+      ],
+      "agree": 6,
+      "total": 6
+    },
+    {
+      "config": "C-ch0tcp-ch1udp",
+      "serial0": "tcp:0 (default)",
+      "serial1": "udpclient:127.0.0.1:14601",
+      "extra_params": {},
+      "cases": [
+        {
+          "state": "unkeyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "unkeyed",
+          "link": "ch1",
+          "transport": "udpin",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "udpin",
+          "wire": 2,
+          "signed": false,
+          "predicted": false,
+          "observed": false,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "udpin",
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        }
+      ],
+      "agree": 6,
+      "total": 6
+    },
+    {
+      "config": "D-ch0tcp-ch1mav1",
+      "serial0": "tcp:0 (default)",
+      "serial1": "tcp:2",
+      "extra_params": {
+        "SERIAL1_PROTOCOL": 1
+      },
+      "cases": [
+        {
+          "state": "unkeyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "unkeyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire": 1,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire": 1,
+          "signed": false,
+          "predicted": false,
+          "observed": false,
+          "agree": true
+        }
+      ],
+      "agree": 5,
+      "total": 5
+    }
+  ]
+}

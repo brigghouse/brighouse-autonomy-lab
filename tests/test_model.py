@@ -156,3 +156,21 @@ def test_conformance_predictions_match_recorded_observations():
     # the keyed rejections (px4-1.18 untrusted/unsigned x1, ardupilot untrusted/unsigned x1,
     # plus px4-1.18 trusted/unsigned) actually test the model's discriminating power.
     assert discriminating >= 3
+
+
+def test_ch0_configs_recorded_transport_independence():
+    """Recorded SITL runs (results/ch0-configs): the ch0 exemption follows the channel
+    index, not the transport. B (ch0 over UDP) accepts unsigned; C (ch1 over UDP) rejects."""
+    import json
+    from pathlib import Path
+    p = Path(__file__).resolve().parent.parent / "results/ch0-configs/ch0-configs.json"
+    d = json.loads(p.read_text())
+    by = {c["config"]: c for c in d["configs"]}
+    def obs(cfg, link, signed=False):
+        return [c["observed"] for c in by[cfg]["cases"]
+                if c["state"] == "keyed" and c["link"] == link and c["signed"] == signed][0]
+    assert obs("B-ch0udp-ch1tcp", "ch0") is True
+    assert obs("C-ch0tcp-ch1udp", "ch1") is False
+    assert obs("D-ch0tcp-ch1mav1", "ch1") is False
+    assert all(c["agree"] for cfg in d["configs"] for c in cfg["cases"])
+    assert sum(cfg["total"] for cfg in d["configs"]) == 23

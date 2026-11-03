@@ -55,8 +55,9 @@ it protected. This channel-0 exemption is a documented upstream behaviour
 (ArduPilot issue~\#34489, with a fix proposed but not yet merged~\cite{ardupilot_issue34489,ardupilot_pr34780});
 our contribution is to measure it independently, to show that the model built
 from the implementation reproduces it, and to make explicit that the exemption
-follows the channel index rather than the link type, which motivates an active,
-read-only probe. Third, we map each observed property to the essential
+follows the channel index rather than the link type (measured by moving the
+transport of each channel independently), which motivates an active, read-only
+probe. Third, we map each observed property to the essential
 requirements of EU Regulation~2024/2847 (the Cyber Resilience Act) and the
 command-link requirement of Delegated Regulation~2019/945, producing, to our
 knowledge, the first measurable conformance-evidence crosswalk for civil
@@ -403,6 +404,39 @@ read-only probe and states the discrepancy explicitly. A model-based conformance
 run~\cite{brighouse2026formal} confirms it: over eight read-only probe cases the
 stack's behaviour matches the model exactly ($8/8$), including the keyed
 trusted-link case in which an unsigned read is answered.
+
+\emph{Index, not transport.} Because the exemption is justified by the
+assumption that channel~0 is USB, we checked whether it follows the channel
+index or the link type by moving the transport of each channel independently
+(Table~\ref{tab:ch0}). With SERIAL0 carried over UDP instead of TCP the keyed
+channel still answers unsigned reads; with SERIAL1 carried over the same UDP
+transport it rejects them. The two runs differ only in which channel index the
+UDP link occupies, so the exemption is a property of the index. On any board
+whose SERIAL0 is a telemetry radio or a network port rather than USB, that port
+accepts unsigned commands while every other port is protected---the situation
+described in the upstream issue~\cite{ardupilot_issue34489}, now measured. A
+fourth configuration sets \code{SERIAL1\_PROTOCOL}=1 (MAVLink~1): the
+documentation states such ports are ``not protected,'' but in 4.7.2 a keyed
+MAVLink~1 port rejects an unsigned MAVLink~1 read (the frame cannot carry a
+signature and the channel is not channel~0); we report the measurement, which is
+stricter than the text. All 23 observations agree with the policy.
+
+\begin{table}[t]
+\caption{Channel-0 exemption vs.\ transport, ArduPilot 4.7.2 SITL, key active,
+unsigned \code{PARAM\_REQUEST\_READ}. Recorded in \code{results/ch0-configs}.}
+\label{tab:ch0}
+\centering
+\begin{tabular}{llll}
+\toprule
+Config & SERIAL0 (ch0) & SERIAL1 (ch1) & unsigned read answered \\
+\midrule
+A & TCP & TCP & ch0 yes, ch1 no \\
+B & \textbf{UDP} & TCP & ch0 \textbf{yes}, ch1 no \\
+C & TCP & \textbf{UDP} & ch0 yes, ch1 \textbf{no} \\
+D & TCP & TCP, MAVLink~1 & ch0 yes, ch1 no (MAVLink~1 probe) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{figure}[t]
 \centering

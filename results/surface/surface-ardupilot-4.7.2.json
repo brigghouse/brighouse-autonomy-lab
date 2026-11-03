@@ -1,0 +1,43 @@
+{
+  "heartbeat": true,
+  "advertised": {
+    "ftp": true,
+    "mavlink2": true,
+    "mission_int": true,
+    "flight_termination": true,
+    "param_float": true,
+    "command_int": true,
+    "set_position_target": true
+  },
+  "answered": {
+    "param_read": true,
+    "ftp_list": {
+      "result": "ack",
+      "entries_bytes": 25
+    }
+  },
+  "capabilities_raw": 64495,
+  "stack": "ardupilot",
+  "version": "4.7.2",
+  "target": "tcp:127.0.0.1:5760",
+  "static": {
+    "checked": true,
+    "method": "string search in build tree",
+    "hits": {
+      "mavlink_shell": false,
+      "serial_control": true
+    },
+    "note": "compiled-in only; we do not open a shell (not a read-only probe)"
+  },
+  "recorded_utc": "2026-11-03T22:23:21Z",
+  "evidence_kinds": {
+    "advertised": "capability bits",
+    "answered": "read-only request answered",
+    "static": "build inspected, not exercised"
+  },
+  "not_measured": [
+    "whether FTP can traverse paths or write (never attempted)",
+    "whether a shell can be opened (deliberately not attempted)",
+    "post-arming behaviour; all probes are on a disarmed vehicle"
+  ]
+}

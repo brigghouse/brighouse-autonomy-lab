@@ -143,3 +143,23 @@ def test_recorded_dds_runs_match_the_readme_claims():
     assert px4 and all(r["unauthenticated_agent_discovery"] for r in px4)
     assert all(r["submessage_counts"].get("GET_INFO", 0) > 0 for r in px4)
     assert ap and not any(r["unauthenticated_agent_discovery"] for r in ap)
+
+
+def test_recorded_surface_runs_are_internally_consistent():
+    """results/surface: every release answered a read-only FTP listing and a parameter
+    read, and the static shell detection is recorded per build (not inferred)."""
+    import json
+    from pathlib import Path
+    d = Path(__file__).resolve().parent.parent / "results/surface"
+    recs = [json.loads(f.read_text()) for f in sorted(d.glob("surface-*.json"))]
+    assert len(recs) >= 3
+    for r in recs:
+        assert r["advertised"]["ftp"] is True
+        assert r["answered"]["param_read"] is True
+        assert r["answered"]["ftp_list"]["result"] == "ack"
+        assert r["static"]["checked"] is True
+    px4 = [r for r in recs if r["stack"] == "px4"]
+    ap = [r for r in recs if r["stack"] == "ardupilot"]
+    # The shell asymmetry the README claims, asserted against the recorded data.
+    assert all(r["static"]["hits"]["mavlink_shell"] is True for r in px4)
+    assert all(r["static"]["hits"]["mavlink_shell"] is False for r in ap)

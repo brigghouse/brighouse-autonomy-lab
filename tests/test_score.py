@@ -163,3 +163,26 @@ def test_recorded_surface_runs_are_internally_consistent():
     # The shell asymmetry the README claims, asserted against the recorded data.
     assert all(r["static"]["hits"]["mavlink_shell"] is True for r in px4)
     assert all(r["static"]["hits"]["mavlink_shell"] is False for r in ap)
+
+
+def test_allowlists_extracted_from_source_match_the_readme():
+    """results/allowlists: the exceptions to signing, with the claims the README makes
+    about them asserted against the extracted data (not against prose)."""
+    import json
+    from pathlib import Path
+    p = Path(__file__).resolve().parent.parent / "results/allowlists/allowlists.json"
+    d = json.loads(p.read_text())
+    ap = d["stacks"]["ardupilot"]
+    px4 = d["stacks"]["px4"]
+    assert {e["message"] for e in ap["allowlist"]["entries"]} == {"RADIO_STATUS", "RADIO"}
+    assert {e["message"] for e in px4["allowlist"]["entries"]} == {
+        "HEARTBEAT", "RADIO_STATUS", "ADSB_VEHICLE", "COLLISION"}
+    # ArduPilot's blanket channel exemption exists; PX4's does not.
+    assert ap["channel_exemption"]["present"] is True
+    assert px4["channel_exemption"]["present"] is False
+    # G8: neither stack allowlists Remote ID messages, so signing covers them.
+    assert not any(v for v in d["open_drone_id_allowlisted"].values())
+    # Every entry carries file/line provenance (A1).
+    for st in (ap, px4):
+        assert st["allowlist"]["file"]
+        assert all(e["line"] > 0 for e in st["allowlist"]["entries"])

@@ -29,6 +29,13 @@ Reading:
   build, stricter-sounding than the behaviour; we report the measurement, not the text.
   Note: unsolicited `PARAM_VALUE` broadcasts (index 65535) still flow on that port; the
   probe only counts a reply to its own request (`param_index == 0`).
+  The wire version is **measured, not assumed**: each case records the first byte of the
+  frame the probe sent (`wire_first_byte_sent`), and configuration D's `ch1` cases record
+  `0xFE`, a genuine MAVLink 1 frame. This matters because pymavlink's
+  `auto_mavlink_version` silently upgrades a connection to MAVLink 2 as soon as it
+  receives a v2 frame, so a probe intended as v1 is only v1 if the port itself speaks v1.
+  An earlier version of this record labelled the wire version from the configuration
+  rather than from the frame; it is now taken from the frame, and a test asserts it.
 - All 23 observations agree with the formal policy, which already models ch0 as the
   trusted link irrespective of transport.
 

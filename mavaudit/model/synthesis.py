@@ -67,28 +67,45 @@ def analyse(depth: int = 3) -> Dict:
             if removed or added:
                 edits[ename] = {"removes": removed, "adds": added,
                                 "still_functional": is_functional(fn(pol), depth)}
-        # greedy minimal combination to clear all FAILURES (P1-P3)
-        combo, cleared = [], failures(base)
+        # Greedy combination to clear all FAILURES (P1-P3). Two guards keep the
+        # published set honest: (i) an edit that leaves the policy unchanged for this
+        # stack (a no-op, e.g. enabling a check that is already on) is never counted;
+        # (ii) an edit is appended only if it strictly reduces the failure count, so
+        # the set carries no dead edits. Greedy is not guaranteed globally minimal;
+        # the papers say "greedy-minimal", not "minimal".
+        # (iii) iteration follows the declared EDITS order, never a hash-ordered set, so
+        # the result is deterministic across runs; ties (several edits equally good at a
+        # step) are recorded as alternatives instead of being silently broken.
+        combo, alternatives = [], []
         cur = pol
         remaining = set(EDITS)
-        while failures(present(cur, depth)) and remaining:
-            best = None
-            for ename in list(remaining):
+        cur_f = len(failures(present(cur, depth)))
+        while cur_f and remaining:
+            cands = []
+            for ename in [e for e in EDITS if e in remaining]:
                 cand = EDITS[ename](cur)
-                f = failures(present(cand, depth))
-                if best is None or len(f) < best[1]:
-                    best = (ename, len(f), cand)
-            combo.append(best[0])
-            cur = best[2]
-            remaining.discard(best[0])
-            if best[1] == 0:
+                if cand == cur:  # no-op for this policy
+                    remaining.discard(ename)
+                    continue
+                cands.append((len(failures(present(cand, depth))), ename, cand))
+            if not cands:
                 break
+            best_f = min(c[0] for c in cands)
+            if best_f >= cur_f:  # no edit makes progress
+                break
+            tied = [c for c in cands if c[0] == best_f]
+            chosen = tied[0]
+            combo.append(chosen[1])
+            alternatives.append([c[1] for c in tied])
+            cur, cur_f = chosen[2], best_f
+            remaining.discard(chosen[1])
         out[pol.name] = {
             "present": sorted(base),
             "failures": sorted(failures(base)),
             "functional": is_functional(pol, depth),
             "single_edits": edits,
             "min_edits_to_clear_failures": combo,
+            "min_edits_alternatives": alternatives,  # per step: all equally-good edits
             "residual_failures_after_combo": sorted(failures(present(cur, depth))),
             "functional_after_combo": is_functional(cur, depth),
         }

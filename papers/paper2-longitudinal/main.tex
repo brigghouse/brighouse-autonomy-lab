@@ -21,12 +21,15 @@
 \begin{abstract}
 ``Secure by default'' is now a legal requirement for connected products sold in
 the EU, yet we have little historical evidence on whether open-source embedded
-stacks have moved toward it. We present the first decade-spanning study of the
-command-link security defaults of the two dominant open-source drone flight
-stacks, ArduPilot and PX4, combining three lines of evidence: the projects'
-version-control history, a measured posture matrix from building and auditing
-releases in software-in-the-loop, and the buildability of each release on a
-current toolchain. Two findings are clear and mutually reinforcing. First,
+stacks have moved toward it. We present, to our knowledge, the first
+decade-spanning study of the command-link security defaults of the two dominant
+open-source drone flight stacks, ArduPilot and PX4, combining three lines of
+evidence: the projects' version-control history, a measured posture matrix from
+building and auditing releases in software-in-the-loop (which, we state plainly,
+covers only $n{=}2$ releases that both build and run on a current toolchain,
+ArduPilot~4.5.7 and~4.6.3; PX4~v1.16.2 builds but does not run under the
+harness), and the buildability of each release on a current toolchain. Two
+findings are clear and mutually reinforcing. First,
 \emph{signing is never on by default}: version control shows it was added to
 ArduPilot in 2016 and never defaulted, and absent from PX4 until 2026, and the
 releases we can still build confirm it. Second---and unexpectedly---\emph{the
@@ -46,9 +49,11 @@ evolution, Cyber Resilience Act.
 
 \section{Introduction}
 Regulators increasingly treat insecure defaults as a product defect: the EU
-Cyber Resilience Act (CRA, Regulation~2024/2847) makes ``secure by default'' an
-essential requirement, and the RED delegated act with EN~18031 withholds a
-presumption of conformity where a user may skip security configuration. These
+Cyber Resilience Act (CRA, Regulation~2024/2847~\cite{cra2024}) makes ``secure by
+default'' an essential requirement, and under the RED delegated
+act~\cite{red2022_30} the harmonised standards EN~18031 are cited with
+restrictions that withhold the presumption of conformity where a user may skip
+security configuration~\cite{ec2025_138}. These
 rules presuppose that we can \emph{measure} the default posture of a product and
 track how it changes. For drones, the two stacks that matter are open source and
 have a decade of public history, which makes them an unusually good subject for a
@@ -169,8 +174,9 @@ cannot simply be produced on demand---the version-control timeline
 
 \section{Discussion}
 \label{sec:disc}
-The CRA's reporting duty began on 11~September~2026 and full application lands on
-11~December~2027. Our timeline shows that, as of late~2026, a manufacturer
+The CRA's reporting duty under Article~14 applies from 11~September~2026 and the
+Regulation applies in full from 11~December~2027 (Article~71(2))~\cite{cra2024}.
+Our timeline shows that, as of late~2026, a manufacturer
 building on either stack cannot rely on the \emph{upstream default} to meet the
 ``secure by default'' requirement: signing is off by default in every release,
 and in the stable PX4 line it is absent. Conformity therefore rests on
@@ -205,7 +211,7 @@ defaults, not downstream per-unit configuration.
 
 \section*{Availability}
 Build recipes, raw audits, logs, and the analysis pipeline are released at the
-project repository. The study is defensive and simulation-only.
+project repository.\footnote{Repository and data: \url{https://github.com/brigghouse/brighouse-autonomy-lab}} The study is defensive and simulation-only.
 
 \bibliographystyle{IEEEtran}
 \bibliography{../common/refs}

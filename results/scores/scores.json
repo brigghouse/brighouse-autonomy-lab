@@ -65,7 +65,7 @@
     {
       "stack": "px4",
       "ref": "v1.16.2",
-      "default_score": 42.0,
+      "default_score": null,
       "provisioned_score": null
     }
   ]

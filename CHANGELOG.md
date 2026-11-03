@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.2 (2026-11-03) — channel-0 exemption measured across transports
+
+- `scripts/ch0_configs.py` + `results/ch0-configs/`: four ArduPilot 4.7.2 SITL
+  configurations moving the transport of SERIAL0 and SERIAL1 independently (TCP/UDP)
+  plus a MAVLink 1 port. Shows the unsigned-accept exemption follows the channel index,
+  not the link type (ch0 over UDP accepts unsigned; ch1 over UDP rejects). 23/23 agree
+  with the `ardupilot-4.7.2` policy. Regression test on the recorded data.
+- Paper 1: new "Index, not transport" paragraph and Table (tab:ch0); MAVLink 1 port
+  measured stricter than the documentation's wording.
+
 ## 0.2.1 (2026-11-03) — honesty pass after independent audit
 
 - **Score**: a run that observed no frames and whose probe never completed is now *unscorable* (`score: null`, `grade: "N/A"`, `insufficient_data: true`) instead of being graded. Previously an empty PX4 v1.16.2 run scored 42/D, above devices that actually ran and were insecure. Regression test added; `results/scores/*` regenerated.

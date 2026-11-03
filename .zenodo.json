@@ -1,6 +1,6 @@
 {
   "title": "Brighouse Autonomy Security Lab: mavaudit, MAVLink signing measurements, and acceptance-semantics model",
-  "description": "Defensive security research artifact for MAVLink-based drones and autonomous systems, aligned to the EU Cyber Resilience Act (CRA). Includes: mavaudit (a key-less MAVLink configuration auditor with CRA-mapped findings), a parameterised acceptance-semantics formal model with bounded adversary exploration and design-space synthesis, a model-based conformance harness, a reproducible secure-by-default score, and measured software-in-the-loop results for ArduPilot 4.7.2 and PX4 v1.17.0 / v1.18.0-rc1. Simulation-only; contains no exploit code or attack automation.",
+  "description": "Defensive security research artifact for MAVLink-based drones and autonomous systems, aligned to the EU Cyber Resilience Act (CRA). Includes: mavaudit (a key-less MAVLink configuration auditor with CRA-mapped findings), a parameterised acceptance-semantics formal model with bounded adversary exploration and design-space synthesis, a model-based conformance harness (47 recorded model-vs-implementation decisions across three stacks and four link configurations), a reproducible and versioned secure-by-default score, and measured software-in-the-loop results for ArduPilot 4.7.2 and PX4 v1.17.0 / v1.18.0-rc1. Measurements include the channel-0 unsigned-accept exemption (shown to follow the channel index rather than the transport), the surface served to an unauthenticated peer per release, and the unauthenticated uXRCE-DDS control plane that a MAVLink signing key does not protect. All probes are read-only and run against local simulators; the artifact contains no exploit code and no attack automation.",
   "upload_type": "software",
   "license": "Apache-2.0",
   "creators": [
@@ -19,7 +19,11 @@
     "Cyber Resilience Act",
     "Remote ID",
     "conformance testing",
-    "formal methods"
+    "formal methods",
+    "uXRCE-DDS",
+    "secure by default",
+    "software-in-the-loop",
+    "reproducibility"
   ],
   "related_identifiers": [
     {
@@ -28,5 +32,7 @@
       "scheme": "url"
     }
   ],
-  "access_right": "open"
+  "access_right": "open",
+  "version": "0.3.0",
+  "notes": "Preprints, not peer-reviewed. Measurements are of software-in-the-loop builds, not of physical aircraft; no Remote ID broadcast or CAN-bus measurement is included, and the repository states this where the question arises."
 }

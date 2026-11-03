@@ -421,12 +421,23 @@ analysis of adjacent provisioning protocols: Tamarin for ASTM~F3411 Remote
 ID~\cite{alam2026remoteid}, ProVerif for Bluetooth ``Just
 Works''/passkey~\cite{wu2022bluetooth,jangid2023passkey} and Matter
 commissioning~\cite{duttagupta2025matter}, and Tamarin for automotive
-SecOC~\cite{bodei2024autosar}. To our knowledge, no prior work gives an
-executable model of MAVLink's \emph{native} signing scheme and its provisioning
-(as opposed to an added cipher or a runtime monitor), nor checks such a model by
-model-based conformance testing against a flight stack's running implementation;
-we state this on the basis of published abstracts and will revise it if the full
-texts show otherwise.
+SecOC~\cite{bodei2024autosar}. The closest prior work is PAVE-MAVLink, which pairs
+a ProVerif analysis of MAVLink~2 with empirical validation, including attacks on
+the Damn Vulnerable Drone platform and over-the-air validation on a physical PX4
+aircraft~\cite{wray2025pave,wray2025pavedemo}; its mitigation is an added
+ChaCha20 layer. We therefore do not claim to be first to verify MAVLink~2
+formally, nor first to check such an analysis against running hardware. What we
+believe is new here is narrower and we state it in those terms: a model whose
+parameters \emph{are} the points on which implementations differ, so that PX4 and
+ArduPilot are instances of one semantics rather than separate studies; the
+treatment of provisioning---the trust-on-first-use window and the per-link
+exemptions---as first-class rather than as assumptions; a conformance campaign
+that systematically compares predicted with observed \emph{accept/reject}
+decisions and accounts for which of them discriminate, rather than demonstrating
+that particular attacks succeed; and a remedy posed as repair of the native
+policy rather than as an added cipher. We state this on the basis of published
+abstracts and metadata---the MILCOM proceedings are paywalled and we have not
+read the full texts---and we will revise it if those texts show otherwise.
 Fuzzing of flight stacks~\cite{kim2019rvfuzzer,kim2021pgfuzz} targets input
 validation, a complementary concern: our model assumes memory safety and studies
 the acceptance decision.

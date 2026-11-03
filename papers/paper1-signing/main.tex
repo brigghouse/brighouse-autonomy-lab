@@ -552,9 +552,18 @@ ATT\&CK and to GDPR~\cite{ruohonen2025sok,ruohonen2025gdpr}, UNECE~R155 to
 ISO/SAE~21434~\cite{costantino2022r155}, DO-326A to avionics
 architecture~\cite{siddiqui2023do326a}---and none maps essential requirements to
 \emph{measurable protocol properties} of a drone C2 link or produces evidence by
-executing checks against the implementation. To our knowledge no prior work gives
-a parameterised semantics of MAVLink signing nor an executable CRA conformance
-crosswalk.
+executing checks against the implementation. MAVLink~2 itself has been verified
+formally before: PAVE-MAVLink analyses it in ProVerif and validates the result
+empirically, over the air, on a physical PX4
+aircraft~\cite{wray2025pave,wray2025pavedemo}, proposing an added ChaCha20 layer
+as the remedy. We claim neither priority in verifying the protocol nor in testing
+against real hardware. What we have not found in prior work is a semantics
+\emph{parameterised} by the points on which implementations differ---so that the
+stacks become instances to compare rather than separate case studies---or a
+conformance crosswalk that produces CRA evidence by executing checks against the
+implementation. We say this from published abstracts and metadata, the MILCOM
+proceedings being paywalled, and will revise it if the full texts show
+otherwise.
 
 \section{Conclusion}
 \label{sec:conclusion}

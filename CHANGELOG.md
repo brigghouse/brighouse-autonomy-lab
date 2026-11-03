@@ -9,6 +9,12 @@
   with the `ardupilot-4.7.2` policy. Regression test on the recorded data.
 - Paper 1: new "Index, not transport" paragraph and Table (tab:ch0); MAVLink 1 port
   measured stricter than the documentation's wording.
+- Paper 3: the four configurations folded into the conformance experiment
+  (24 -> 47 recorded decisions; 20 unkeyed tautological, 4 negative control,
+  23 discriminating keyed, 7 observed rejections). New paragraph arguing that
+  the B/C pair is a controlled single-variable experiment rather than mere
+  agreement, and that configuration D agrees for a reason the model does not
+  represent (no wire-version parameter) - recorded as a limit of the model.
 
 ## 0.2.1 (2026-11-03) — honesty pass after independent audit
 

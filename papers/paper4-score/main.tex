@@ -32,8 +32,11 @@ requirement and carries a fixed weight summing to 100)---and is released as
 executable code with a property-test suite that checks the axioms. Applied to our
 measured configurations, the score separates insecure defaults (grade~E) from a
 provisioned but console-exempt link (grade~D) and from a cleanly signed link
-(grade~C), and ranks them below an idealised target (grade~A); the
-console-exemption penalty is captured numerically rather than described. We argue
+(grade~C), and ranks them below an idealised target (grade~A), with grade~B the ceiling for
+MAVLink~2 signing alone; the
+console-exemption penalty is captured numerically rather than described, and a
+criterion for a \emph{second}, non-MAVLink control plane reorders two
+configurations that the MAVLink criteria alone rank equally. We argue
 that such a metric is the missing piece between a measurement tool and a
 conformity-evidence artefact, and we discuss its limits as a rubric rather than a
 canonical truth.
@@ -79,7 +82,17 @@ observation. The score is
 \]
 Table~\ref{tab:crit} lists the criteria, their CRA Annex~I, Part~I(2) anchor, and
 their weight. Weights reflect the CRA's emphasis on command-channel integrity and
-access control; confidentiality and maintenance are lighter for a C2 link.
+access control; confidentiality and maintenance are lighter for a C2 link. The criteria
+set is \emph{versioned}, and the version is reported with every score, because
+adding a criterion changes every number: scores from different versions are not
+comparable. The set below is v2, which splits v1's single
+``unauthenticated service exposure'' criterion (16) into the file-transfer
+surface (8) and a \emph{second control plane} (8). The split is not cosmetic. A
+flight controller may expose a control path that is not MAVLink at all---PX4's
+uXRCE-DDS bridge reaches uORB directly and its transport is unauthenticated by
+design---and a MAVLink signing key does not protect it. A deployment can
+therefore satisfy every MAVLink criterion and still be commandable by another
+route, which a metric that scores only one protocol would rate as clean.
 
 \begin{table}[t]
 \caption{Criteria, CRA anchor, weight, and the observable that computes $m_c$.}
@@ -91,7 +104,8 @@ criterion & CRA & $w_c$ & observable ($m_c$) \\
 \midrule
 integrity        & I.2(f) & 28 & signed-frame fraction \\
 access control   & I.2(d) & 24 & unsigned read rejected \\
-attack surface   & I.2(j) & 16 & no unauth.\ FTP/service \\
+attack surface   & I.2(j) & 8  & no unauth.\ file transfer \\
+control plane    & I.2(d) & 8  & no unauth.\ second plane \\
 no legacy        & I.2(b) & 10 & no MAVLink 1 on link \\
 provisioning     & I.2(d) & 12 & out-of-band keys (no TOFU) \\
 confidentiality  & I.2(e) & 6  & link payloads encrypted \\
@@ -142,7 +156,7 @@ SERIAL1 link despite identical signed-frame fractions.}
 \label{fig:scores}
 \end{figure}
 
-Three observations validate the metric against intuition and against the companion
+Four observations validate the metric against intuition and against the companion
 findings. First, insecure defaults cluster at the bottom (grade~E, scores
 $14$--$20$): zero signed frames and an answered unsigned read cost the two
 heaviest criteria at once. Second, the metric gives the console-exemption
@@ -150,18 +164,42 @@ behaviour (companion result \emph{R4}) a \emph{numeric} penalty: the ArduPilot
 \code{ch0} link, which signs every outbound frame yet still answers unsigned
 requests, scores below the cleanly signed SERIAL1 link even though their
 signed-frame fractions are identical---because the access-control criterion reads
-the active probe, not the passive traffic. Third, no measured configuration
+the active probe, not the passive traffic. Third, the control-plane criterion reorders two
+configurations that the MAVLink criteria alone rank equally: ArduPilot~4.7.2
+signed on SERIAL1 (74) now sits above PX4~v1.18 signed (66), because the PX4
+build offers an unauthenticated uXRCE-DDS plane and this ArduPilot build offers
+none. That ordering is invisible to a MAVLink-only metric, and it is the kind of
+reordering a metric has to be able to express if it is to be used as evidence.
+We note the asymmetry honestly: the absence is a property of \emph{this}
+ArduPilot build, which does not compile the DDS subsystem, not of ArduPilot. A
+criterion that was never probed earns nothing and the score is reported as a
+lower bound, because a plane we did not look at is not a plane we know to be
+clean. Fourth, no measured configuration
 reaches grade~A: every one either lacks confidentiality or keeps a
 trust-on-first-use window, so the idealised target (out-of-band keys, encrypted
-link) sits alone at the top. This deserves a plain statement: a MAVLink link
-that is configured as well as the protocol allows---every frame signed, unsigned
-input rejected, no legacy frames, services closed---still tops out near $70$
-(grade~C), because the provisioning ($12$) and confidentiality ($6$) criteria
-cannot be earned without out-of-band key distribution and link encryption, which
-MAVLink~2 does not provide natively. The grade therefore combines a
+link) sits alone at the top. This deserves a plain statement, and a correction we
+owe an earlier draft. A link configured as well as MAVLink~2 signing alone
+allows---every frame signed, unsigned input rejected, no legacy frames, file
+transfer closed, no second plane, firmware identifiable---scores $82$ (grade~B),
+not more: the provisioning ($12$) and confidentiality ($6$) criteria are the
+remainder, and neither is in the protocol's gift. Confidentiality is simply
+absent from MAVLink~2, which authenticates frames without encrypting them, so it
+requires security underneath the protocol: an encrypted radio or a VPN.
+Provisioning is subtler---it is earnable, but only by distributing keys out of
+band in production, because the \code{SETUP\_SIGNING}-over-the-link flow both
+stacks implement is precisely the trust-on-first-use window the criterion
+penalises. With out-of-band keys the ceiling rises to $94$, and only with link
+encryption as well does $100$ become reachable. The grade therefore combines a
 \emph{protocol ceiling} with the integrator's configuration, and a reader should
-separate the two before judging a product; a grade~C link may be as good as
-MAVLink gets. The score thus points at exactly the two upstream changes the
+separate the two before judging a product: grade~B is what signing alone can
+buy, and the step to grade~A is a production practice and a radio, not a
+protocol fix. (An earlier draft of this paper put the ceiling ``near $70$,
+grade~C''. That was wrong: it quoted the best score we had measured, $74$, as
+though it were the ceiling. The measured best falls short of $82$ for mundane
+reasons---on that run the file-transfer status was unknown, drawing partial
+credit, and the firmware was not identifiable on that link---and conflating a
+measurement with a bound is exactly the error a published metric should not
+make.) The score thus points at exactly the two upstream changes the
 companion synthesis identifies.
 
 \section{Discussion}

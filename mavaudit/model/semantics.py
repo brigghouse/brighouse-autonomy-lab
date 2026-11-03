@@ -5,8 +5,12 @@ Notation (mirrors the paper):
   K        V's current signing key, or None
   L        set of link identifiers; policy.trusted ⊆ L never require signatures
   S[s]     last accepted timestamp per stream s = (sysid, compid, link_id)
-  frame    (link, src, msg, signed, key, ts, link_id)   -- key is the key used to sign
+  frame    (link, src, msg, signed, key, ts, link_id, wire)  -- key is the key used to sign
   Message kinds: CMD (state-changing), READ (read-only request), HB, RADIO, SETUP(key')
+  wire     the MAVLink wire version, 1 or 2. A version 1 frame has no signature field at
+           all, so wire=1 implies signed=False; it is not "an unsigned version 2 frame",
+           and conflating the two is how a model can predict the right answer for the
+           wrong reason.
 
 Decisions are functions of the policy, the state and the frame. Signature verification is
 abstract: a frame "verifies" iff it was signed with V's key (no forgery; collisions ignored).
@@ -43,6 +47,12 @@ class Policy:
     refuse_setup_armed: bool = False
     #: enforce strictly increasing timestamps per stream and the 1-minute window
     replay_check: bool = True
+    #: while keyed, accept MAVLink 1 frames (which cannot carry a signature) anyway.
+    #: False in every implementation we measured; True expresses the reading of
+    #: ArduPilot's documentation, that a port speaking MAVLink 1 "is not protected".
+    #: The parameter exists so that the two readings are distinguishable, and so that a
+    #: measurement can decide between them rather than the model assuming one.
+    v1_bypasses_signing: bool = False
     #: does the vehicle sign its own outbound frames on link l? (telemetry may stay unsigned)
     sign_outgoing_on_trusted: bool = True
     #: key is installed out of band (factory), not over MAVLink: V starts keyed, no TOFU window
@@ -59,6 +69,14 @@ class Frame:
     ts: int = 0                   # signing timestamp
     link_id: int = 0
     payload: Optional[str] = None # for SETUP: the new key label
+    wire: int = 2                 # MAVLink wire version: 1 or 2
+
+    def __post_init__(self):
+        if self.wire not in (1, 2):
+            raise ValueError(f"wire version must be 1 or 2, got {self.wire!r}")
+        if self.wire == 1 and self.signed:
+            # Structural, not a policy choice: version 1 frames have no signature field.
+            raise ValueError("a MAVLink 1 frame cannot be signed")
 
 
 @dataclass(frozen=True)
@@ -137,6 +155,14 @@ def step(policy: Policy, st: State, fr: Frame) -> Decision:
         return Decision(False, "unkeyed: closed", st)
     if fr.link in policy.trusted:
         return Decision(True, "trusted link: unsigned accepted", st)
+    if fr.wire == 1:
+        # Reached only on a non-trusted link while keyed. A version 1 frame carries no
+        # signature, so the only question is whether the policy waives the requirement.
+        if policy.v1_bypasses_signing:
+            return Decision(True, "MAVLink 1 frame accepted while keyed (v1 bypass)", st)
+        if fr.kind in policy.allow_unsigned:
+            return Decision(True, "allow-listed kind accepted unsigned (MAVLink 1)", st)
+        return Decision(False, "MAVLink 1 frame cannot be signed; rejected", st)
     if fr.signed:
         if fr.key != st.key:
             return Decision(False, "bad signature", st)

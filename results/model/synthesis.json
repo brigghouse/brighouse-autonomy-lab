@@ -149,5 +149,43 @@
     ],
     "residual_failures_after_combo": [],
     "functional_after_combo": true
+  },
+  "ardupilot-4.7.2-doc": {
+    "present": [
+      "P1",
+      "P2",
+      "P4",
+      "P5",
+      "P6"
+    ],
+    "failures": [
+      "P1",
+      "P2"
+    ],
+    "functional": true,
+    "single_edits": {
+      "close-tofu+oob": {
+        "removes": [
+          "P4",
+          "P6"
+        ],
+        "adds": [],
+        "still_functional": true
+      },
+      "drop-trusted-links": {
+        "removes": [
+          "P5"
+        ],
+        "adds": [],
+        "still_functional": true
+      }
+    },
+    "min_edits_to_clear_failures": [],
+    "min_edits_alternatives": [],
+    "residual_failures_after_combo": [
+      "P1",
+      "P2"
+    ],
+    "functional_after_combo": true
   }
 }

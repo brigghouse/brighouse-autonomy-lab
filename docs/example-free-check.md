@@ -15,12 +15,12 @@ parameter file; nothing else changes about the method.
 
 | Configuration | Score | Grade |
 |---|---|---|
-| Default, primary link (SERIAL0) | **14 / 100** | **E** |
-| Signing enabled, primary link (SERIAL0) | 42 / 100 | D |
-| Signing enabled, telemetry link (SERIAL1) | 70 / 100 | C |
+| Default, primary link (SERIAL0) | **22 / 100** | **E** |
+| Signing enabled, primary link (SERIAL0) | 50 / 100 | D |
+| Signing enabled, telemetry link (SERIAL1) | 74 / 100 | C |
 
 Read the three rows together: enabling signing is necessary but, on the primary link,
-not sufficient. 70/C is close to the practical ceiling for MAVLink (see *Ceiling*, below).
+not sufficient. See *Ceiling* below for how high this can go at all.
 
 ## Findings
 
@@ -61,7 +61,8 @@ peer, on any link. Whoever gets there first owns the aircraft.
 |---|---|---|
 | Frames signed | 2(f) | 0 / 28 |
 | Unsigned requests rejected | 2(d) | 0 / 24 |
-| No unauthenticated service exposure | 2(j) | 0 / 16 |
+| No unauthenticated file transfer | 2(j) | 0 / 8 |
+| No unauthenticated second control plane | 2(d) | 8 / 8 |
 | No unprotected MAVLink 1 | 2(b) | 10 / 10 |
 | Out-of-band key provisioning | 2(d) | 0 / 12 |
 | Payload confidentiality | 2(e) | 0 / 6 |
@@ -69,14 +70,31 @@ peer, on any link. Whoever gets there first owns the aircraft.
 
 The weights are ours, fixed in advance, and documented in `mavaudit/score.py`. They are
 not an official scale: the score is a rubric for comparing configurations, not a verdict.
+The criteria set is versioned (this is v2); scores from different versions are not
+comparable, and the version is reported with every result.
+
+The second-control-plane criterion is earned here because this ArduPilot build does not
+compile its DDS subsystem — we probed for it and found nothing. On a PX4 build the same
+criterion scores zero, because PX4's uXRCE-DDS bridge offers an unauthenticated path that
+reaches the flight stack directly and a MAVLink signing key does not protect it.
 
 ## Ceiling
 
-MAVLink 2 signing authenticates frames; it does not encrypt them, and a short list of
-messages is always accepted unsigned. So payload confidentiality and part of the attack
-surface cannot be earned at the protocol level. **A grade C may be as good as MAVLink
-gets**; above that needs link-layer security (an encrypted radio, a VPN) underneath.
-We would rather tell you that now than sell you a path to an A that does not exist.
+MAVLink 2 signing authenticates frames; it does not encrypt them. A link configured as well
+as signing alone allows — every frame signed, unsigned input rejected, file transfer closed,
+no second plane, firmware identifiable — scores **82, a grade B**, and no higher. The
+remaining 18 points are not in the protocol's gift:
+
+- **12** for key provisioning, earnable only by distributing keys out of band in production.
+  The in-band `SETUP_SIGNING` flow both stacks implement *is* the trust-on-first-use window
+  this criterion penalises.
+- **6** for confidentiality, which MAVLink 2 does not do at all. It needs an encrypted radio
+  or a VPN underneath.
+
+With out-of-band keys the ceiling is 94; only with link encryption as well is 100 reachable.
+So the honest version is: **grade B is what signing alone can buy you, and the step to A is a
+production practice and a radio, not a protocol fix.** We would rather tell you that now
+than sell you a path to an A that does not exist.
 
 ## What we did not test
 

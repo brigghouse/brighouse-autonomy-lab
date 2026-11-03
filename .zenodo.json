@@ -1,0 +1,32 @@
+{
+  "title": "Brighouse Autonomy Security Lab: mavaudit, MAVLink signing measurements, and acceptance-semantics model",
+  "description": "Defensive security research artifact for MAVLink-based drones and autonomous systems, aligned to the EU Cyber Resilience Act (CRA). Includes: mavaudit (a key-less MAVLink configuration auditor with CRA-mapped findings), a parameterised acceptance-semantics formal model with bounded adversary exploration and design-space synthesis, a model-based conformance harness, a reproducible secure-by-default score, and measured software-in-the-loop results for ArduPilot 4.7.2 and PX4 v1.17.0 / v1.18.0-rc1. Simulation-only; contains no exploit code or attack automation.",
+  "upload_type": "software",
+  "license": "Apache-2.0",
+  "creators": [
+    {
+      "name": "Brighouse, Ian",
+      "affiliation": "Brighouse Autonomy Security Lab"
+    }
+  ],
+  "keywords": [
+    "MAVLink",
+    "drone security",
+    "UAS",
+    "PX4",
+    "ArduPilot",
+    "message signing",
+    "Cyber Resilience Act",
+    "Remote ID",
+    "conformance testing",
+    "formal methods"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/brigghouse/brighouse-autonomy-lab",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
+  "access_right": "open"
+}

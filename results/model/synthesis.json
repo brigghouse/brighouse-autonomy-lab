@@ -26,6 +26,11 @@
     "min_edits_to_clear_failures": [
       "close-tofu+oob"
     ],
+    "min_edits_alternatives": [
+      [
+        "close-tofu+oob"
+      ]
+    ],
     "residual_failures_after_combo": [],
     "functional_after_combo": true
   },
@@ -55,6 +60,11 @@
     },
     "min_edits_to_clear_failures": [
       "close-tofu+oob"
+    ],
+    "min_edits_alternatives": [
+      [
+        "close-tofu+oob"
+      ]
     ],
     "residual_failures_after_combo": [],
     "functional_after_combo": true
@@ -86,14 +96,11 @@
         "still_functional": true
       }
     },
-    "min_edits_to_clear_failures": [
-      "strict-allowlist",
-      "enable-replay-check",
-      "no-unsigned-rekey",
-      "close-tofu+oob",
-      "drop-trusted-links"
+    "min_edits_to_clear_failures": [],
+    "min_edits_alternatives": [],
+    "residual_failures_after_combo": [
+      "P3"
     ],
-    "residual_failures_after_combo": [],
     "functional_after_combo": true
   },
   "ardupilot-4.7.2": {
@@ -130,6 +137,15 @@
     "min_edits_to_clear_failures": [
       "close-tofu+oob",
       "drop-trusted-links"
+    ],
+    "min_edits_alternatives": [
+      [
+        "close-tofu+oob"
+      ],
+      [
+        "drop-trusted-links",
+        "no-unsigned-rekey"
+      ]
     ],
     "residual_failures_after_combo": [],
     "functional_after_combo": true

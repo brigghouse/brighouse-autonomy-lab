@@ -29,7 +29,7 @@ Details and raw data: [results/](results/README.md)
 
 Four reproducible IEEE-format papers build on this data and model (see [papers/](papers/README.md)):
 
-1. **Signed but Unprotected** — measurement + a formal acceptance model + a CRA conformance crosswalk. The model predicts the ArduPilot ch0 "signed yet unprotected" case before it is measured.
+1. **Signed but Unprotected** — measurement + a formal acceptance model + a CRA conformance crosswalk. The model, derived from reading `GCS_Signing.cpp`, reproduces the ArduPilot ch0 "signed yet unprotected" behaviour that the SITL measurement then confirms. (That behaviour is tracked upstream as [ArduPilot#34489](https://github.com/ArduPilot/ardupilot/issues/34489) with fix PR [#34780](https://github.com/ArduPilot/ardupilot/pull/34780), unmerged as of Nov 2026; our contribution is the independent measurement, the formal model and the CRA mapping, not the discovery.)
 2. **A Decade of Defaults** — longitudinal study: signing was added to ArduPilot in 2016 and PX4 in 2026, and *never* shipped on by default.
 3. **Acceptance Semantics for MAVLink 2 Signing** — bounded symbolic analysis + model-based conformance testing; a liveness-constrained search shows ArduPilot needs two independent fixes where PX4 1.18 needs one.
 4. **Scoring Secure by Default** — a reproducible, CRA-grounded 0–100 metric that prices the ch0 pitfall numerically (42 vs 70).
@@ -68,7 +68,7 @@ Full guide: [docs/setup.md](docs/setup.md) (Spanish: [docs/setup.es.md](docs/set
 | Path | What |
 |---|---|
 | [`mavaudit/`](mavaudit/) | The auditor; `mavaudit/sim/fake_vehicle.py` is the reference vehicle used in tests |
-| [`tests/`](tests/) | 15 tests: unsigned, signed, signing-exempt and MAVLink 1 vehicles, advisories, exit codes, scope guard |
+| [`tests/`](tests/) | 42 tests: auditor (unsigned, signed, signing-exempt and MAVLink 1 vehicles, advisories, exit codes, scope guard), the formal model (incl. conformance against recorded SITL observations) and the score (incl. the empty-run guard) |
 | [`scripts/`](scripts/) | SITL build and experiment runners |
 | [`results/`](results/README.md) | Measured data: reports, summaries, simulator logs |
 | [`paper/`](paper/paper1-draft.md) | Paper 1 draft: MAVLink signing in 2026 and the CRA |

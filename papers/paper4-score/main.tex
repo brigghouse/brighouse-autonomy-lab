@@ -101,7 +101,14 @@ maintenance      & II.1   & 4  & firmware identifiable \\
 \end{table}
 
 \paragraph{Axioms} \textbf{A1 Provenance:} each $m_c$ is a function of an observed
-finding or a model property; none is a judgement. \textbf{A2 Monotonicity:}
+finding or a model property; none is a free judgement. Two inputs are
+\emph{declared} rather than observed by the audit itself and are therefore the
+places where an analyst's input enters: the provisioning criterion reads the
+model-policy name the analyst assigns to the stack, and the confidentiality
+criterion reads a flag stating whether the link is encrypted. Both are recorded
+in the breakdown, so a reviewer can see and contest them. A run that observed no
+frames and whose probe never completed is \emph{unscorable} and receives no
+grade; absence of evidence is never scored as security. \textbf{A2 Monotonicity:}
 improving any observable (more signed frames, an unsigned read now rejected, a
 service now closed) does not decrease any $m_c$, hence not the score.
 \textbf{A3 Grounding:} each $c$ cites an Annex~I requirement and
@@ -146,8 +153,16 @@ signed-frame fractions are identical---because the access-control criterion read
 the active probe, not the passive traffic. Third, no measured configuration
 reaches grade~A: every one either lacks confidentiality or keeps a
 trust-on-first-use window, so the idealised target (out-of-band keys, encrypted
-link) sits alone at the top. The score thus points at exactly the two upstream
-changes the companion synthesis identifies.
+link) sits alone at the top. This deserves a plain statement: a MAVLink link
+that is configured as well as the protocol allows---every frame signed, unsigned
+input rejected, no legacy frames, services closed---still tops out near $70$
+(grade~C), because the provisioning ($12$) and confidentiality ($6$) criteria
+cannot be earned without out-of-band key distribution and link encryption, which
+MAVLink~2 does not provide natively. The grade therefore combines a
+\emph{protocol ceiling} with the integrator's configuration, and a reader should
+separate the two before judging a product; a grade~C link may be as good as
+MAVLink gets. The score thus points at exactly the two upstream changes the
+companion synthesis identifies.
 
 \section{Discussion}
 \label{sec:disc}
@@ -184,7 +199,7 @@ console-exemption pitfall numerically, and points at the fixes. We release it as
 code so that the number is never a matter of opinion.
 
 \section*{Availability}
-The metric, tests, and the data it scores are released. The work is defensive and
+The metric, tests, and the data it scores are released at the project repository.\footnote{Repository and data: \url{https://github.com/brigghouse/brighouse-autonomy-lab}} The work is defensive and
 simulation-based.
 
 \bibliographystyle{IEEEtran}

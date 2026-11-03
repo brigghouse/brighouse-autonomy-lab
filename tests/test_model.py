@@ -32,7 +32,7 @@ def test_keyed_accepts_valid_signature_and_advances_timestamp():
 def test_replay_rejected_by_timestamp():
     st = State(key="K", clock=1_000_000).with_ts((1, 1, 1), 1_000_050)
     d = step(PX4_118, st, Frame("ch1", (1, 1), CMD, signed=True, key="K", ts=1_000_050, link_id=1))
-    assert not d.accepted and "replay" in d.reason.lower() or "increasing" in d.reason
+    assert not d.accepted and ("replay" in d.reason.lower() or "increasing" in d.reason.lower())
 
 
 def test_bad_signature_rejected():
@@ -121,31 +121,38 @@ def test_synthesis_px4_118_single_fix():
     assert not d["residual_failures_after_combo"]
 
 
-def test_conformance_predictions_match_measured_ground_truth():
-    """The 8-case prediction vector per policy equals what the live SITL confirmed (8/8).
-    Order: (keyed, trusted, signed) over {0,1}^3 as in scripts.conformance."""
-    import sys, os
+def test_conformance_predictions_match_recorded_observations():
+    """Every model prediction equals the *observed* SITL outcome recorded in
+    results/conformance/conformance-*.json.
+
+    This is a RECORDED experiment: the SITL runs are not re-executed in CI. The test
+    guards against the model drifting away from the committed observations. It
+    deliberately reads the `observed` field (what the vehicle actually did), never a
+    copy of the model's own `predicted` output, so it cannot be satisfied trivially.
+    """
+    import sys, os, json, glob
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
     from conformance import model_predict
     from mavaudit.model.configs import BY_NAME
-    # Ground truth from results/conformance (all stacks agreed 8/8 with these predictions):
-    expected = {
-        "ardupilot-4.7.2": {
-            (False, True, False): True, (False, True, True): True,
-            (False, False, False): True, (False, False, True): True,
-            (True, True, False): True,  (True, True, True): True,     # ch0 answers unsigned (R4)
-            (True, False, False): False, (True, False, True): True,
-        },
-        "px4-1.18": {
-            (False, True, False): True, (False, True, True): True,
-            (False, False, False): True, (False, False, True): True,
-            (True, True, False): False, (True, True, True): True,     # no trusted link
-            (True, False, False): False, (True, False, True): True,
-        },
-        "px4-1.17": {k: True for k in [(a, b, c) for a in (0, 1) for b in (0, 1) for c in (0, 1)]},
-    }
-    for pol, cases in expected.items():
-        p = BY_NAME[pol]
-        for (keyed, trusted, signed), exp in cases.items():
-            got = model_predict(p, bool(trusted), bool(signed), bool(keyed))
-            assert got == exp, (pol, keyed, trusted, signed, got, exp)
+    root = os.path.join(os.path.dirname(__file__), "..", "results", "conformance")
+    files = sorted(glob.glob(os.path.join(root, "conformance-*.json")))
+    assert files, "no recorded conformance results found"
+    checked, discriminating = 0, 0
+    for f in files:
+        with open(f) as fh:
+            d = json.load(fh)
+        p = BY_NAME[d["policy"]]
+        for c in d["cases"]:
+            keyed = c["state"] == "keyed"
+            trusted = c["link"] == "trusted"
+            got = model_predict(p, trusted, bool(c["signed"]), keyed)
+            assert got == c["observed"], (d["policy"], c, got)
+            checked += 1
+            # A case only discriminates when the vehicle could have rejected: keyed state.
+            if keyed and c["observed"] is False:
+                discriminating += 1
+    assert checked == 24
+    # Honest accounting: the unkeyed half is a tautology (nothing can reject). Only
+    # the keyed rejections (px4-1.18 untrusted/unsigned x1, ardupilot untrusted/unsigned x1,
+    # plus px4-1.18 trusted/unsigned) actually test the model's discriminating power.
+    assert discriminating >= 3

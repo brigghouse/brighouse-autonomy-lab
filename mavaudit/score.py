@@ -54,7 +54,14 @@ def score(report: dict, policy: Optional[str] = None, link_confidential: bool = 
     """Compute the score for one audited link. `report` is a mavaudit report dict."""
     ep = _endpoint(report)
     probe = report.get("unsigned_probe") or {}
-    frames = max(ep.get("frames", 0), 1)
+    raw_frames = int(ep.get("frames", 0) or 0)
+    # A1 (provenance): absence of evidence is not evidence of security. A run that
+    # observed no frames and whose probe never answered is unscorable, not a good score.
+    if raw_frames == 0 and not bool(probe.get("answered")):
+        return {"score": None, "max": MAXW, "grade": "N/A", "insufficient_data": True,
+                "reason": "no frames observed and probe did not complete; run is unscorable",
+                "link": report.get("target"), "policy": policy, "breakdown": []}
+    frames = max(raw_frames, 1)
     signed_frac = ep.get("signed_frames", 0) / frames
     unsigned_answered = bool(probe.get("answered"))
     ftp = ep.get("ftp_advertised")
@@ -105,6 +112,10 @@ def _grade(total: float) -> str:
 def score_summary_run(summary_run: dict, policy: Optional[str] = None,
                       link_confidential: bool = False) -> dict:
     """Score from a longitudinal/summary 'run' dict (no full report).  A2-safe."""
+    if int(summary_run.get("frames", 0) or 0) == 0 and not summary_run.get("unsigned_probe_answered"):
+        return {"score": None, "max": MAXW, "grade": "N/A", "insufficient_data": True,
+                "reason": "no frames observed and probe did not complete; run is unscorable",
+                "link": summary_run.get("firmware"), "policy": policy, "breakdown": []}
     frames = max(summary_run.get("frames", 0), 1)
     fake_report = {
         "target": None,

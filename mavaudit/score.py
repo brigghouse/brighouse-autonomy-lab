@@ -9,6 +9,13 @@ axioms so that it is defensible as conformance evidence:
   A3 CRA-grounded weights. Each criterion maps to a CRA Annex I, Part I(2) requirement and
                    carries a fixed weight; weights sum to 100.
 
+The criteria set is versioned (SCORE_VERSION). Version 2 splits the "unauthenticated
+service exposure" budget of version 1 between the MAVLink file-transfer surface and a
+*secondary control plane* (PX4's uXRCE-DDS bridge, which reaches uORB directly and which a
+MAVLink signing key does not protect), because a deployment can enable MAVLink signing and
+still expose that path. Scores from different versions are not comparable; the version is
+reported with every result.
+
 The input is a mavaudit report dict (for the link under test) plus, optionally, the
 provisioning model policy name (for the one criterion a single audit cannot observe: the
 trust-on-first-use window). Output is a 0-100 score with a per-criterion breakdown.
@@ -32,10 +39,13 @@ class Criterion:
 
 # Weights reflect CRA Annex I emphasis: integrity/access control of the command channel
 # dominate; confidentiality and maintenance are real but lighter for a C2 link.
+SCORE_VERSION = 2
+
 CRITERIA = [
     Criterion("integrity", 28, "I.2(f)", "command/telemetry frames are signed"),
     Criterion("access_control", 24, "I.2(d)", "unsigned requests are rejected"),
-    Criterion("attack_surface", 16, "I.2(j)", "no unauthenticated file-transfer/service exposure"),
+    Criterion("attack_surface", 8, "I.2(j)", "no unauthenticated file-transfer exposure"),
+    Criterion("control_plane", 8, "I.2(d)", "no unauthenticated secondary control plane"),
     Criterion("no_legacy", 10, "I.2(b)", "no unprotected MAVLink 1 on the link"),
     Criterion("provisioning", 12, "I.2(d)", "no trust-on-first-use key window (out-of-band keys)"),
     Criterion("confidentiality", 6, "I.2(e)", "link payloads are confidential"),
@@ -59,6 +69,7 @@ def score(report: dict, policy: Optional[str] = None, link_confidential: bool = 
     # observed no frames and whose probe never answered is unscorable, not a good score.
     if raw_frames == 0 and not bool(probe.get("answered")):
         return {"score": None, "max": MAXW, "grade": "N/A", "insufficient_data": True,
+                "score_version": SCORE_VERSION,
                 "reason": "no frames observed and probe did not complete; run is unscorable",
                 "link": report.get("target"), "policy": policy, "breakdown": []}
     frames = max(raw_frames, 1)
@@ -69,10 +80,12 @@ def score(report: dict, policy: Optional[str] = None, link_confidential: bool = 
     firmware = ep.get("firmware")
 
     # Each criterion returns a fraction in [0,1] of its weight earned (A1: from observables).
+    cp_frac, cp_why = _control_plane_credit(report)
     met = {
         "integrity": signed_frac,                                   # partial credit = signed fraction
         "access_control": 0.0 if unsigned_answered else 1.0,
         "attack_surface": 1.0 if ftp is False else (0.0 if ftp else 0.5),  # None(unknown)->0.5
+        "control_plane": cp_frac,
         "no_legacy": 0.0 if v1 else 1.0,
         "provisioning": _provisioning_credit(policy),
         "confidentiality": 1.0 if link_confidential else 0.0,
@@ -83,10 +96,33 @@ def score(report: dict, policy: Optional[str] = None, link_confidential: bool = 
     for c in CRITERIA:
         earned = round(c.weight * met[c.key], 2)
         total += earned
-        breakdown.append({"criterion": c.key, "cra": c.cra, "weight": c.weight,
-                          "fraction": round(met[c.key], 3), "earned": earned, "describe": c.describe})
-    return {"score": round(total, 1), "max": MAXW, "grade": _grade(total),
-            "link": report.get("target"), "policy": policy, "breakdown": breakdown}
+        row = {"criterion": c.key, "cra": c.cra, "weight": c.weight,
+               "fraction": round(met[c.key], 3), "earned": earned, "describe": c.describe}
+        if c.key == "control_plane":
+            row["why"] = cp_why
+        breakdown.append(row)
+    out = {"score": round(total, 1), "max": MAXW, "grade": _grade(total),
+           "score_version": SCORE_VERSION,
+           "link": report.get("target"), "policy": policy, "breakdown": breakdown}
+    if report.get("control_plane") is None:
+        out["unmeasured_criteria"] = ["control_plane"]
+        out["lower_bound"] = True
+    return out
+
+
+def _control_plane_credit(report: dict) -> tuple[float, str]:
+    """A1 (provenance): this criterion needs its own observation, from scripts/dds_probe.py.
+    `report["control_plane"]` is expected to be {"unauthenticated": bool, ...}.
+
+    Absence of an unauthenticated secondary plane earns the credit; its presence earns
+    nothing. If no probe was recorded we earn nothing and say so: a plane we never looked
+    at is not a plane we know to be clean, so the score becomes a lower bound."""
+    cp = report.get("control_plane")
+    if cp is None:
+        return 0.0, "not measured (no dds_probe record); score is a lower bound"
+    if cp.get("unauthenticated"):
+        return 0.0, f"unauthenticated secondary plane observed: {cp.get('detail', 'see dds_probe record')}"
+    return 1.0, f"no unauthenticated secondary plane observed: {cp.get('detail', 'probe found none')}"
 
 
 def _provisioning_credit(policy: Optional[str]) -> float:
@@ -110,10 +146,15 @@ def _grade(total: float) -> str:
 
 
 def score_summary_run(summary_run: dict, policy: Optional[str] = None,
-                      link_confidential: bool = False) -> dict:
-    """Score from a longitudinal/summary 'run' dict (no full report).  A2-safe."""
+                      link_confidential: bool = False,
+                      control_plane: Optional[dict] = None) -> dict:
+    """Score from a longitudinal/summary 'run' dict (no full report).  A2-safe.
+
+    `control_plane` is the dds_probe observation for the same build, if one was recorded;
+    without it the control-plane criterion earns nothing and the result is a lower bound."""
     if int(summary_run.get("frames", 0) or 0) == 0 and not summary_run.get("unsigned_probe_answered"):
         return {"score": None, "max": MAXW, "grade": "N/A", "insufficient_data": True,
+                "score_version": SCORE_VERSION,
                 "reason": "no frames observed and probe did not complete; run is unscorable",
                 "link": summary_run.get("firmware"), "policy": policy, "breakdown": []}
     frames = max(summary_run.get("frames", 0), 1)
@@ -129,4 +170,6 @@ def score_summary_run(summary_run: dict, policy: Optional[str] = None,
         }],
         "unsigned_probe": {"answered": summary_run.get("unsigned_probe_answered")},
     }
+    if control_plane is not None:
+        fake_report["control_plane"] = control_plane
     return score(fake_report, policy, link_confidential)

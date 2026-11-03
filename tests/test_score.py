@@ -208,3 +208,20 @@ def test_protocol_ceiling_is_82_not_70():
     # The two unearnable criteria are exactly provisioning (12) and confidentiality (6).
     missing = {b["criterion"] for b in signing_only["breakdown"] if b["earned"] < b["weight"]}
     assert missing == {"provisioning", "confidentiality"}
+
+
+def test_recorded_measurements_declare_their_repeatability_and_target():
+    """Validity hygiene, asserted so it cannot quietly drop out of the write-ups:
+    each campaign's README states how often it was repeated, and the surface campaign
+    states that it measured a POSIX/SITL target rather than generalising to NuttX."""
+    from pathlib import Path
+    base = Path(__file__).resolve().parent.parent / "results"
+    ch0 = (base / "ch0-configs/README.md").read_text()
+    assert "Repeatability" in ch0 and "three times" in ch0
+    # The hardware-carryover claim must be labelled source-derived, not measured.
+    assert "source-derived argument, not a measurement" in ch0
+    # Normalise whitespace: the prose is hard-wrapped, the claim is what matters.
+    surface = " ".join((base / "surface/README.md").read_text().split())
+    assert "SITL is not NuttX" in surface and "POSIX/SITL build" in surface
+    dds = (base / "dds/README.md").read_text()
+    assert "Repeatability" in dds

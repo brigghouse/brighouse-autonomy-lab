@@ -36,6 +36,14 @@ a property of ArduPilot: in the source, `DDS_ENABLE` defaults to `1` and `DDS_UD
 `2019` where `AP_DDS` is compiled in, so a vendor build that includes it would need the same
 probe. We score what we measured and say which build it was.
 
+## Repeatability
+
+The PX4 v1.18.0-rc1 measurement was repeated three times on 2026-11-03. The number of
+datagrams captured varies with the listening window and the moment the client starts — 20,
+17 and 18 over a 35-to-40 second window — because the client emits discovery periodically.
+The finding does not vary: in all three runs every decoded datagram is a `GET_INFO`
+submessage addressed to the agent in a session with no client key.
+
 ## Not measured
 
 Whether a full agent could then read or write uORB topics (not attempted: it would require

@@ -39,6 +39,21 @@ Reading:
 - All 23 observations agree with the formal policy, which already models ch0 as the
   trusted link irrespective of transport.
 
-Limits: SITL is not a ChibiOS board nor a Linux board; what we measure is the firmware's
-channel logic, which is shared across HALs. We have not measured a physical USB port.
+## Repeatability
+
+The four configurations were run three times end to end on 2026-11-03. All three runs are
+identical, byte for byte, over the full tuple of (state, link, signed, observed, wire byte)
+for every case. The firmware's decision here is deterministic, and we checked rather than
+assumed it.
+
+## Limits
+
+SITL is not a ChibiOS board nor a Linux board. The claim that this carries to real hardware
+rests on where the code lives, which we checked: `accept_unsigned_callback` is in
+`libraries/GCS_MAVLink/GCS_Signing.cpp`, shared code, and no `AP_HAL_*` directory in the
+tree contains an override for it; the channel assignment is likewise shared
+(`chan = MAVLINK_COMM_0 + instance`, `GCS_Common.cpp:146`). So a ChibiOS or Linux board runs
+the same decision path. That is a source-derived argument, not a measurement: we have not
+flashed a board, and we do not claim to have.
+
 Read-only probes only; the simulator is started and stopped by the script.

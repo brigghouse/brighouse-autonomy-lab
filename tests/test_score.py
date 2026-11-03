@@ -72,6 +72,20 @@ def test_r4_is_captured_numerically():
     assert exempt["score"] < clean["score"]
 
 
+def test_empty_run_is_unscorable_not_secure():
+    # A run that observed no frames and whose probe never answered must NOT get a grade
+    # (absence of evidence is not evidence of security). Regression for the 42/D bug.
+    s = score_summary_run({"frames": 0, "signed_frames": 0, "v1_frames": 0,
+                           "ftp_advertised": None, "unsigned_probe_answered": None,
+                           "firmware": "1.16.2"}, "px4-1.17")
+    assert s["score"] is None and s["grade"] == "N/A" and s.get("insufficient_data")
+    # and a real, running, insecure device must still be scored (and thus rank below nothing)
+    insecure = score_summary_run({"frames": 100, "signed_frames": 0, "v1_frames": 0,
+                                  "ftp_advertised": True, "unsigned_probe_answered": True,
+                                  "firmware": "1.17.0"}, "px4-1.17")
+    assert insecure["score"] is not None
+
+
 def test_partial_credit_for_signed_fraction():
     half = score(base_report(ep={"signed_frames": 50}), policy="px4-1.18")["score"]
     none = score(base_report(ep={"signed_frames": 0}), policy="px4-1.18")["score"]

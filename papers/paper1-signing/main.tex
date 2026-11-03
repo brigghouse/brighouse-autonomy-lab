@@ -34,8 +34,9 @@ MAVLink is the de facto command-and-control (C2) protocol of the open-source
 drone ecosystem. Since 2016 MAVLink~2 has offered optional per-frame
 \emph{message signing}, yet whether a deployed aircraft is actually protected
 depends on a tangle of implementation choices---default state, allow-lists,
-link exemptions, and a trust-on-first-use key-provisioning step---that no prior
-work has stated precisely or measured end to end. We make three contributions.
+link exemptions, and a trust-on-first-use key-provisioning step---that, to our
+knowledge, no prior work has stated precisely or measured end to end. We make
+three contributions.
 First, we give a compact parameterised \emph{acceptance semantics} for MAVLink~2
 signing: a transition system whose parameters capture the points at which
 PX4 and ArduPilot differ, together with a bounded symbolic adversary and six
@@ -50,12 +51,16 @@ unauthenticated reads, and expose MAVLink~FTP; that the current \emph{stable}
 PX4 release contains no signing implementation at all; and that with signing
 enabled ArduPilot's primary channel signs every outbound frame while still
 accepting unsigned commands---so a purely passive observer would wrongly judge
-it protected. The model predicts exactly this discrepancy, which motivates an
-active, read-only probe. Third, we map each observed property to the essential
+it protected. This channel-0 exemption is a documented upstream behaviour
+(ArduPilot issue~\#34489, with a fix proposed but not yet merged~\cite{ardupilot_issue34489,ardupilot_pr34780});
+our contribution is to measure it independently, to show that the model built
+from the implementation reproduces it, and to make explicit that the exemption
+follows the channel index rather than the link type, which motivates an active,
+read-only probe. Third, we map each observed property to the essential
 requirements of EU Regulation~2024/2847 (the Cyber Resilience Act) and the
-command-link requirement of Delegated Regulation~2019/945, producing the first
-measurable conformance-evidence crosswalk for civil drones. All code, models,
-and data are released for reproduction.
+command-link requirement of Delegated Regulation~2019/945, producing, to our
+knowledge, the first measurable conformance-evidence crosswalk for civil
+drones. All code, models, and data are released for reproduction.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -105,8 +110,10 @@ ArduPilot implement each violate a distinct subset.
 (Section~\ref{sec:method}--\ref{sec:results}), using \emph{mavaudit}, a
 released passive/active auditor. Key findings: insecure by default everywhere;
 no signing in stable PX4; and a sign-everything-yet-accept-unsigned behaviour on
-ArduPilot's primary channel that only an active probe detects---exactly as the
-model predicts.
+ArduPilot's primary channel that only an active probe detects. The behaviour
+itself is tracked upstream~\cite{ardupilot_issue34489,ardupilot_pr34780}; what
+we add is an independent measurement and a model that reproduces it from the
+implementation's own rules.
 \item A measurable crosswalk (Section~\ref{sec:cra}) from protocol properties to
 CRA Annex~I essential requirements and to the 2019/945 C2-link requirement, i.e.\
 conformance evidence a manufacturer can actually produce.
@@ -506,8 +513,11 @@ machine-checkable first piece of conformance evidence.
 \section*{Availability and Ethics}
 All code, models, and data are released under permissive licences for
 reproduction. The work is defensive: no exploit code, attack automation, or RF
-tooling is included, and only self-hosted simulators were tested. Any
-previously unknown issue is reported to maintainers before publication.
+tooling is included, and only self-hosted simulators were tested. The
+channel-0 signing exemption discussed here was already public upstream before
+this work (issue~\#34489 and the unmerged fix in PR~\#34780~\cite{ardupilot_issue34489,ardupilot_pr34780});
+we therefore claim no new vulnerability, and no embargo applies. Our
+measurements are public and may be cited in that discussion.
 
 \bibliographystyle{IEEEtran}
 \bibliography{../common/refs}

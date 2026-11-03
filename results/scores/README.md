@@ -21,4 +21,4 @@ Computed by `mavaudit.score` (axioms: provenance, monotonicity, CRA-grounded wei
 |---|---|---|---|
 | ardupilot | Copter-4.6.3 | 14.0 | 42.0 |
 | ardupilot | Copter-4.5.7 | 14.0 | 42.0 |
-| px4 | v1.16.2 | 42.0 | None |
+| px4 | v1.16.2 | None | None |

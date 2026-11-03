@@ -38,6 +38,22 @@ relevant observation is not that any single item is a vulnerability — most are
 features — but that the shipped default serves all of them without authentication, and that
 this has not changed between releases we can still run.
 
+## Repeatability
+
+The ArduPilot run was repeated three times on 2026-11-03 with identical results (FTP
+listing answered, 25 bytes of entries; parameter read answered).
+
+## A limit specific to this campaign: SITL is not NuttX
+
+The MAVLink FTP implementation does not take the same path on every target, and the clearest
+evidence is in the advisory for CVE-2026-32709 itself, which states that on POSIX targets —
+Linux companion computers and SITL — the write-path validation function unconditionally
+returns true, where NuttX has a guard. Our probe only *reads* a directory listing, so that
+particular difference does not bear on what we measured. But it establishes that the FTP
+code paths differ by target, and therefore that **this measurement is of the POSIX/SITL
+build**. A NuttX board may answer differently, and a technical file should say which target
+was measured rather than generalising from one. We did not have a NuttX target to compare.
+
 ## Limits
 
 Three releases, two stacks: the releases that both build and run on a current toolchain (see

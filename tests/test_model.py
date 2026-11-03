@@ -174,3 +174,11 @@ def test_ch0_configs_recorded_transport_independence():
     assert obs("D-ch0tcp-ch1mav1", "ch1") is False
     assert all(c["agree"] for cfg in d["configs"] for c in cfg["cases"])
     assert sum(cfg["total"] for cfg in d["configs"]) == 23
+    # The MAVLink 1 claim must rest on a measured wire version, not on a label: every
+    # ch1 case of configuration D records 0xFE as the first byte actually sent.
+    dcfg = by["D-ch0tcp-ch1mav1"]
+    ch1 = [c for c in dcfg["cases"] if c["link"] == "ch1"]
+    assert ch1 and all(c["wire_first_byte_sent"] == 0xFE and c["wire"] == 1 for c in ch1)
+    # and every other configuration's probes were MAVLink 2.
+    others = [c for k, cfg in by.items() if k != "D-ch0tcp-ch1mav1" for c in cfg["cases"]]
+    assert all(c["wire_first_byte_sent"] == 0xFD for c in others)

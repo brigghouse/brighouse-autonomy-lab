@@ -51,21 +51,43 @@ CONFIGS = {
 }
 
 
-def probe(cfg: dict, link: str, signed: bool, key):
-    """Read probe; on a MAVLink 1 port the probe itself is sent as MAVLink 1 (pymavlink
-    picks the wire version from the MAVLINK20 environment variable at connection time).
+def probe(cfg: dict, link: str, signed: bool, key) -> tuple[bool, int]:
+    """Read probe that also *measures* the wire version it actually used, instead of
+    assuming it. pymavlink's `auto_mavlink_version` silently upgrades a connection to
+    MAVLink 2 (and sets MAVLINK20 process-wide) as soon as it receives a v2 frame, so a
+    port configured for MAVLink 1 is the only case where a v1 probe survives the
+    heartbeat. Returning the first byte of the frame we send (0xFE = v1, 0xFD = v2) keeps
+    the record honest: an earlier version of this script labelled the wire version from
+    the configuration rather than from the frame.
+
     A MAVLink 1 frame cannot carry a signature, so `signed` is forced False there."""
     from pymavlink import mavutil
-    if cfg.get(f"{link}_v1"):
-        saved = os.environ.pop("MAVLINK20", None)
+    if not cfg.get(f"{link}_v1"):
+        return _probe_read(cfg[link], signed, key), 0xFD if _wire_is_v2() else 0xFE
+
+    saved = os.environ.pop("MAVLINK20", None)
+    mavutil.set_dialect("all")
+    try:
+        conn = mavutil.mavlink_connection(cfg[link], source_system=251, dialect="all")
+        conn.wait_heartbeat(timeout=15)
+        wire = conn.mav.param_request_read_encode(1, 1, b"", 0).pack(conn.mav)[0]
+        conn.mav.param_request_read_send(1, 1, b"", 0)
+        deadline, answered = time.time() + 3.0, False
+        while time.time() < deadline:
+            m = conn.recv_match(type="PARAM_VALUE", blocking=True, timeout=0.5)
+            if m is not None and int(getattr(m, "param_index", -2)) == 0:
+                answered = True
+                break
+        conn.close()
+        return answered, wire
+    finally:
+        if saved is not None:
+            os.environ["MAVLINK20"] = saved
         mavutil.set_dialect("all")
-        try:
-            return _probe_read(cfg[link], False, None)
-        finally:
-            if saved is not None:
-                os.environ["MAVLINK20"] = saved
-            mavutil.set_dialect("all")
-    return _probe_read(cfg[link], signed, key)
+
+
+def _wire_is_v2() -> bool:
+    return "MAVLINK20" in os.environ
 
 
 def predict(policy, link: str, signed: bool, keyed: bool) -> bool:
@@ -102,16 +124,18 @@ def run_config(name: str, cfg: dict, ap: Path, policy) -> dict:
     try:
         # SITL boots once SERIAL0 has a peer; one unkeyed read on ch0 also settles that.
         for link in ("ch0", "ch1"):
-            obs = probe(cfg, link, False, None)
+            obs, wire = probe(cfg, link, False, None)
             cases.append({"state": "unkeyed", "link": link, "transport": cfg[link].split(":")[0],
-                          "wire": 1 if cfg.get(f"{link}_v1") else 2, "signed": False, "predicted": predict(policy, link, False, False),
+                          "wire_first_byte_sent": wire, "wire": 1 if wire == 0xFE else 2,
+                          "signed": False, "predicted": predict(policy, link, False, False),
                           "observed": obs})
         labkit.provision_signing(cfg["ch0"], key)
         for link in ("ch0", "ch1"):
             for signed in ((False,) if cfg.get(f"{link}_v1") else (False, True)):
-                obs = probe(cfg, link, signed, key if signed else None)
+                obs, wire = probe(cfg, link, signed, key if signed else None)
                 cases.append({"state": "keyed", "link": link, "transport": cfg[link].split(":")[0],
-                              "wire": 1 if cfg.get(f"{link}_v1") else 2, "signed": signed, "predicted": predict(policy, link, signed, True),
+                              "wire_first_byte_sent": wire, "wire": 1 if wire == 0xFE else 2,
+                              "signed": signed, "predicted": predict(policy, link, signed, True),
                               "observed": obs})
     finally:
         proc.terminate()
@@ -144,7 +168,8 @@ def main():
         r = run_config(name, cfg, a.ardupilot, policy)
         results["configs"].append(r)
         print(name, f"{r['agree']}/{r['total']}",
-              [(c["state"], c["link"], c["transport"], f"v{c['wire']}", c["signed"], c["observed"]) for c in r["cases"]])
+              [(c["state"], c["link"], c["transport"], f"v{c['wire']}", c["signed"], c["observed"])
+               for c in r["cases"]])
         (a.out / "ch0-configs.json").write_text(json.dumps(results, indent=2))
         time.sleep(2)
 

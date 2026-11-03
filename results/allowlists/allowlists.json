@@ -1,0 +1,81 @@
+{
+  "recorded_utc": "2026-11-03T22:27:36Z",
+  "method": "extracted from the source trees; file and line recorded per entry",
+  "stacks": {
+    "ardupilot": {
+      "rev": "fb77356",
+      "allowlist": {
+        "file": "libraries/GCS_MAVLink/GCS_Signing.cpp",
+        "present": true,
+        "array": "accept_list",
+        "entries": [
+          {
+            "message": "RADIO_STATUS",
+            "line": 112
+          },
+          {
+            "message": "RADIO",
+            "line": 113
+          }
+        ],
+        "source_comment": []
+      },
+      "channel_exemption": {
+        "present": true,
+        "file": "libraries/GCS_MAVLink/GCS_Signing.cpp",
+        "line": 118,
+        "rationale_in_source": "always accept channel 0, assumed to be secure channel. This is USB on ChibiOS boards",
+        "effect": "every message, not a list: any unsigned frame on channel 0 is accepted. Measured in results/ch0-configs/ to follow the channel index rather than the transport."
+      }
+    },
+    "px4": {
+      "rev": "fca3df8",
+      "allowlist": {
+        "file": "src/modules/mavlink/mavlink_sign_control.cpp",
+        "present": true,
+        "array": "unsigned_messages",
+        "entries": [
+          {
+            "message": "HEARTBEAT",
+            "line": 49
+          },
+          {
+            "message": "RADIO_STATUS",
+            "line": 50
+          },
+          {
+            "message": "ADSB_VEHICLE",
+            "line": 51
+          },
+          {
+            "message": "COLLISION",
+            "line": 52
+          }
+        ],
+        "source_comment": [
+          "Messages accepted without signing per MAVLink spec recommendation.",
+          "HEARTBEAT is required for link discovery/interop but allows spoofed phantom vehicles on GCS."
+        ]
+      },
+      "channel_exemption": {
+        "present": false,
+        "note": "no per-channel blanket exemption in this release"
+      }
+    },
+    "px4_previous_release": {
+      "rev": "d6f12ad",
+      "allowlist": {
+        "file": "src/modules/mavlink/mavlink_sign_control.cpp",
+        "present": false,
+        "note": "array not found in this tree (feature absent in this release)"
+      },
+      "channel_exemption": {
+        "present": false
+      }
+    }
+  },
+  "open_drone_id_allowlisted": {
+    "ardupilot": false,
+    "px4": false
+  }
+}

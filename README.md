@@ -46,6 +46,7 @@ mavaudit scan --target udpin:127.0.0.1:14550 --fail-on high      # CI gate, exit
 
 - **Passive by default.** It classifies every frame as MAVLink 1, unsigned MAVLink 2 or signed MAVLink 2, and never needs the key.
 - **`--active-probe`** sends two read-only, unsigned requests (a parameter read and an `AUTOPILOT_VERSION` request). This catches links that sign everything they send but still accept unsigned input.
+- **A worked example of the report** this produces is in [docs/example-free-check.md](docs/example-free-check.md), including the score breakdown, the protocol ceiling, and an explicit list of what was not tested.
 - **Findings MAV-001 to MAV-007** come with CRA Annex I references and related advisories (CVE-2026-1579, CVE-2026-32709, CVE-2020-10283). See [docs/findings.md](docs/findings.md).
 - **Scope guard:** loopback and private targets only. Before the active probe it also checks the address the traffic actually came from. An active probe over a serial port, which could go out over a telemetry radio, requires `--authorized --scope-ref <id>`.
 - Markdown and JSON reports.
@@ -74,7 +75,7 @@ Full guide: [docs/setup.md](docs/setup.md) (Spanish: [docs/setup.es.md](docs/set
 | [`paper/`](paper/paper1-draft.md) | Paper 1 draft: MAVLink signing in 2026 and the CRA |
 | [`research/`](research/) | [Literature review](research/literature-review.md) (20 academic references plus 17 regulatory and project sources, CVE tables) and [experiment plan](research/experiment-plan.md) |
 | [`notebook/`](notebook/INDEX.md) | Lab notebook: diary, lessons learned, roadmap. Open the repo root as an Obsidian vault |
-| [`docs/`](docs/) | Setup guides and the findings reference |
+| [`docs/`](docs/) | Setup guides, the findings reference, and an example report |
 
 ## Responsible use
 

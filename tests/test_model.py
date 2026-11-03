@@ -182,3 +182,41 @@ def test_ch0_configs_recorded_transport_independence():
     # and every other configuration's probes were MAVLink 2.
     others = [c for k, cfg in by.items() if k != "D-ch0tcp-ch1mav1" for c in cfg["cases"]]
     assert all(c["wire_first_byte_sent"] == 0xFD for c in others)
+
+
+def test_wire_version_parameter_discriminates_doc_from_implementation():
+    """The model used to agree with configuration D for a reason it did not represent:
+    it had no notion of wire version. With the parameter, the documentation's reading
+    ("a MAVLink 1 port is not protected") and the implementation's behaviour are two
+    distinct policies, and the recorded measurement picks one."""
+    import json
+    from pathlib import Path
+    from mavaudit.model.configs import BY_NAME
+    from mavaudit.model.semantics import READ, Frame, State, step
+
+    st = State(key="K", clock=2_000_000)
+    v1 = Frame("ch1", (9, 9), READ, signed=False, ts=2_000_050, link_id=1, wire=1)
+    impl = step(BY_NAME["ardupilot-4.7.2"], st, v1)
+    doc = step(BY_NAME["ardupilot-4.7.2-doc"], st, v1)
+    assert impl.accepted is False and doc.accepted is True, "the policies must differ"
+
+    # The recorded run decides between them: configuration D's keyed ch1 case, whose
+    # frames are measured as 0xFE, was rejected.
+    p = Path(__file__).resolve().parent.parent / "results/ch0-configs/ch0-configs.json"
+    d = json.loads(p.read_text())
+    cfg = next(c for c in d["configs"] if c["config"].startswith("D"))
+    case = next(c for c in cfg["cases"]
+                if c["state"] == "keyed" and c["link"] == "ch1")
+    assert case["wire_first_byte_sent"] == 0xFE
+    assert case["observed"] == impl.accepted      # implementation policy matches
+    assert case["observed"] != doc.accepted       # documentation reading is refuted
+
+
+def test_mavlink1_frame_cannot_be_signed():
+    """Structural, not a policy choice: version 1 frames have no signature field."""
+    import pytest
+    from mavaudit.model.semantics import READ, Frame
+    with pytest.raises(ValueError):
+        Frame("ch1", (1, 1), READ, signed=True, wire=1)
+    with pytest.raises(ValueError):
+        Frame("ch1", (1, 1), READ, wire=3)

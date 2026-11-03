@@ -73,6 +73,12 @@ def adversary_moves(w: World, a_link: str, clock: int) -> List[Tuple[str, Frame]
     for kind in (CMD, READ, HB, RADIO):
         moves.append((f"A:inject {kind} unsigned@{a_link}", Frame(a_link, A_SRC, kind, ts=clock, link_id=7)))
     moves.append((f"A:inject SETUP(K_adv) unsigned@{a_link}", Frame(a_link, A_SRC, SETUP, ts=clock, link_id=7, payload=K_ADV)))
+    # Downgrade: a MAVLink 1 frame, which carries no signature field at all. Distinct from
+    # an unsigned MAVLink 2 frame, and the move that separates policies differing only in
+    # v1_bypasses_signing (the reading of ArduPilot's documentation from its behaviour).
+    for kind in (CMD, READ):
+        moves.append((f"A:inject {kind} MAVLink1@{a_link}",
+                      Frame(a_link, A_SRC, kind, ts=clock, link_id=7, wire=1)))
     if w.a_key:
         moves.append((f"A:inject CMD signed({w.a_key})@{a_link}",
                       Frame(a_link, A_SRC, CMD, signed=True, key=w.a_key, ts=clock, link_id=7)))

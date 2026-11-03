@@ -63,5 +63,20 @@ ARDUPILOT_472 = Policy(
     unsigned_rekey_on_trusted=True,
 )
 
-ALL = [SPEC_STRICT, IDEAL_OOB, PX4_118, PX4_117, ARDUPILOT_472]
+#: The same policy as read from ArduPilot's *documentation* rather than its source: the
+#: signing page states that a serial port speaking MAVLink 1 "is not protected". If that
+#: were the behaviour, a keyed non-trusted port would accept MAVLink 1 commands. We keep
+#: this as a separate policy so the two readings are distinguishable and a measurement can
+#: decide between them; configuration D in results/ch0-configs refutes it for 4.7.2.
+ARDUPILOT_472_DOC = Policy(
+    name="ardupilot-4.7.2-doc",
+    trusted=frozenset({"ch0"}),
+    allow_unsigned=frozenset({RADIO}),
+    tofu=True,
+    setup_links=None,
+    unsigned_rekey_on_trusted=True,
+    v1_bypasses_signing=True,
+)
+
+ALL = [SPEC_STRICT, IDEAL_OOB, PX4_118, PX4_117, ARDUPILOT_472, ARDUPILOT_472_DOC]
 BY_NAME = {p.name: p for p in ALL}

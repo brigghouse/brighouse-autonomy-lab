@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.3.0 (2026-11-03) — gaps measured, score v2, a wrong ceiling corrected
+
+- **Correction.** The "protocol ceiling" was stated as "near 70, grade C" in Paper 4, on
+  the web page and in the example report. It was wrong: it quoted the best score measured
+  (74) as though it were a bound. The real bound under MAVLink 2 signing alone is **82,
+  grade B**; out-of-band keys raise it to 94 and link encryption to 100. Corrected
+  everywhere and pinned by a test.
+- G6: `scripts/dds_probe.py`, passive XRCE decoding; PX4 1.17/1.18 offer unauthenticated
+  agent discovery, ArduPilot 4.7.2's build offers none.
+- G10: `scripts/surface_probe.py`; all three runnable releases answer an FTP directory
+  listing to an unauthenticated peer; `mavlink_shell` present in PX4 builds only.
+- G7/G8: `scripts/allowlists.py` extracts both stacks' unsigned-accept allowlists from
+  source with file/line provenance. Neither allowlists Remote ID messages.
+- Score criteria v2 (`SCORE_VERSION`): attack surface 16 -> file transfer 8 + second
+  control plane 8. Unprobed criteria earn nothing and the score is flagged a lower bound.
+- Model: wire version added as a frame attribute and `v1_bypasses_signing` as a policy
+  parameter, with `ardupilot-4.7.2-doc` encoding the documentation's reading. The
+  measurement refutes it, and the parameter changes the repair cost (Paper 3).
+- `scripts/synthesis_report.py` generates SYNTHESIS.md, which was previously hand-written.
+- Papers: all four rebuilt. P1 gains the second-control-plane finding; P2 gains F5/F6
+  (surface does not shrink; the release that added signing left the second plane open);
+  P3 turns a stated limitation into a result; P4 gains the control-plane criterion and the
+  ceiling correction.
+- 51 tests.
+
 ## 0.2.2 (2026-11-03) — channel-0 exemption measured across transports
 
 - `scripts/ch0_configs.py` + `results/ch0-configs/`: four ArduPilot 4.7.2 SITL

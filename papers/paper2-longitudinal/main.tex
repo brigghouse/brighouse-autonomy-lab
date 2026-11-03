@@ -23,12 +23,14 @@
 the EU, yet we have little historical evidence on whether open-source embedded
 stacks have moved toward it. We present, to our knowledge, the first
 decade-spanning study of the command-link security defaults of the two dominant
-open-source drone flight stacks, ArduPilot and PX4, combining three lines of
+open-source drone flight stacks, ArduPilot and PX4, combining four lines of
 evidence: the projects' version-control history, a measured posture matrix from
 building and auditing releases in software-in-the-loop (which, we state plainly,
 covers only $n{=}2$ releases that both build and run on a current toolchain,
 ArduPilot~4.5.7 and~4.6.3; PX4~v1.16.2 builds but does not run under the
-harness), and the buildability of each release on a current toolchain. Two
+harness), the buildability of each release on a current toolchain, and a
+measurement of what each runnable release answers to a peer that has presented no
+credential. Three
 findings are clear and mutually reinforcing. First,
 \emph{signing is never on by default}: version control shows it was added to
 ArduPilot in 2016 and never defaulted, and absent from PX4 until 2026, and the
@@ -36,7 +38,10 @@ releases we can still build confirm it. Second---and unexpectedly---\emph{the
 binding constraint on auditing old releases is reproducibility, not posture}:
 pre-4.5 ArduPilot no longer builds on a current system through a layered cascade
 of Python and C++ toolchain breaks, and older PX4 builds but will not run under a
-uniform simulator harness. Both bear directly on the Cyber Resilience Act's
+uniform simulator harness. Third, the one clear advance---message signing
+arriving in the PX4 line---leaves a second, unauthenticated control plane (the
+uXRCE-DDS bridge to uORB) untouched in the same release, so a trend measured on
+one protocol alone would record progress and miss this. Both bear directly on the Cyber Resilience Act's
 expectation that products remain patchable and testable through their support
 period. All build recipes, raw records, failure reasons, and the analysis
 pipeline are released.
@@ -171,6 +176,29 @@ expectation that a product remain patchable and testable through its support
 period, and they are the reason a decade-wide \emph{measured} posture matrix
 cannot simply be produced on demand---the version-control timeline
 (Section~\ref{sec:history}) carries the long-range evidence instead.
+
+(F5)~\emph{The surface served to an unauthenticated peer does not shrink.} For
+the three releases that both build and run we measured not only whether frames
+are signed but what each one answers to a peer that has presented no credential.
+All three answer a read-only MAVLink~FTP directory listing (ArduPilot~4.7.2,
+PX4~v1.17.0, PX4~v1.18.0-rc1) and a parameter read, and all three advertise
+mission upload and flight termination. The PX4 builds additionally contain the
+module that serves an interactive shell over \code{SERIAL\_CONTROL}, which the
+ArduPilot build does not---found by inspecting the build tree, not by opening a
+shell. We report this dimension for the releases that run and we cannot extend it
+backwards, for exactly the reason (F4) gives; the limitation is the same
+limitation, which is the point rather than an excuse.
+
+(F6)~\emph{The release that added signing did not close the second control
+plane.} PX4's uXRCE-DDS client ships enabled in SITL and most firmware builds and
+reaches uORB directly; PX4's own documentation says the transport is
+unauthenticated. We find it offering agent discovery to whichever local process
+holds the configured port, in a session with no client key, on \emph{both}
+v1.17.0 (which has no signing at all) and v1.18.0-rc1 (which introduces it). A
+MAVLink signing key does not apply to that path. So the one clear advance in this
+decade---signing arriving in the PX4 line---improves the MAVLink plane and leaves
+a second, unauthenticated plane in place. Measuring the trend on one protocol
+alone would have recorded an improvement and missed this.
 
 \section{Discussion}
 \label{sec:disc}

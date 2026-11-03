@@ -48,10 +48,14 @@ we introduce \emph{model-based conformance testing} for flight stacks: read-only
 test frames derived from the semantics are executed against real
 software-in-the-loop builds, and the observed accept/reject decisions are
 compared with the model's predictions. In a recorded experiment across three
-stacks the model agrees with all $24$ observed decisions; we are explicit that
-half of these cases (the unkeyed state) are tautological and that the
-signing-less PX4~v1.17 stack serves as a negative control, so the discriminating
-evidence rests on the keyed cases, including the three observed rejections. All
+stacks and four link configurations the model agrees with all $47$ observed
+decisions; we are explicit that the $20$ unkeyed cases are tautological and that
+the signing-less PX4~v1.17 stack serves as a negative control, so the
+discriminating evidence rests on the $23$ keyed cases, including seven observed
+rejections. One pair of configurations is a controlled experiment rather than a
+coincidence of agreement: moving the \emph{same} transport between channel
+indices flips the decision exactly as the policy's trusted-link parameter
+predicts. All
 models, proofs-in-code, and harnesses are released.
 \end{abstract}
 
@@ -92,8 +96,11 @@ remediations per policy (reporting ties as alternatives), yielding non-obvious
 results (ArduPilot needs two independent fixes; PX4~v1.18 one).
 \item Model-based conformance testing for flight stacks
 (Section~\ref{sec:conf}): read-only tests derived from the semantics, executed
-against real SITL builds as a recorded experiment, checking the policies
-against the running code.
+against real SITL builds as a recorded experiment ($47$ decisions, three stacks
+and four link configurations), checking the policies against the running code.
+One pair of configurations varies a single parameter---which channel index
+carries a given transport---and the stack's decision flips as the policy
+predicts, which separates a model of the mechanism from mere agreement.
 \end{itemize}
 
 \section{Acceptance Semantics}
@@ -303,34 +310,65 @@ whether the vehicle responds, and compare with $\mathrm{step}_\pi$'s prediction
 
 Agreement turns a documentation-derived policy into a \emph{measured} one; a
 disagreement is a finding about the model or the implementation.
-Table~\ref{tab:conf} reports the agreement for the three stacks: the model
-agrees with every one of the eight recorded read-only decisions for all three
-($24/24$ cases). That headline must be read with its evidential weight. The
-twelve \emph{unkeyed} cases are tautological: with no key installed nothing can
-reject, so model and stack trivially agree. The eight \textsf{px4-1.17} cases are
-a \emph{negative control}: the policy encodes ``signing absent'' and the stack
-has no signing, so agreement confirms the absence of a mechanism, not a model of
-one. The discriminating evidence is the keyed cases, and in particular the three
-observed \emph{rejections} (\textsf{px4-1.18}: unsigned on the trusted and on the
-untrusted link; \textsf{ardupilot-4.7.2}: unsigned on the untrusted link) together
-with the decisive \textsf{ardupilot-4.7.2} pair: on the trusted console link
-(\code{ch0}) an unsigned read is \emph{answered} (predicted and observed), while
-on the untrusted link it is \emph{rejected}---the model's characterisation of R4
-checked against the running stack. The experiment is \emph{recorded}: the SITL
+Table~\ref{tab:conf} reports the agreement over two campaigns: three stacks in
+their default link layout (eight decisions each) and four link configurations of
+ArduPilot~4.7.2 in which we vary the transport of each channel. The model agrees
+with all $47$ recorded decisions. That headline must be read with its evidential
+weight. Twenty \emph{unkeyed} cases are tautological: with no key installed
+nothing can reject, so model and stack trivially agree. The four keyed
+\textsf{px4-1.17} cases are a \emph{negative control}: the policy encodes
+``signing absent'' and the stack has no signing, so agreement confirms the
+absence of a mechanism, not a model of one. The discriminating evidence is the
+remaining $23$ keyed cases, and in particular the seven observed
+\emph{rejections} (\textsf{px4-1.18}: unsigned on the trusted and on the
+untrusted link; \textsf{ardupilot-4.7.2}: unsigned on the untrusted link in each
+of the four configurations).
+
+\paragraph*{A controlled pair, not merely agreement} Agreement alone cannot
+distinguish a model that captures the mechanism from one that happens to predict
+the same outcome. Configurations~B and~C differ in exactly one respect: which
+channel index carries the UDP link. In~B the UDP link is \code{ch0} and a keyed
+unsigned read is answered; in~C the UDP link is \code{ch1} and the same read is
+rejected. The policy parameter under test---the set of trusted links, here
+$\{\code{ch0}\}$---is the only thing that can explain the flip, and it does so in
+both directions. This is the strongest conformance evidence in the paper: the
+implementation's exemption is keyed to the channel \emph{index}, as the model
+says, and not to the link's transport, as its source comment's rationale
+(``USB on ChibiOS boards'') would suggest.
+
+Configuration~D exposes a limit of the model rather than of the stack. It sets a
+port to MAVLink~1, whose frames cannot carry a signature; the documentation
+states such ports are unprotected, yet the keyed stack rejects an unsigned
+MAVLink~1 read. The policy predicts rejection and the stack rejects, so the case
+agrees---but for a reason the model does not represent: our semantics has no
+notion of wire version, and the agreement follows from the channel rule alone.
+We record the case as agreement with that caveat, and note the wire-version
+dimension as a natural parameter to add.
+
+The experiment is \emph{recorded}: the SITL
 runs are not re-executed in continuous integration; the repository stores the
 observed decisions and a test asserts that the model reproduces them.
 
 \begin{table}[t]
-\caption{Model-vs-implementation conformance (read-only probes).}
+\caption{Model-vs-implementation conformance (read-only probes). Upper block:
+default link layout. Lower block: ArduPilot~4.7.2 with the transport of each
+channel varied; \code{ch0} is the channel the implementation exempts.}
 \label{tab:conf}
 \centering\footnotesize
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}llcc@{}}
 \toprule
-stack & policy & cases agree & agreement \\
+stack / configuration & policy & agree & keyed rej. \\
 \midrule
-ArduPilot 4.7.2 & \textsf{ardupilot-4.7.2} & 8/8 & 1.00 \\
-PX4 1.18.0-rc1  & \textsf{px4-1.18}        & 8/8 & 1.00 \\
-PX4 1.17.0      & \textsf{px4-1.17}        & 8/8 & 1.00 \\
+ArduPilot 4.7.2 (default) & \textsf{ardupilot-4.7.2} & 8/8 & 1 \\
+PX4 1.18.0-rc1            & \textsf{px4-1.18}        & 8/8 & 2 \\
+PX4 1.17.0 (neg.\ control) & \textsf{px4-1.17}       & 8/8 & 0 \\
+\midrule
+A: \code{ch0} TCP, \code{ch1} TCP & \textsf{ardupilot-4.7.2} & 6/6 & 1 \\
+B: \code{ch0} \textbf{UDP}, \code{ch1} TCP & \textsf{ardupilot-4.7.2} & 6/6 & 1 \\
+C: \code{ch0} TCP, \code{ch1} \textbf{UDP} & \textsf{ardupilot-4.7.2} & 6/6 & 1 \\
+D: \code{ch1} MAVLink~1 & \textsf{ardupilot-4.7.2} & 5/5 & 1 \\
+\midrule
+total & & \textbf{47/47} & 7 \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -49,7 +49,8 @@ test frames derived from the semantics are executed against real
 software-in-the-loop builds, and the observed accept/reject decisions are
 compared with the model's predictions. In a recorded experiment across three
 stacks and four link configurations the model agrees with all $47$ observed
-decisions; we are explicit that the $20$ unkeyed cases are tautological and that
+decisions, and one configuration resolves a disagreement between a stack's
+documentation and its behaviour in favour of the behaviour; we are explicit that the $20$ unkeyed cases are tautological and that
 the signing-less PX4~v1.17 stack serves as a negative control, so the
 discriminating evidence rests on the $23$ keyed cases, including seven observed
 rejections. One pair of configurations is a controlled experiment rather than a
@@ -265,6 +266,7 @@ policy & greedy-minimal edit set clearing \prop{P1}--\prop{P3} & \prop{L}? \\
 \textsf{px4-1.18}        & close TOFU + out-of-band keys & yes \\
 \textsf{ardupilot-4.7.2} & close TOFU + OOB keys \emph{and} (drop the console-link exemption \emph{or} forbid unsigned re-keying; either clears the failures) & yes \\
 \textsf{px4-1.17}        & no single edit reduces the failures: adopt the full mechanism & --- \\
+\textsf{ardupilot-4.7.2-doc} & no single edit reduces the failures: the MAVLink~1 downgrade keeps a forged-command path open, so closing the provisioning window no longer suffices & yes \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -336,14 +338,41 @@ implementation's exemption is keyed to the channel \emph{index}, as the model
 says, and not to the link's transport, as its source comment's rationale
 (``USB on ChibiOS boards'') would suggest.
 
-Configuration~D exposes a limit of the model rather than of the stack. It sets a
-port to MAVLink~1, whose frames cannot carry a signature; the documentation
-states such ports are unprotected, yet the keyed stack rejects an unsigned
-MAVLink~1 read. The policy predicts rejection and the stack rejects, so the case
-agrees---but for a reason the model does not represent: our semantics has no
-notion of wire version, and the agreement follows from the channel rule alone.
-We record the case as agreement with that caveat, and note the wire-version
-dimension as a natural parameter to add.
+\paragraph*{A disagreement between documentation and behaviour, resolved}
+Configuration~D sets a port to MAVLink~1, whose frames carry no signature field
+at all. ArduPilot's signing documentation states that such a port ``is not
+protected'', which, read as a policy, says a keyed non-trusted port accepts
+MAVLink~1 commands. The measurement says otherwise: the keyed port rejects an
+unsigned MAVLink~1 read, and the probe's frames are recorded as \code{0xFE}, so
+they were genuinely version~1 and not unsigned version~2 frames.\footnote{We
+record the first byte actually sent for every case, because a client library may
+silently upgrade a connection to MAVLink~2 on receiving a version~2 frame; an
+earlier revision of our harness labelled the wire version from the
+configuration rather than from the frame, and one attempted measurement against
+PX4 had to be discarded for exactly this reason.}
+
+We therefore added the wire version to the semantics as a frame attribute
+($\mathit{wire}\in\{1,2\}$, with $\mathit{wire}{=}1$ structurally implying
+unsigned) and the documented behaviour as a policy parameter
+($\mathit{v1\_bypasses\_signing}$), and kept the documentation's reading as a
+separate policy, \textsf{ardupilot-4.7.2-doc}. The parameter earns its place in
+three ways. It makes the case agree \emph{for the right reason} rather than by
+the channel rule alone. It adds an adversary move---inject a version~1
+frame---that separates the two policies: under the implementation's policy the
+move is rejected on an ordinary link, under the documentation's reading it
+delivers a command. And it changes the repair cost: for
+\textsf{ardupilot-4.7.2}, closing the provisioning window
+(\textsf{close-tofu+oob}) removes \prop{P1}, while for the documented reading
+the same edit does not, because the downgrade keeps a forged-command path open,
+so the greedy search finds no single sufficient edit at all
+(Table~\ref{tab:edits}).
+
+What the parameter does \emph{not} do is change which properties ArduPilot
+violates: the channel-0 exemption already violates \prop{P1} and \prop{P2} on
+its own, so both readings fail the same set. The difference is in the witnesses
+and in the cost of repair. We state this plainly because a parameter that
+changed nothing would still be worth reporting, and this one changes less than
+its security significance might suggest.
 
 The experiment is \emph{recorded}: the SITL
 runs are not re-executed in continuous integration; the repository stores the

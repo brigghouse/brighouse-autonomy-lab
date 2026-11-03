@@ -12,7 +12,7 @@ from dataclasses import replace
 from itertools import product
 from typing import Dict, List, Set
 
-from .configs import ARDUPILOT_472, PX4_117, PX4_118, SPEC_STRICT
+from .configs import ARDUPILOT_472, ARDUPILOT_472_DOC, PX4_117, PX4_118, SPEC_STRICT
 from .explore import SCENARIOS, World, explore, functional, legit_provision
 from .semantics import State
 from .semantics import HB, RADIO, Policy
@@ -27,6 +27,7 @@ EDITS = {
     "refuse-setup-armed": lambda p: replace(p, refuse_setup_armed=True),
     "strict-allowlist": lambda p: replace(p, allow_unsigned=frozenset({RADIO})),
     "enable-replay-check": lambda p: replace(p, replay_check=True),
+    "no-v1-bypass": lambda p: replace(p, v1_bypasses_signing=False),
 }
 
 
@@ -52,7 +53,7 @@ def failures(present_set: Set[str]) -> Set[str]:
 
 
 def analyse(depth: int = 3) -> Dict:
-    base_policies = [SPEC_STRICT, PX4_118, PX4_117, ARDUPILOT_472]
+    base_policies = [SPEC_STRICT, PX4_118, PX4_117, ARDUPILOT_472, ARDUPILOT_472_DOC]
     out = {}
     for pol in base_policies:
         base = present(pol, depth)

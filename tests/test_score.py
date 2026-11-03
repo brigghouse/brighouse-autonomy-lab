@@ -186,3 +186,25 @@ def test_allowlists_extracted_from_source_match_the_readme():
     for st in (ap, px4):
         assert st["allowlist"]["file"]
         assert all(e["line"] > 0 for e in st["allowlist"]["entries"])
+
+
+def test_protocol_ceiling_is_82_not_70():
+    """A published metric must not confuse a measurement with a bound. An earlier draft
+    claimed the MAVLink ceiling was 'near 70, grade C', quoting the best score measured
+    (74) as though it were the maximum. The actual bound, with everything earnable under
+    MAVLink 2 signing alone, is 82 (grade B); out-of-band keys take it to 94, and link
+    encryption to 100."""
+    perfect = {"target": None,
+               "endpoints": [{"autopilot": "px4", "frames": 100, "signed_frames": 100,
+                              "v1_frames": 0, "ftp_advertised": False, "firmware": "x"}],
+               "unsigned_probe": {"answered": False},
+               "control_plane": {"unauthenticated": False, "detail": "none offered"}}
+    signing_only = score(dict(perfect), policy="px4-1.18", link_confidential=False)
+    assert signing_only["score"] == 82.0 and signing_only["grade"] == "B"
+    oob = score(dict(perfect), policy="ideal-oob-provisioning", link_confidential=False)
+    assert oob["score"] == 94.0
+    both = score(dict(perfect), policy="ideal-oob-provisioning", link_confidential=True)
+    assert both["score"] == 100.0
+    # The two unearnable criteria are exactly provisioning (12) and confidentiality (6).
+    missing = {b["criterion"] for b in signing_only["breakdown"] if b["earned"] < b["weight"]}
+    assert missing == {"provisioning", "confidentiality"}

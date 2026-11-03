@@ -447,6 +447,30 @@ still accepts unsigned input.}
 \label{fig:passive}
 \end{figure}
 
+\paragraph*{A second control plane the key does not cover}
+Signing protects MAVLink links, and a deployment that has provisioned a key may
+reasonably believe its command path is authenticated. PX4 ships a second one.
+The \code{uxrce\_dds\_client} module is included in SITL and most firmware
+builds and started by the stock init script; it bridges uORB to a DDS network,
+and PX4's documentation states that the transport is unauthenticated and reaches
+uORB directly. We measured the consequence passively: binding the configured
+agent port and decoding what arrives, without answering. Both PX4~v1.17.0 and
+v1.18.0-rc1 emit repeated XRCE \code{GET\_INFO} submessages addressed to
+\code{OBJECTID\_AGENT} in a session with no client key---agent discovery offered
+to whichever process holds the port, with no credential, key or challenge
+preceding it, and no means for the client to authenticate the agent that
+answers. We did not answer, so no session was established and no topic was read
+or written; this is detection, not exploitation, and we claim nothing about what
+a full agent could then do beyond what PX4 documents. The same probe against
+ArduPilot~4.7.2 returns nothing and the build exposes no \code{DDS\_ENABLE}
+parameter, so its DDS subsystem is not compiled in---a property of that build,
+since the source defaults the parameter to enabled where it is compiled.
+
+The point for conformance is not that this is a defect; it is documented. The
+point is that \emph{the key does not reach it}. A technical file that records
+``message signing enabled'' as evidence for Annex~I~2(d) is incomplete if a
+second, unauthenticated path to the same vehicle state ships in the same binary.
+
 \section{From Protocol Properties to CRA Evidence}
 \label{sec:cra}
 

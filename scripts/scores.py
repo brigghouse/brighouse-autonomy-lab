@@ -13,7 +13,27 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "papers" / "common"))
-from mavaudit.score import score_summary_run  # noqa: E402
+from mavaudit.score import SCORE_VERSION, score_summary_run  # noqa: E402
+
+
+def control_plane_for(stack: str, version_hint: str) -> dict | None:
+    """The dds_probe observation for a build, if one was recorded (A1: provenance).
+    Returns None when we never probed that build, which makes its score a lower bound."""
+    d = REPO / "results" / "dds"
+    if not d.exists():
+        return None
+    for f in sorted(d.glob("dds-*.json")):
+        r = json.loads(f.read_text())
+        if r.get("stack") != stack:
+            continue
+        v = str(r.get("version", ""))
+        if version_hint and version_hint not in v and v not in version_hint:
+            continue
+        return {"unauthenticated": bool(r.get("unauthenticated_agent_discovery")),
+                "detail": (f"{r.get('xrce_datagrams', 0)} XRCE datagrams, "
+                           f"{r.get('submessage_counts')} on port {r.get('port')} "
+                           f"({f.name})")}
+    return None
 
 # Cross-sectional configs: (label, folder, run, model-policy)
 CONFIGS = [
@@ -36,12 +56,17 @@ def cross_section():
         d = json.loads(f.read_text())["runs"].get(run)
         if not d:
             continue
-        s = score_summary_run(d, policy)
-        rows.append({"label": label, "score": s["score"], "grade": s["grade"], "policy": policy})
+        stack = "ardupilot" if folder.startswith("ardupilot") else "px4"
+        hint = folder.split("-", 1)[1] if "-" in folder else ""
+        s = score_summary_run(d, policy, control_plane=control_plane_for(stack, hint))
+        rows.append({"label": label, "score": s["score"], "grade": s["grade"], "policy": policy,
+                     "lower_bound": bool(s.get("lower_bound"))})
     # ideal target
     ideal = score_summary_run({"frames": 100, "signed_frames": 100, "v1_frames": 0,
                                "ftp_advertised": False, "unsigned_probe_answered": False,
-                               "firmware": "x"}, "ideal-oob-provisioning", link_confidential=True)
+                               "firmware": "x"}, "ideal-oob-provisioning", link_confidential=True,
+                              control_plane={"unauthenticated": False,
+                                             "detail": "model target: no secondary plane"})
     rows.append({"label": "IDEAL (model target)", "score": ideal["score"], "grade": ideal["grade"],
                  "policy": "ideal-oob-provisioning"})
     return sorted(rows, key=lambda r: -r["score"])
@@ -61,11 +86,13 @@ def longitudinal():
         pkey = next((k for k in m if k.startswith("provisioned")), None)
         policy = "ardupilot-4.7.2" if e["stack"] == "ardupilot" else (
             "px4-1.18" if "1.18" in e["ref"] or "1.17" not in e["ref"] else "px4-1.17")
-        d_default = score_summary_run(m[dkey], policy) if dkey else None
-        d_prov = score_summary_run(m[pkey], policy) if pkey else None
+        cp = control_plane_for(e["stack"], e["ref"].split("-")[-1])
+        d_default = score_summary_run(m[dkey], policy, control_plane=cp) if dkey else None
+        d_prov = score_summary_run(m[pkey], policy, control_plane=cp) if pkey else None
         rows.append({"stack": e["stack"], "ref": e["ref"],
                      "default_score": d_default["score"] if d_default else None,
-                     "provisioned_score": d_prov["score"] if d_prov else None})
+                     "provisioned_score": d_prov["score"] if d_prov else None,
+                     "control_plane_measured": cp is not None})
     return rows
 
 
@@ -74,19 +101,29 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     cs = cross_section()
     lg = longitudinal()
-    (out / "scores.json").write_text(json.dumps({"cross_section": cs, "longitudinal": lg}, indent=2))
+    (out / "scores.json").write_text(json.dumps(
+        {"score_version": SCORE_VERSION, "cross_section": cs, "longitudinal": lg}, indent=2))
 
     lines = ["# Secure-by-default scores", "",
-             "Computed by `mavaudit.score` (axioms: provenance, monotonicity, CRA-grounded "
-             "weights). 0--100; grade A--E.", "",
-             "## Cross-section", "", "| Configuration | Score | Grade |", "|---|---|---|"]
+             f"Computed by `mavaudit.score`, criteria set **v{SCORE_VERSION}** (axioms: "
+             "provenance, monotonicity, CRA-grounded weights). 0--100; grade A--E. Scores "
+             "from different criteria versions are not comparable.", "",
+             "v2 splits v1's single \"unauthenticated service exposure\" criterion into the "
+             "MAVLink file-transfer surface (8) and a secondary control plane (8), measured "
+             "by `scripts/dds_probe.py`. A build we never probed earns nothing for the "
+             "latter and is marked as a lower bound.", "",
+             "## Cross-section", "", "| Configuration | Score | Grade | |", "|---|---|---|---|"]
     for r in cs:
-        lines.append(f"| {r['label']} | {r['score']} | {r['grade']} |")
+        flag = "lower bound (control plane not probed)" if r.get("lower_bound") else ""
+        lines.append(f"| {r['label']} | {r['score']} | {r['grade']} | {flag} |")
     if lg:
         lines += ["", "## Longitudinal (per release)", "",
-                  "| Stack | Version | Default | Provisioned (best link) |", "|---|---|---|---|"]
+                  "| Stack | Version | Default | Provisioned (best link) | Control plane |",
+                  "|---|---|---|---|---|"]
         for r in lg:
-            lines.append(f"| {r['stack']} | {r['ref']} | {r['default_score']} | {r['provisioned_score']} |")
+            cp = "probed" if r.get("control_plane_measured") else "not probed (lower bound)"
+            lines.append(f"| {r['stack']} | {r['ref']} | {r['default_score']} | "
+                         f"{r['provisioned_score']} | {cp} |")
     (out / "README.md").write_text("\n".join(lines) + "\n")
 
     # LaTeX table for paper 4

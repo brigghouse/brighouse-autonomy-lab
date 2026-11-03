@@ -1,4 +1,5 @@
 {
+  "score_version": 2,
   "cross_section": [
     {
       "label": "IDEAL (model target)",
@@ -8,45 +9,52 @@
     },
     {
       "label": "ArduPilot 4.7.2 SERIAL1 signed",
-      "score": 70.0,
+      "score": 74.0,
       "grade": "C",
-      "policy": "ardupilot-4.7.2"
+      "policy": "ardupilot-4.7.2",
+      "lower_bound": false
     },
     {
       "label": "PX4 1.18 GCS signed",
-      "score": 70.0,
+      "score": 66.0,
       "grade": "C",
-      "policy": "px4-1.18"
+      "policy": "px4-1.18",
+      "lower_bound": false
     },
     {
       "label": "ArduPilot 4.7.2 ch0 signed",
-      "score": 42.0,
+      "score": 50.0,
       "grade": "D",
-      "policy": "ardupilot-4.7.2"
+      "policy": "ardupilot-4.7.2",
+      "lower_bound": false
+    },
+    {
+      "label": "ArduPilot 4.7.2 ch0 default",
+      "score": 22.0,
+      "grade": "E",
+      "policy": "ardupilot-4.7.2",
+      "lower_bound": false
     },
     {
       "label": "PX4 1.17 GCS default",
       "score": 20.0,
       "grade": "E",
-      "policy": "px4-1.17"
+      "policy": "px4-1.17",
+      "lower_bound": false
     },
     {
       "label": "PX4 1.17 GCS provisioned",
       "score": 20.0,
       "grade": "E",
-      "policy": "px4-1.17"
-    },
-    {
-      "label": "ArduPilot 4.7.2 ch0 default",
-      "score": 14.0,
-      "grade": "E",
-      "policy": "ardupilot-4.7.2"
+      "policy": "px4-1.17",
+      "lower_bound": false
     },
     {
       "label": "PX4 1.18 GCS default",
       "score": 14.0,
       "grade": "E",
-      "policy": "px4-1.18"
+      "policy": "px4-1.18",
+      "lower_bound": false
     }
   ],
   "longitudinal": [
@@ -54,19 +62,22 @@
       "stack": "ardupilot",
       "ref": "Copter-4.6.3",
       "default_score": 14.0,
-      "provisioned_score": 42.0
+      "provisioned_score": 42.0,
+      "control_plane_measured": false
     },
     {
       "stack": "ardupilot",
       "ref": "Copter-4.5.7",
       "default_score": 14.0,
-      "provisioned_score": 42.0
+      "provisioned_score": 42.0,
+      "control_plane_measured": false
     },
     {
       "stack": "px4",
       "ref": "v1.16.2",
       "default_score": null,
-      "provisioned_score": null
+      "provisioned_score": null,
+      "control_plane_measured": false
     }
   ]
 }

@@ -9,6 +9,10 @@
   everywhere and pinned by a test.
 - G6: `scripts/dds_probe.py`, passive XRCE decoding; PX4 1.17/1.18 offer unauthenticated
   agent discovery, ArduPilot 4.7.2's build offers none.
+  **Withdrawn 2026-11-04:** the ArduPilot half of that sentence was absence of evidence.
+  The probe captured no datagrams and we read the silence as a clean result; it is now
+  recorded as inconclusive and the score it fed is a lower bound. See README and
+  `results/dds/README.md`.
 - G10: `scripts/surface_probe.py`; all three runnable releases answer an FTP directory
   listing to an unauthenticated peer; `mavlink_shell` present in PX4 builds only.
 - G7/G8: `scripts/allowlists.py` extracts both stacks' unsigned-accept allowlists from

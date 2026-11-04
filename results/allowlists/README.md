@@ -24,10 +24,33 @@ the exposure reduces to the two mechanisms we have already measured: the unkeyed
 state, and ArduPilot's channel-0 exemption. There is no third, Remote-ID-specific hole in
 the MAVLink path.
 
-What we did **not** measure, and will not claim: the stock ArduPilot SITL build has
-`AP_OPENDRONEID_ENABLED` defaulting to 0 and no `OPEN_DRONE_ID` strings in the binary, so we
-cannot exercise Remote ID message handling on it at all; a vendor board that enables it in
-`hwdef.dat` would need its own run. And the broadcast side — the Bluetooth and Wi-Fi frames
+**Correction (4 Nov 2026).** An earlier version of this note said the stock SITL build has
+`AP_OPENDRONEID_ENABLED` defaulting to 0 and no `OPEN_DRONE_ID` strings in the binary, and
+therefore that Remote ID handling could not be exercised here at all. **Both halves were
+false, and the error was ours: we grepped for the wrong symbol.** The build gate does default
+to 0 in `libraries/AP_OpenDroneID/AP_OpenDroneID_config.h:7`, which is what we read, but the
+SITL board class overrides it — `Tools/ardupilotwaf/boards.py:813` calls
+`cfg.define('AP_OPENDRONEID_ENABLED', 1)`, the generated `build/sitl/ap_config.h:13` carries
+`#define AP_OPENDRONEID_ENABLED 1`, `build/sitl/libraries/AP_OpenDroneID/*.o` are compiled,
+and the binary contains the five `DID_*` parameter names and the pre-arm string
+`DID_ENABLE must be 1`. (ArduPilot `fb7735678960`.) So Remote ID handling **is** reachable on
+stock SITL by setting `DID_ENABLE=1`, and `scripts/odid_probe.py` does exactly that. The
+lesson we are keeping: a negative claim from a `grep` is only as good as the string, and a
+default in a header is not the value in the build — read the generated config, not the
+`#ifndef`.
+
+One thing that override exposes, which we were not looking for: `AP_CheckFirmware.h:15`
+defines `AP_CHECK_FIRMWARE_ENABLED` as `AP_OPENDRONEID_ENABLED`. Firmware-integrity checking
+in ArduPilot is not an independent switch — it is enabled *by* enabling Remote ID. On this
+build that means the check is compiled in while `AP_SIGNED_FIRMWARE` is 0
+(`boards.py:814`), so the machinery is present and has nothing to verify against. A vendor
+board shipping an ODID hwdef inherits the coupling in the other direction: it gets
+firmware-check code whether or not it has set up signing keys. We have not measured what that
+check does at runtime in either state; it is recorded here as a reading of the build, not as
+a result.
+
+What we still have **not** measured, and will not claim: anything about a vendor board's own
+`hwdef.dat`, which would need its own run. And the broadcast side — the Bluetooth and Wi-Fi frames
 an observer actually receives, where ASTM F3411 defines only the framing of an
 Authentication Message and leaves the method to others (IETF DRIP fills that gap) — needs a
 Remote ID module we do not have. Spoofing of that broadcast is documented against receivers

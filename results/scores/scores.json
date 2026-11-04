@@ -9,10 +9,10 @@
     },
     {
       "label": "ArduPilot 4.7.2 SERIAL1 signed",
-      "score": 74.0,
+      "score": 66.0,
       "grade": "C",
       "policy": "ardupilot-4.7.2",
-      "lower_bound": false
+      "lower_bound": true
     },
     {
       "label": "PX4 1.18 GCS signed",
@@ -23,28 +23,28 @@
     },
     {
       "label": "ArduPilot 4.7.2 ch0 signed",
-      "score": 50.0,
+      "score": 42.0,
       "grade": "D",
       "policy": "ardupilot-4.7.2",
-      "lower_bound": false
+      "lower_bound": true
     },
     {
       "label": "ArduPilot 4.7.2 ch0 default",
-      "score": 22.0,
+      "score": 14.0,
       "grade": "E",
       "policy": "ardupilot-4.7.2",
-      "lower_bound": false
+      "lower_bound": true
     },
     {
       "label": "PX4 1.17 GCS default",
-      "score": 20.0,
+      "score": 14.0,
       "grade": "E",
       "policy": "px4-1.17",
       "lower_bound": false
     },
     {
       "label": "PX4 1.17 GCS provisioned",
-      "score": 20.0,
+      "score": 14.0,
       "grade": "E",
       "policy": "px4-1.17",
       "lower_bound": false

@@ -5,9 +5,12 @@ anyone can reproduce it. A real check mirrors the customer's own firmware versio
 parameter file; nothing else changes about the method.
 
 - **Subject:** ArduPilot Copter 4.7.2 (`fb77356`), built from source, default parameters
-- **Method:** software-in-the-loop, read-only probes only (`PARAM_REQUEST_READ`,
-  `AUTOPILOT_VERSION`). No commands, no writes, no hardware touched.
-- **Date:** 2026-11-03 · **Tool:** `mavaudit` (open source, this repository)
+- **Method:** software-in-the-loop. The probes are read-only (`PARAM_REQUEST_READ`, a
+  capability request, an FTP directory listing). Two things are not reads, and we say so:
+  the capability request is a `COMMAND_LONG`, and the rows below that show signing enabled
+  required us to **install a signing key** on the simulator first, which is a write that
+  changes persistent state. Both happen only on our own simulator, never on your aircraft.
+- **Dates:** posture runs 2026-11-02; channel configurations and surface probes 2026-11-03/04 · **Tool:** `mavaudit` (open source, this repository)
 - **What this is not:** a certification, a penetration test, or a statement about a
   physical aircraft. It measures the firmware's command-link posture as shipped.
 
@@ -15,9 +18,9 @@ parameter file; nothing else changes about the method.
 
 | Configuration | Score | Grade |
 |---|---|---|
-| Default, primary link (SERIAL0) | **22 / 100** | **E** |
-| Signing enabled, primary link (SERIAL0) | 50 / 100 | D |
-| Signing enabled, telemetry link (SERIAL1) | 74 / 100 | C |
+| Default, primary link (SERIAL0) | **14 / 100** | **E** |
+| Signing enabled, primary link (SERIAL0) | 42 / 100 | D |
+| Signing enabled, telemetry link (SERIAL1) | 66 / 100 | C |
 
 Read the three rows together: enabling signing is necessary but, on the primary link,
 not sufficient. See *Ceiling* below for how high this can go at all.
@@ -26,10 +29,13 @@ not sufficient. See *Ceiling* below for how high this can go at all.
 
 **F1 — The default link accepts unauthenticated commands.** (CRA Annex I 2(d))
 With default parameters, an unsigned `PARAM_REQUEST_READ` from an unknown sender is
-answered. Any peer that can reach the link can also read and write parameters, upload
-missions, arm, or trigger flight termination, because MAVLink does not distinguish a
-legitimate ground station from any other sender.
-*Reproduce:* `python -m mavaudit tcp:127.0.0.1:5760 --out /tmp/check`
+answered: that part is measured. The vehicle also *advertises* parameter writing, mission
+upload and flight termination, which we did not exercise — a capability bit is an offer, not
+a demonstration. What the measurement establishes is that the firmware has no way to tell a
+legitimate ground station from any other sender, which is why the distinction between
+advertised and exploited comes down to who is within range.
+*Reproduce:* `python -m mavaudit scan --target tcp:127.0.0.1:5760 --active-probe --out /tmp/check`
+(`--active-probe` is what asks the question; without it the unsigned read is never sent)
 *Fix:* provision a signing key (`SETUP_SIGNING`) over a trusted connection.
 
 **F2 — With signing enabled, the primary channel still accepts unsigned commands.**
@@ -62,8 +68,8 @@ peer, on any link. Whoever gets there first owns the aircraft.
 | Frames signed | 2(f) | 0 / 28 |
 | Unsigned requests rejected | 2(d) | 0 / 24 |
 | No unauthenticated file transfer | 2(j) | 0 / 8 |
-| No unauthenticated second control plane | 2(d) | 8 / 8 |
-| No unprotected MAVLink 1 | 2(b) | 10 / 10 |
+| No unauthenticated second control plane | 2(d) | 0 / 8 — **not established** |
+| No MAVLink 1 frames emitted on this link | 2(b) | 10 / 10 |
 | Out-of-band key provisioning | 2(d) | 0 / 12 |
 | Payload confidentiality | 2(e) | 0 / 6 |
 | Firmware identifiable (SBOM/advisories) | II.1 | 4 / 4 |
@@ -73,10 +79,14 @@ not an official scale: the score is a rubric for comparing configurations, not a
 The criteria set is versioned (this is v2); scores from different versions are not
 comparable, and the version is reported with every result.
 
-The second-control-plane criterion is earned here because this ArduPilot build does not
-compile its DDS subsystem — we probed for it and found nothing. On a PX4 build the same
-criterion scores zero, because PX4's uXRCE-DDS bridge offers an unauthenticated path that
-reaches the flight stack directly and a MAVLink signing key does not protect it.
+The second-control-plane criterion earns nothing here, and the reason matters. We probed
+the port ArduPilot would use and captured no traffic, and the build does not answer for a
+`DDS_ENABLE` parameter — both consistent with the subsystem not being compiled in. But
+silence is not a measurement: it cannot distinguish a stack that offers nothing from a probe
+that listened in the wrong place. So the criterion is unearned and this score is a **lower
+bound**. On a PX4 build the same criterion scores zero for a different and firmer reason:
+its uXRCE-DDS bridge was *observed* offering unauthenticated agent discovery, and a MAVLink
+signing key does not reach it.
 
 ## Ceiling
 
@@ -102,6 +112,15 @@ Radio hardware and its link-layer security · Remote ID broadcast over Bluetooth
 DroneCAN/Cyphal peripheral bus · the companion computer's own interfaces (note that a
 PX4 uXRCE-DDS bridge is unauthenticated by design and MAVLink signing does not protect
 it) · bootloader and firmware-signature configuration · anything on physical hardware.
+
+Two limits bear directly on what you just read, so they belong here and not in a footnote:
+
+- **This is a POSIX/SITL build, and the MAVLink FTP code path differs by target.** The
+  advisory for CVE-2026-32709 states that on POSIX targets — Linux companion computers and
+  simulation — a write-path check that NuttX performs is skipped. Our probe only reads, so
+  that difference does not bear on this result, but the FTP row describes the target we
+  measured and should not be generalised to a NuttX flight controller.
+- **The channel-0 result reaches hardware by argument, not by measurement**, as said above.
 
 Each of these is in scope for the paid engagement where it is measurable; where it needs
 hardware we say so rather than guessing.

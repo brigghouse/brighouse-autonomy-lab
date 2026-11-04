@@ -2,7 +2,7 @@
   "stack": "ArduPilot Copter SITL",
   "source_rev": "AP_Periph-4.7.2,Copter-4.7.2,Plane-4.7.2@fb7735678960",
   "policy": "ardupilot-4.7.2",
-  "started_utc": "2026-11-03T22:31:31Z",
+  "started_utc": "2026-11-03T23:59:18Z",
   "configs": [
     {
       "config": "A-ch0tcp-ch1tcp",

@@ -47,8 +47,8 @@ own limits section:
 Four reproducible IEEE-format papers build on this data and model (see [papers/](papers/README.md)):
 
 1. **Signed but Unprotected** — measurement + a formal acceptance model + a CRA conformance crosswalk. The model, derived from reading `GCS_Signing.cpp`, reproduces the ArduPilot ch0 "signed yet unprotected" behaviour that the SITL measurement then confirms. (That behaviour is tracked upstream as [ArduPilot#34489](https://github.com/ArduPilot/ardupilot/issues/34489) with fix PR [#34780](https://github.com/ArduPilot/ardupilot/pull/34780), unmerged as of Nov 2026; our contribution is the independent measurement, the formal model and the CRA mapping, not the discovery. `results/ch0-configs/` adds the discriminating runs: the exemption follows the channel *index*, not the transport — SERIAL0 over UDP still accepts unsigned commands, SERIAL1 over the same UDP does not; 23/23 observations match the model.)
-2. **A Decade of Defaults** — longitudinal study: signing was added to ArduPilot in 2016 and PX4 in 2026, and *never* shipped on by default.
-3. **Acceptance Semantics for MAVLink 2 Signing** — bounded symbolic analysis + model-based conformance testing; a liveness-constrained search shows ArduPilot needs two independent fixes where PX4 1.18 needs one.
+2. **A Decade of Defaults** — a decade of version-control history, plus a *measured* posture matrix covering only the two releases that both build and run on a current toolchain. Signing was added to ArduPilot in 2016 and to PX4 in 2026 and never shipped on by default: the decade-long part of that is archaeology from version control, the measured part is n=2, and the paper says which is which.
+3. **Acceptance Semantics for MAVLink 2 Signing** — bounded symbolic analysis + model-based conformance testing; a liveness-constrained *greedy* search finds a two-edit repair for ArduPilot where PX4 1.18 takes one. Greedy is not proven minimal and the recorded alternatives include a single-edit path, so this is what the search found, not what is necessary.
 4. **Scoring Secure by Default** — a reproducible, CRA-grounded 0–100 metric that prices the ch0 pitfall numerically (50 vs 74) and states the bound plainly: a link configured as well as MAVLink 2 signing alone allows scores **82, grade B**, never higher. The last 18 points need out-of-band key provisioning (12) and link encryption (6), neither of which the protocol provides.
 
 To our knowledge, no prior work gives a formal model of MAVLink signing, a decade-long measurement of flight-stack defaults, or a measurable CRA conformance score (see [research/](research/)). · Discussion: [paper draft](paper/paper1-draft.md) §7.
@@ -86,9 +86,9 @@ Full guide: [docs/setup.md](docs/setup.md) (Spanish: [docs/setup.es.md](docs/set
 | Path | What |
 |---|---|
 | [`mavaudit/`](mavaudit/) | The auditor; `mavaudit/sim/fake_vehicle.py` is the reference vehicle used in tests |
-| [`tests/`](tests/) | 42 tests: auditor (unsigned, signed, signing-exempt and MAVLink 1 vehicles, advisories, exit codes, scope guard), the formal model (incl. conformance against recorded SITL observations) and the score (incl. the empty-run guard) |
+| [`tests/`](tests/) | 52 tests: auditor (unsigned, signed, signing-exempt and MAVLink 1 vehicles, advisories, exit codes, scope guard), the formal model (incl. conformance against recorded SITL observations) and the score (incl. the empty-run guard) |
 | [`scripts/`](scripts/) | SITL build and experiment runners |
-| [`results/`](results/README.md) | Measured data: reports, summaries, simulator logs |
+| [`results/`](results/README.md) | Recorded evidence: measured runs, plus source-derived extraction (`allowlists/`) and static build inspection, each labelled in its own README |
 | [`paper/`](paper/paper1-draft.md) | Paper 1 draft: MAVLink signing in 2026 and the CRA |
 | [`research/`](research/) | [Literature review](research/literature-review.md) (20 academic references plus 17 regulatory and project sources, CVE tables) and [experiment plan](research/experiment-plan.md) |
 | [`notebook/`](notebook/INDEX.md) | Lab notebook: diary, lessons learned, roadmap. Open the repo root as an Obsidian vault |

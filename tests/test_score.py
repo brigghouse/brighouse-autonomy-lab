@@ -161,8 +161,22 @@ def test_recorded_surface_runs_are_internally_consistent():
     px4 = [r for r in recs if r["stack"] == "px4"]
     ap = [r for r in recs if r["stack"] == "ardupilot"]
     # The shell asymmetry the README claims, asserted against the recorded data.
-    assert all(r["static"]["hits"]["mavlink_shell"] is True for r in px4)
-    assert all(r["static"]["hits"]["mavlink_shell"] is False for r in ap)
+    # `evidence` is the field that matters: it is the raw string-match count with
+    # generated MAVLink dialect headers excluded, which is what caught the
+    # serial_control false positive. Asserting on the raw count would re-admit it.
+    assert all(r["static"]["hits"]["mavlink_shell"]["evidence"] is True for r in px4)
+    assert all(r["static"]["hits"]["mavlink_shell"]["evidence"] is False for r in ap)
+    # ArduPilot's serial_control matches exist but live only in generated headers.
+    for r in ap:
+        sc = r["static"]["hits"]["serial_control"]
+        assert sc["any_match"] is True and sc["excluding_generated_headers"] == 0
+        assert sc["evidence"] is False
+    # Repeatability must be measured and retained, not asserted in prose.
+    for r in recs:
+        rp = r["repeatability"]
+        assert rp["live_runs"] >= 3
+        assert rp["identical_across_runs"] is True
+        assert len(rp["per_run"]) == rp["live_runs"]
 
 
 def test_allowlists_extracted_from_source_match_the_readme():

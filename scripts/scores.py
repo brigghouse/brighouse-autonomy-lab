@@ -29,6 +29,12 @@ def control_plane_for(stack: str, version_hint: str) -> dict | None:
         v = str(r.get("version", ""))
         if version_hint and version_hint not in v and v not in version_hint:
             continue
+        # An inconclusive capture earns nothing. Zero datagrams cannot distinguish "no
+        # second plane is offered" from "we listened on the wrong port, or too late", and
+        # crediting it turned absence of evidence into eight points -- which was enough to
+        # reorder two stacks in a published table. Found by an independent reviewer.
+        if r.get("inconclusive"):
+            return None
         return {"unauthenticated": bool(r.get("unauthenticated_agent_discovery")),
                 "detail": (f"{r.get('xrce_datagrams', 0)} XRCE datagrams, "
                            f"{r.get('submessage_counts')} on port {r.get('port')} "

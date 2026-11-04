@@ -57,6 +57,12 @@ class Policy:
     sign_outgoing_on_trusted: bool = True
     #: key is installed out of band (factory), not over MAVLink: V starts keyed, no TOFU window
     oob_provision: bool = False
+    #: does this release implement message signing at all? False for a stack that ships no
+    #: signing code, where SETUP_SIGNING is inert. Needed because "no trust-on-first-use
+    #: window" is true of such a stack for the wrong reason -- there is no key mechanism to
+    #: have a window in -- and scoring it as neutral rewarded the stack that cannot be
+    #: secured over the one that can. Found by an independent reviewer.
+    signing_implemented: bool = True
 
 
 @dataclass(frozen=True)

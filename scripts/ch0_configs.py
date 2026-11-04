@@ -36,6 +36,11 @@ from conformance import _probe_read
 from mavaudit.model.configs import BY_NAME
 from mavaudit.model.semantics import READ, Frame, State, step
 
+#: How long a probe waits for a reply before recording "not answered". A negative result
+#: is therefore a *timeout*, not an observed rejection: the vehicle may have replied late.
+#: Stated here because every "rejected" cell in the published table rests on it.
+PROBE_TIMEOUT = 5.0
+
 UDP0, UDP1 = 14600, 14601
 TCP0, TCP1 = 5760, 5762
 
@@ -62,20 +67,27 @@ def probe(cfg: dict, link: str, signed: bool, key) -> tuple[bool, int]:
 
     A MAVLink 1 frame cannot carry a signature, so `signed` is forced False there."""
     from pymavlink import mavutil
-    if not cfg.get(f"{link}_v1"):
-        return _probe_read(cfg[link], signed, key), 0xFD if _wire_is_v2() else 0xFE
-
-    saved = os.environ.pop("MAVLINK20", None)
-    mavutil.set_dialect("all")
+    want_v1 = bool(cfg.get(f"{link}_v1"))
+    saved = os.environ.pop("MAVLINK20", None) if want_v1 else None
+    if want_v1:
+        mavutil.set_dialect("all")
     try:
         conn = mavutil.mavlink_connection(cfg[link], source_system=251, dialect="all")
         conn.wait_heartbeat(timeout=15)
+        if signed and key is not None and not want_v1:
+            conn.setup_signing(key, sign_outgoing=True,
+                               allow_unsigned_callback=lambda m, i: True)
+        # The wire version is read off the frame we are about to send, on every path.
+        # The previous version only did this for the v1 path and returned a constant for
+        # the other, derived from a process-wide environment variable that an import had
+        # already set -- so it was never an observation. Found by an independent reviewer.
         wire = conn.mav.param_request_read_encode(1, 1, b"", 0).pack(conn.mav)[0]
         conn.mav.param_request_read_send(1, 1, b"", 0)
-        deadline, answered = time.time() + 3.0, False
+        deadline, answered = time.time() + PROBE_TIMEOUT, False
         while time.time() < deadline:
             m = conn.recv_match(type="PARAM_VALUE", blocking=True, timeout=0.5)
-            if m is not None and int(getattr(m, "param_index", -2)) == 0:
+            if (m is not None and int(getattr(m, "param_index", -2)) == 0
+                    and m.get_srcSystem() == 1):
                 answered = True
                 break
         conn.close()
@@ -83,17 +95,18 @@ def probe(cfg: dict, link: str, signed: bool, key) -> tuple[bool, int]:
     finally:
         if saved is not None:
             os.environ["MAVLINK20"] = saved
-        mavutil.set_dialect("all")
+            mavutil.set_dialect("all")
 
 
-def _wire_is_v2() -> bool:
-    return "MAVLINK20" in os.environ
-
-
-def predict(policy, link: str, signed: bool, keyed: bool) -> bool:
+def predict(policy, link: str, signed: bool, keyed: bool, wire: int = 2) -> bool:
+    """The prediction must be made for the frame we actually send, wire version included.
+    An earlier version omitted `wire`, which silently made every prediction a version-2
+    prediction: configuration D then "agreed" with both ardupilot-4.7.2 and its
+    documentation variant, and the experiment could not discriminate between them at all.
+    Found by an independent reviewer, not by us."""
     st = State(key="K" if keyed else None, clock=2_000_000)
     fr = Frame(link, (9, 9) if not signed else (1, 1), READ, signed=signed,
-               key="K" if signed else None, ts=2_000_050, link_id=1)
+               key="K" if signed else None, ts=2_000_050, link_id=1, wire=wire)
     return step(policy, st, fr).accepted
 
 
@@ -127,7 +140,9 @@ def run_config(name: str, cfg: dict, ap: Path, policy) -> dict:
             obs, wire = probe(cfg, link, False, None)
             cases.append({"state": "unkeyed", "link": link, "transport": cfg[link].split(":")[0],
                           "wire_first_byte_sent": wire, "wire": 1 if wire == 0xFE else 2,
-                          "signed": False, "predicted": predict(policy, link, False, False),
+                          "signed": False,
+                          "predicted": predict(policy, link, False, False,
+                                               wire=1 if wire == 0xFE else 2),
                           "observed": obs})
         labkit.provision_signing(cfg["ch0"], key)
         for link in ("ch0", "ch1"):
@@ -135,7 +150,9 @@ def run_config(name: str, cfg: dict, ap: Path, policy) -> dict:
                 obs, wire = probe(cfg, link, signed, key if signed else None)
                 cases.append({"state": "keyed", "link": link, "transport": cfg[link].split(":")[0],
                               "wire_first_byte_sent": wire, "wire": 1 if wire == 0xFE else 2,
-                              "signed": signed, "predicted": predict(policy, link, signed, True),
+                              "signed": signed,
+                              "predicted": predict(policy, link, signed, True,
+                                                   wire=1 if wire == 0xFE else 2),
                               "observed": obs})
     finally:
         proc.terminate()

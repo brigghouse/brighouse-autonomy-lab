@@ -1,12 +1,15 @@
 {
   "port": 2019,
-  "listened_seconds": 40.0,
+  "listened_seconds": 30.0,
   "datagrams_received": 0,
   "xrce_datagrams": 0,
   "submessage_counts": {},
   "peers": [],
   "samples": [],
+  "agent_discovery_datagrams": 0,
   "unauthenticated_agent_discovery": false,
+  "inconclusive": true,
+  "inconclusive_reason": "no datagrams at all: cannot distinguish an absent or authenticated service from a probe that listened on the wrong port or started too late",
   "note": "an unauthenticated listener on the configured agent port receives repeated XRCE agent-discovery submessages from the flight controller, in a session with no client key; no credential, key or challenge precedes them. We did not answer, so no session was established and no topic was read or written.",
   "why_it_matters": "this is a second control plane that reaches uORB directly, and a MAVLink signing key does not apply to it: provisioning SETUP_SIGNING protects MAVLink links only. A deployment that has 'enabled signing' may still expose this path.",
   "not_measured": [
@@ -14,7 +17,14 @@
     "DDS-Security (the OMG standard) is not implemented by micro XRCE-DDS in PX4; we did not test it",
     "whether a remote (non-loopback) peer can reach the port in a given deployment: that is an integrator's network question"
   ],
+  "parameter_check": {
+    "DDS_ENABLE": {
+      "present": false,
+      "value": null,
+      "caveat": "absence of a reply within the timeout, not proof of absence"
+    }
+  },
   "stack": "ardupilot",
   "version": "4.7.2",
-  "recorded_utc": "2026-11-03T22:14:06Z"
+  "recorded_utc": "2026-11-04T00:06:24Z"
 }

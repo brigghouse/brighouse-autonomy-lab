@@ -133,6 +133,12 @@ def _provisioning_credit(policy: Optional[str]) -> float:
     p = BY_NAME.get(policy)
     if p is None:
         return 0.5
+    # A stack with no signing implementation has no provisioning to credit. Returning the
+    # neutral 0.5 here gave PX4 1.17 -- which cannot be secured at all -- six points that
+    # PX4 1.18, which can, did not get, so the metric ranked the unsecurable release above
+    # the securable one. That inverted the thing the score exists to measure.
+    if not p.signing_implemented:
+        return 0.0
     if p.oob_provision:
         return 1.0
     if p.tofu:

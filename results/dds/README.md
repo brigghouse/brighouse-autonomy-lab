@@ -13,7 +13,29 @@ written. This is detection, not exploitation.
 
 ## What the PX4 result means
 
-PX4's `uxrce_dds_client` is included in SITL and most firmware builds by default and is
+PX4's `uxrce_dds_client` is **not** "included in most firmware builds by default", which is
+what an earlier version of this note claimed on the strength of a case-sensitive grep that
+missed the configuration symbol entirely -- the same mistake we made about OpenDroneID the
+same day. What the tree actually shows (PX4 `v1.18.0-rc1`): its Kconfig default is `n`
+(`src/modules/uxrce_dds_client/Kconfig:3`), 73 of 286 `.px4board` configurations set
+`CONFIG_MODULES_UXRCE_DDS_CLIENT=y` and 12 set it to `n`. More importantly, being compiled
+in is not the same as listening: the only startup script in the tree that starts the client
+is the **POSIX** one, `ROMFS/px4fmu_common/init.d-posix/rcS:326`, which runs
+`uxrce_dds_client start -t udp -p 8888` with no parameter gating it -- unlike Zenoh two
+lines below, which is behind `ZENOH_ENABLE`. The stock NuttX `init.d/rcS` contains zero
+references to it.
+
+So the honest shape of this finding is narrower than we had it and more useful: on a
+**POSIX target** -- SITL, and a Linux companion computer such as ModalAI's VoXL2, whose own
+start script also launches it -- the second control plane is up by default and ungated. On a
+**stock NuttX flight board** the module may be in flash while nothing starts it. A customer
+asking "do I have this plane?" gets a different answer depending on which of the two they
+are running, and that is a question we can now answer from their build rather than guess.
+
+This bounds our own score: the eight points PX4 loses on the control-plane criterion were
+measured against a POSIX/SITL build, and they do not transfer unexamined to a NuttX board.
+
+The client is
 started by the stock `rcS`. It emits a repeated `GET_INFO` submessage (id `0x02`) addressed
 to `OBJECTID_AGENT` (`0xfffd`), in a session with `SESSION_ID_NONE_WITHOUT_CLIENT_KEY`, to
 whichever process holds the configured agent port. No credential, key or challenge precedes

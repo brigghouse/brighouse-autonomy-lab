@@ -190,7 +190,7 @@ backwards, for exactly the reason (F4) gives; the limitation is the same
 limitation, which is the point rather than an excuse.
 
 (F6)~\emph{The release that added signing did not close the second control
-plane.} PX4's uXRCE-DDS client ships enabled in SITL and most firmware builds and
+plane.} PX4's uXRCE-DDS client is compiled into 73 of the 286 board configurations in the v1.18.0-rc1 tree, and is started unconditionally only by the stock POSIX startup script; the NuttX one never starts it, so a flight board can carry the module without anything listening. On the POSIX target we measured it
 reaches uORB directly; PX4's own documentation says the transport is
 unauthenticated. We find it offering agent discovery to whichever local process
 holds the configured port, in a session with no client key, on \emph{both}

@@ -1,5 +1,6 @@
 """Score chart for the web page, drawn from results/scores.json. Regenerate with:
    python /tmp/mkchart.py   (source of truth: the repo's recorded measurements)"""
+import datetime as _dt, json as _json, pathlib as _pl
 import json, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -29,7 +30,12 @@ ax.tick_params(colors=MUT, labelsize=8.5, length=0)
 for sp in ax.spines.values(): sp.set_visible(False)
 ax.grid(axis="x", color=FG, alpha=.07, lw=.8)
 ax.set_axisbelow(True)
-ax.set_xlabel("secure-by-default score (criteria v2) — measured 3 Nov 2026",
+_sc = _json.loads(_pl.Path("results/scores/scores.json").read_text())
+# Dated from the record, not typed in: the hard-coded date outlived its own measurement
+# once already, on the figure next to this one.
+_when = (_sc.get("generated_utc") or _sc.get("recorded_utc") or "")[:10]
+_nice = _dt.date.fromisoformat(_when).strftime("%-d %b %Y") if _when else "see results/scores"
+ax.set_xlabel(f"secure-by-default score (criteria v2) \u2014 measured {_nice}",
               color=MUT, fontsize=8.5, labelpad=9)
 fig.tight_layout()
 fig.savefig("/home/claude/assets/scores.png", facecolor=BG, bbox_inches="tight")

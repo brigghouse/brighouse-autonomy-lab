@@ -13,23 +13,104 @@
     "param_read": true,
     "ftp_list": {
       "result": "ack",
-      "entries_bytes": 101
+      "ack_size_field": 101,
+      "size_field_caveat": "describes the listed directory, which under SITL is the simulator's cwd; not a firmware property and not comparable across releases"
     }
   },
   "capabilities_raw": 59647,
+  "repeatability": {
+    "live_runs": 3,
+    "identical_across_runs": true,
+    "fields_that_varied": [],
+    "per_run": [
+      {
+        "heartbeat": true,
+        "advertised": {
+          "ftp": true,
+          "mavlink2": true,
+          "mission_int": true,
+          "flight_termination": true,
+          "param_float": true,
+          "command_int": true,
+          "set_position_target": false
+        },
+        "answered": {
+          "param_read": true,
+          "ftp_list": {
+            "result": "ack",
+            "ack_size_field": 101,
+            "size_field_caveat": "describes the listed directory, which under SITL is the simulator's cwd; not a firmware property and not comparable across releases"
+          }
+        }
+      },
+      {
+        "heartbeat": true,
+        "advertised": {
+          "ftp": true,
+          "mavlink2": true,
+          "mission_int": true,
+          "flight_termination": true,
+          "param_float": true,
+          "command_int": true,
+          "set_position_target": false
+        },
+        "answered": {
+          "param_read": true,
+          "ftp_list": {
+            "result": "ack",
+            "ack_size_field": 101,
+            "size_field_caveat": "describes the listed directory, which under SITL is the simulator's cwd; not a firmware property and not comparable across releases"
+          }
+        }
+      },
+      {
+        "heartbeat": true,
+        "advertised": {
+          "ftp": true,
+          "mavlink2": true,
+          "mission_int": true,
+          "flight_termination": true,
+          "param_float": true,
+          "command_int": true,
+          "set_position_target": false
+        },
+        "answered": {
+          "param_read": true,
+          "ftp_list": {
+            "result": "ack",
+            "ack_size_field": 101,
+            "size_field_caveat": "describes the listed directory, which under SITL is the simulator's cwd; not a firmware property and not comparable across releases"
+          }
+        }
+      }
+    ],
+    "caveat": "same binary, same simulator process, runs back to back; this measures probe determinism, not reproducibility on a rebuild or on hardware. The static section is a build inspection and is recorded once."
+  },
   "stack": "px4",
   "version": "v1.17.0",
   "target": "udpin:127.0.0.1:14550",
   "static": {
     "checked": true,
-    "method": "string search in build tree",
+    "method": "string search in the build tree, counting generated MAVLink dialect headers separately: a hit only in those is not evidence that the feature is compiled in",
     "hits": {
-      "mavlink_shell": true,
-      "serial_control": true
+      "mavlink_shell": {
+        "any_match": true,
+        "total_files": 9,
+        "excluding_generated_headers": 9,
+        "evidence": true,
+        "example": "/home/claude/sitl/px4-117/build/px4_sitl_default/.ninja_log"
+      },
+      "serial_control": {
+        "any_match": true,
+        "total_files": 9,
+        "excluding_generated_headers": 4,
+        "evidence": true,
+        "example": "/home/claude/sitl/px4-117/build/px4_sitl_default/src/modules/mavlink/CMakeFiles/modules__mavlink.dir/mavlink_receiver.cpp.o"
+      }
     },
     "note": "compiled-in only; we do not open a shell (not a read-only probe)"
   },
-  "recorded_utc": "2026-11-03T22:25:04Z",
+  "recorded_utc": "2026-11-04T00:19:13Z",
   "evidence_kinds": {
     "advertised": "capability bits",
     "answered": "read-only request answered",

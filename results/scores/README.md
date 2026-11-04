@@ -9,12 +9,12 @@ v2 splits v1's single "unauthenticated service exposure" criterion into the MAVL
 | Configuration | Score | Grade | |
 |---|---|---|---|
 | IDEAL (model target) | 100.0 | A |  |
-| ArduPilot 4.7.2 SERIAL1 signed | 74.0 | C |  |
+| ArduPilot 4.7.2 SERIAL1 signed | 66.0 | C | lower bound (control plane not probed) |
 | PX4 1.18 GCS signed | 66.0 | C |  |
-| ArduPilot 4.7.2 ch0 signed | 50.0 | D |  |
-| ArduPilot 4.7.2 ch0 default | 22.0 | E |  |
-| PX4 1.17 GCS default | 20.0 | E |  |
-| PX4 1.17 GCS provisioned | 20.0 | E |  |
+| ArduPilot 4.7.2 ch0 signed | 42.0 | D | lower bound (control plane not probed) |
+| ArduPilot 4.7.2 ch0 default | 14.0 | E | lower bound (control plane not probed) |
+| PX4 1.17 GCS default | 14.0 | E |  |
+| PX4 1.17 GCS provisioned | 14.0 | E |  |
 | PX4 1.18 GCS default | 14.0 | E |  |
 
 ## Longitudinal (per release)

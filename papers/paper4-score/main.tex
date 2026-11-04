@@ -157,24 +157,29 @@ SERIAL1 link despite identical signed-frame fractions.}
 \end{figure}
 
 Four observations validate the metric against intuition and against the companion
-findings. First, insecure defaults cluster at the bottom (grade~E, scores
-$14$--$20$): zero signed frames and an answered unsigned read cost the two
+findings. First, insecure defaults cluster at the bottom (grade~E, all at
+$14$): zero signed frames and an answered unsigned read cost the two
 heaviest criteria at once. Second, the metric gives the console-exemption
 behaviour (companion result \emph{R4}) a \emph{numeric} penalty: the ArduPilot
 \code{ch0} link, which signs every outbound frame yet still answers unsigned
 requests, scores below the cleanly signed SERIAL1 link even though their
 signed-frame fractions are identical---because the access-control criterion reads
-the active probe, not the passive traffic. Third, the control-plane criterion reorders two
-configurations that the MAVLink criteria alone rank equally: ArduPilot~4.7.2
-signed on SERIAL1 (74) now sits above PX4~v1.18 signed (66), because the PX4
-build offers an unauthenticated uXRCE-DDS plane and this ArduPilot build offers
-none. That ordering is invisible to a MAVLink-only metric, and it is the kind of
-reordering a metric has to be able to express if it is to be used as evidence.
-We note the asymmetry honestly: the absence is a property of \emph{this}
-ArduPilot build, which does not compile the DDS subsystem, not of ArduPilot. A
-criterion that was never probed earns nothing and the score is reported as a
-lower bound, because a plane we did not look at is not a plane we know to be
-clean. Fourth, no measured configuration
+the active probe, not the passive traffic. Third, the control-plane criterion is the one place where our own
+discipline had to be applied against us, and the episode is worth reporting
+because it is the failure mode a metric of this kind invites. The criterion
+costs PX4 eight points, since its uXRCE-DDS plane is observed to offer
+unauthenticated agent discovery. Our ArduPilot probe captured no traffic at all
+on the corresponding port, and an earlier version of the scoring code read that
+silence as the criterion being satisfied, which lifted ArduPilot above PX4 in
+the table. But zero datagrams cannot distinguish a stack that offers no second
+plane from a probe that listened on the wrong port or started too late. Absence
+of evidence had become eight points, and eight points had reordered two stacks.
+The probe now marks such a capture inconclusive, the criterion earns nothing,
+and the score is reported as a lower bound; the two configurations tie at $66$.
+The general point is that a weighted metric will quietly convert a measurement
+failure into a score unless every criterion distinguishes \emph{observed clean}
+from \emph{not observed}, and that is a property to test for rather than to
+hope for. Fourth, no measured configuration
 reaches grade~A: every one either lacks confidentiality or keeps a
 trust-on-first-use window, so the idealised target (out-of-band keys, encrypted
 link) sits alone at the top. This deserves a plain statement, and a correction we

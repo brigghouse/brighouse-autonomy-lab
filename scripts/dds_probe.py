@@ -73,7 +73,8 @@ def listen(port: int, seconds: float, bind_host: str = "127.0.0.1") -> dict:
     sock.bind((bind_host, port))
     sock.settimeout(1.0)
     deadline = time.time() + seconds
-    datagrams, peers, decoded, kinds = 0, set(), [], {}
+    datagrams, peers, samples, kinds = 0, set(), [], {}
+    unauth_count = 0
     while time.time() < deadline:
         try:
             data, addr = sock.recvfrom(4096)
@@ -86,13 +87,19 @@ def listen(port: int, seconds: float, bind_host: str = "127.0.0.1") -> dict:
             kinds["undecoded"] = kinds.get("undecoded", 0) + 1
             continue
         kinds[d["submessage"]] = kinds.get(d["submessage"], 0) + 1
-        if len(decoded) < 3:
+        # The finding is computed over EVERY decoded datagram, not over a sample. An
+        # earlier version kept only the first three and derived the headline from those,
+        # so a capture whose first three datagrams were not agent-targeted would have
+        # reported "no finding" with the evidence sitting in the discarded remainder.
+        # Found by an independent reviewer.
+        if d.get("session_without_client_key") and d.get("targets_agent"):
+            unauth_count += 1
+        if len(samples) < 3:
             d["raw_prefix_hex"] = data[:16].hex()
-            decoded.append(d)
+            samples.append(d)
     sock.close()
     xrce = sum(v for k, v in kinds.items() if k != "undecoded")
-    unauth = any(d.get("session_without_client_key") and d.get("targets_agent")
-                 for d in decoded)
+    unauth = unauth_count > 0
     return {
         "port": port,
         "listened_seconds": seconds,
@@ -100,9 +107,18 @@ def listen(port: int, seconds: float, bind_host: str = "127.0.0.1") -> dict:
         "xrce_datagrams": xrce,
         "submessage_counts": kinds,
         "peers": sorted(peers),
-        "samples": decoded,
+        "samples": samples,
+        "agent_discovery_datagrams": unauth_count,
         # The finding, stated as what we observed and nothing more.
         "unauthenticated_agent_discovery": unauth,
+        # A capture with no traffic at all is not evidence of authentication: it is
+        # equally consistent with nothing listening, the wrong port, or a bind that
+        # happened after the client gave up. Flagged rather than reported as a negative.
+        "inconclusive": datagrams == 0,
+        "inconclusive_reason": (None if datagrams else
+                                "no datagrams at all: cannot distinguish an absent or "
+                                "authenticated service from a probe that listened on the "
+                                "wrong port or started too late"),
         "note": ("an unauthenticated listener on the configured agent port receives "
                  "repeated XRCE agent-discovery submessages from the flight controller, "
                  "in a session with no client key; no credential, key or challenge "
@@ -121,6 +137,28 @@ def listen(port: int, seconds: float, bind_host: str = "127.0.0.1") -> dict:
     }
 
 
+def param_present(mav_target: str, name: str, timeout: float = 8.0):
+    """Is a parameter exposed by this build? Recorded because a claim about whether a
+    subsystem is compiled in ought to rest on a check that is in the artefact, not on one
+    the author ran once by hand. Found missing by an independent reviewer."""
+    try:
+        from pymavlink import mavutil
+        conn = mavutil.mavlink_connection(mav_target, source_system=246, dialect="all")
+        conn.wait_heartbeat(timeout=20)
+        conn.mav.param_request_read_send(1, 1, name.encode(), -1)
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            m = conn.recv_match(type="PARAM_VALUE", blocking=True, timeout=0.5)
+            if m is not None and m.param_id.strip("\x00") == name:
+                conn.close()
+                return {"present": True, "value": float(m.param_value)}
+        conn.close()
+        return {"present": False, "value": None,
+                "caveat": "absence of a reply within the timeout, not proof of absence"}
+    except Exception as e:  # noqa: BLE001
+        return {"present": None, "error": repr(e)}
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--port", type=int, default=8888)
@@ -128,8 +166,12 @@ def main():
     p.add_argument("--stack", default="px4")
     p.add_argument("--version", default="unknown")
     p.add_argument("--out", type=Path, required=True)
+    p.add_argument("--param-check", help="MAVLink target to ask for --param-name")
+    p.add_argument("--param-name", default="DDS_ENABLE")
     a = p.parse_args()
     r = listen(a.port, a.seconds)
+    if a.param_check:
+        r["parameter_check"] = {a.param_name: param_present(a.param_check, a.param_name)}
     r["stack"] = a.stack
     r["version"] = a.version
     r["recorded_utc"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())

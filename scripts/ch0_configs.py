@@ -56,14 +56,37 @@ CONFIGS = {
 }
 
 
-def probe(cfg: dict, link: str, signed: bool, key) -> tuple[bool, int]:
-    """Read probe that also *measures* the wire version it actually used, instead of
-    assuming it. pymavlink's `auto_mavlink_version` silently upgrades a connection to
-    MAVLink 2 (and sets MAVLINK20 process-wide) as soon as it receives a v2 frame, so a
-    port configured for MAVLink 1 is the only case where a v1 probe survives the
-    heartbeat. Returning the first byte of the frame we send (0xFE = v1, 0xFD = v2) keeps
-    the record honest: an earlier version of this script labelled the wire version from
-    the configuration rather than from the frame.
+def probe(cfg: dict, link: str, signed: bool, key) -> dict:
+    """Read probe that measures three things instead of one, because the first version
+    measured a *timeout* and called it a rejection.
+
+    What it still measures: whether an unsigned (or signed) PARAM_REQUEST_READ is
+    answered, and the wire version of the frame we actually sent. pymavlink's
+    `auto_mavlink_version` silently upgrades a connection to MAVLink 2 (and sets
+    MAVLINK20 process-wide) as soon as it receives a v2 frame, so a port configured for
+    MAVLink 1 is the only case where a v1 probe survives the heartbeat. Returning the
+    first byte of the frame we send (0xFE = v1, 0xFD = v2) keeps the record honest: an
+    earlier version labelled the wire version from the configuration, not from the frame.
+
+    What it now also measures, and the reason this function was rewritten: a silent link
+    and a refusing autopilot look identical from here. Two controls separate them, both
+    inside the same connection and the same moment as the negative result:
+
+    1. **Liveness.** HEARTBEAT is broadcast and is allowlisted by both stacks, so it
+       arrives whether or not our frame was accepted. If heartbeats from the vehicle keep
+       arriving across the window in which our PARAM_VALUE does not, the peer was alive
+       and did not answer. If they stop too, the link died and the case says nothing.
+    2. **Positive control.** On the same link, immediately after, we send a *correctly
+       signed* read. A policy that is rejecting our unsigned frame must accept that one.
+       If the control is also unanswered, the probe or the link is at fault rather than
+       the policy, whatever the negative result looked like.
+
+    So the verdict is no longer a boolean. `accepted` means a reply arrived.
+    `rejected` means no reply arrived *and* both controls passed. Anything else is
+    `inconclusive`, with the reason recorded, and it is excluded from agreement counts
+    rather than silently scored as a refusal. The control is skipped where it cannot
+    apply (no key yet, or a MAVLink 1 port, which cannot carry a signature) and the case
+    then rests on liveness alone, which is stated in the record.
 
     A MAVLink 1 frame cannot carry a signature, so `signed` is forced False there."""
     from pymavlink import mavutil
@@ -77,25 +100,100 @@ def probe(cfg: dict, link: str, signed: bool, key) -> tuple[bool, int]:
         if signed and key is not None and not want_v1:
             conn.setup_signing(key, sign_outgoing=True,
                                allow_unsigned_callback=lambda m, i: True)
-        # The wire version is read off the frame we are about to send, on every path.
-        # The previous version only did this for the v1 path and returned a constant for
-        # the other, derived from a process-wide environment variable that an import had
-        # already set -- so it was never an observation. Found by an independent reviewer.
         wire = conn.mav.param_request_read_encode(1, 1, b"", 0).pack(conn.mav)[0]
         conn.mav.param_request_read_send(1, 1, b"", 0)
-        deadline, answered = time.time() + PROBE_TIMEOUT, False
+
+        # One loop watches for both the answer and the liveness evidence, so the
+        # liveness claim is about the same window as the negative result and not a
+        # separate check made afterwards.
+        deadline = time.time() + PROBE_TIMEOUT
+        answered, heartbeats = False, 0
         while time.time() < deadline:
-            m = conn.recv_match(type="PARAM_VALUE", blocking=True, timeout=0.5)
-            if (m is not None and int(getattr(m, "param_index", -2)) == 0
-                    and m.get_srcSystem() == 1):
+            m = conn.recv_match(type=["PARAM_VALUE", "HEARTBEAT"], blocking=True, timeout=0.5)
+            if m is None or m.get_srcSystem() != 1:
+                continue
+            if m.get_type() == "HEARTBEAT":
+                heartbeats += 1
+            elif int(getattr(m, "param_index", -2)) == 0:
                 answered = True
                 break
+
+        control = _positive_control(conn, cfg, link, key, want_v1, signed)
         conn.close()
-        return answered, wire
+
+        if answered:
+            verdict, reason = "accepted", None
+        elif heartbeats == 0:
+            verdict, reason = "inconclusive", ("no HEARTBEAT from the vehicle during the "
+                                               "window, so the link cannot be shown to "
+                                               "have been up when the read went unanswered")
+        elif control["ran"] and not control["answered"]:
+            verdict, reason = "inconclusive", ("a correctly signed read on the same link "
+                                               "was also unanswered, so the probe or the "
+                                               "link is implicated, not the policy")
+        else:
+            verdict, reason = "rejected", None
+
+        return {"verdict": verdict, "answered": answered, "wire": wire,
+                "heartbeats_during_window": heartbeats, "positive_control": control,
+                "inconclusive_reason": reason,
+                "timeout_s": PROBE_TIMEOUT}
     finally:
         if saved is not None:
             os.environ["MAVLINK20"] = saved
             mavutil.set_dialect("all")
+
+
+def _positive_control(conn, cfg, link, key, want_v1, already_signed) -> dict:
+    """Send a correctly signed read on the live connection and report whether it was
+    answered. This is the control that turns a silence into a rejection, so its own
+    limits are recorded rather than assumed: it cannot run before a key exists, and it
+    cannot run on a MAVLink 1 port, which has no signature field at all."""
+    if key is None:
+        return {"ran": False, "answered": None,
+                "skipped_because": "no key provisioned yet on this link"}
+    if want_v1:
+        return {"ran": False, "answered": None,
+                "skipped_because": "MAVLink 1 frames cannot carry a signature"}
+    try:
+        if not already_signed:
+            conn.setup_signing(key, sign_outgoing=True,
+                               allow_unsigned_callback=lambda m, i: True)
+        conn.mav.param_request_read_send(1, 1, b"", 0)
+        deadline = time.time() + PROBE_TIMEOUT
+        while time.time() < deadline:
+            m = conn.recv_match(type="PARAM_VALUE", blocking=True, timeout=0.5)
+            if m is not None and m.get_srcSystem() == 1 and int(getattr(m, "param_index", -2)) == 0:
+                return {"ran": True, "answered": True,
+                        "means": "the link and the probe both work; a silent negative on "
+                                 "this link is the policy refusing, not a dead link"}
+        return {"ran": True, "answered": False,
+                "means": "a correctly signed read went unanswered too, so nothing on this "
+                         "link can be attributed to the policy"}
+    except Exception as e:  # a control that errors must not be read as a pass
+        return {"ran": False, "answered": None, "skipped_because": f"control errored: {e!r}"}
+
+
+def _case(r: dict, policy, cfg: dict, link: str, *, state: str,
+          signed: bool, keyed: bool) -> dict:
+    """One recorded case. `observed` stays a boolean for the cases that decided something,
+    so the existing agreement arithmetic is unchanged, but the verdict and the evidence
+    behind it travel with it -- including, when the case is a rejection, what made it a
+    rejection rather than a timeout."""
+    wire = 1 if r["wire"] == 0xFE else 2
+    return {"state": state, "link": link, "transport": cfg[link].split(":")[0],
+            "wire_first_byte_sent": r["wire"], "wire": wire, "signed": signed,
+            "predicted": predict(policy, link, signed, keyed, wire=wire),
+            "observed": r["answered"],
+            "verdict": r["verdict"],
+            "inconclusive_reason": r["inconclusive_reason"],
+            "evidence_for_negative": {
+                "heartbeats_during_window": r["heartbeats_during_window"],
+                "positive_control": r["positive_control"],
+                "timeout_s": r["timeout_s"],
+                "note": ("a negative is recorded as a rejection only when the vehicle was "
+                         "seen alive in the same window and a correctly signed read on the "
+                         "same link was answered")}}
 
 
 def predict(policy, link: str, signed: bool, keyed: bool, wire: int = 2) -> bool:
@@ -137,34 +235,34 @@ def run_config(name: str, cfg: dict, ap: Path, policy) -> dict:
     try:
         # SITL boots once SERIAL0 has a peer; one unkeyed read on ch0 also settles that.
         for link in ("ch0", "ch1"):
-            obs, wire = probe(cfg, link, False, None)
-            cases.append({"state": "unkeyed", "link": link, "transport": cfg[link].split(":")[0],
-                          "wire_first_byte_sent": wire, "wire": 1 if wire == 0xFE else 2,
-                          "signed": False,
-                          "predicted": predict(policy, link, False, False,
-                                               wire=1 if wire == 0xFE else 2),
-                          "observed": obs})
+            r = probe(cfg, link, False, None)
+            cases.append(_case(r, policy, cfg, link, state="unkeyed", signed=False, keyed=False))
         labkit.provision_signing(cfg["ch0"], key)
         for link in ("ch0", "ch1"):
             for signed in ((False,) if cfg.get(f"{link}_v1") else (False, True)):
-                obs, wire = probe(cfg, link, signed, key if signed else None)
-                cases.append({"state": "keyed", "link": link, "transport": cfg[link].split(":")[0],
-                              "wire_first_byte_sent": wire, "wire": 1 if wire == 0xFE else 2,
-                              "signed": signed,
-                              "predicted": predict(policy, link, signed, True,
-                                                   wire=1 if wire == 0xFE else 2),
-                              "observed": obs})
+                r = probe(cfg, link, signed, key)
+                cases.append(_case(r, policy, cfg, link, state="keyed", signed=signed, keyed=True))
     finally:
         proc.terminate()
         try:
             proc.wait(timeout=10)
         except subprocess.TimeoutExpired:
             proc.kill()
+    # An inconclusive case is neither agreement nor refutation. Counting it either way
+    # would be the same mistake as reading an empty packet capture as a clean result.
     for c in cases:
-        c["agree"] = c["predicted"] == c["observed"]
+        c["agree"] = (None if c["verdict"] == "inconclusive"
+                      else c["predicted"] == c["observed"])
+    decided = [c for c in cases if c["agree"] is not None]
+    inconclusive = [c for c in cases if c["agree"] is None]
     return {"config": name, "serial0": cfg["serial0"] or "tcp:0 (default)", "serial1": cfg["serial1"],
             "extra_params": cfg["extra"], "cases": cases,
-            "agree": sum(c["agree"] for c in cases), "total": len(cases)}
+            "agree": sum(c["agree"] for c in decided), "total": len(decided),
+            "inconclusive": len(inconclusive),
+            "inconclusive_reasons": sorted({c["inconclusive_reason"] for c in inconclusive
+                                            if c["inconclusive_reason"]}),
+            "denominator_note": ("agree/total count only decided cases; inconclusive cases "
+                                 "are reported separately and are not scored either way")}
 
 
 def main():

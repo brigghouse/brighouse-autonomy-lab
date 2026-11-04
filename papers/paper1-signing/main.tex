@@ -241,9 +241,14 @@ active probe is needed to observe (Section~\ref{sec:results}, \prop{R4}).}
 \end{figure}
 
 \begin{table}[t]
-\caption{Policies. Values marked \emph{m} were confirmed against SITL
-(Section~\ref{sec:results}); others are documentation-derived and tested by the
-conformance run.}
+\caption{Policies, with the provenance of \emph{every cell} rather than of
+each row. $^{m}$: a recorded SITL measurement backs this value
+(Section~\ref{sec:results}). $^{s}$: extracted from the stack's source with
+file and line, not exercised. Unmarked: documentation- or spec-derived, and
+exercised only against the model by the conformance run. An earlier version of
+this table marked whole policy rows \emph{m}, which claimed measurement for
+cells we had never measured; the re-key and armed-state columns are the ones
+that were overstated, and they are unmarked here throughout.}
 \label{tab:policies}
 \centering\footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -253,12 +258,26 @@ policy & trusted & allow & TOFU & u-rekey & s-rekey & armed \\
 \midrule
 \textsf{spec-strict}     & $\emptyset$ & \{radio\}   & yes & no  & yes & no  \\
 \textsf{ideal-oob}       & $\emptyset$ & \{radio\}   & no  & no  & yes & no  \\
-\textsf{px4-1.18}\,(m)   & $\emptyset$ & \{hb,radio\}& yes & no  & yes & yes \\
-\textsf{px4-1.17}\,(m)   & all         & ---         & no  & --- & --- & --- \\
-\textsf{ardupilot-4.7.2}\,(m) & \{ch0\} & \{radio\}  & yes & yes & yes & no  \\
+\textsf{px4-1.18}  & $\emptyset^{m}$ & \{hb,radio\}$^{s}$ & yes$^{m}$ & no$^{m}$ & yes & yes \\
+\textsf{px4-1.17}  & all$^{m}$       & ---                & no        & ---       & --- & --- \\
+\textsf{ardupilot-4.7.2} & \{ch0\}$^{m}$ & \{radio\}$^{s}$ & yes & yes & yes & no \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Three gaps in that table are worth naming, because they bound what the model
+run can be read as evidence \emph{of}. First, no value in the armed column is
+measured on any stack: every probe in this work runs against a disarmed
+vehicle, so the armed-state row of each policy is a reading of the code and the
+documentation, and a stack that changes acceptance on arming would not have
+been caught here. Second, re-keying is measured on PX4~v1.18 only, where the
+record shows an unsigned re-key leaving the installed key unchanged and the
+original key still verifying every decoded frame; on ArduPilot we have no
+re-key record at all, signed or unsigned, so all three of its re-key cells are
+documentation-derived. Third, the allowlist cells come from source extraction
+rather than from the wire: we read which messages each stack exempts, and did
+not confirm by injection that an exempt message is in fact accepted unsigned.
+Each of the three is a candidate for the next campaign rather than a finding.
 
 \subsection{Adversary and properties}
 The adversary $A$ sits on one link, can inject any unsigned frame and replay any

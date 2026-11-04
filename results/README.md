@@ -33,3 +33,5 @@ lab key over the local link). On a stack without signing support the step has no
 - **px4-1.18.0-rc1** (PX4 (SIH), 2026-11-02T16:33:23Z): `{"key_file_present": true, "key_file_size": 40, "tofu_unsigned_rekey": {"key_file_changed": false, "original_key_still_valid": {"frames_decoded": 2917, "valid_signatures": 2917, "unknown_msgid_frames_skipped": 35}}}`
 
 Finding IDs are described in [docs/findings.md](../docs/findings.md).
+
+See [README-provenance.md](README-provenance.md) for what each directory is, and for one stray run that was committed by mistake and removed.

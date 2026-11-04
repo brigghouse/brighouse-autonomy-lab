@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased
+
+Corrections, not features. Everything below removes a claim or dates one; nothing
+new is measured.
+
+- **Withdrawn.** G6's ArduPilot half ("offers none") was absence of evidence: the
+  probe captured no datagrams on a POSIX/SITL build and the silence was read as a
+  result. Recorded as **not established** in the README, the paper and
+  `results/dds/README.md`. The score it fed is a lower bound.
+- **Withdrawn.** Two primacy claims, one in each of Papers 1 and 2, after a
+  documented novelty search found prior work. Both papers now say what the evidence
+  spans instead of who got there first.
+- Positive control on the channel-0 probe: a case counts as `rejected` only when a
+  HEARTBEAT from system 1 was seen in the window *and* a signed control read
+  answered on the same link. Undecided cases are `inconclusive` and excluded from
+  the agreement count. 23 cases, 4 rejections, 0 inconclusive.
+- `scripts/surface_probe.py --repeat` (default 3); all three builds identical
+  across runs.
+- Score figures take their date from `results/scores/scores.json`, which
+  `scripts/scores.py` now stamps. The date was previously typed into the generator
+  and had already gone stale.
+- `results/ardupilot/` removed: it was a two-second accidental run committed as
+  evidence. Documented in `results/README-provenance.md`.
+- CREDITS: the terminal figure was described as verbatim tool output; it was
+  composited. Corrected, and the figure regenerated from a real run.
+- 53 tests.
+
 ## 0.3.0 (2026-11-03) — gaps measured, score v2, a wrong ceiling corrected
 
 - **Correction.** The "protocol ceiling" was stated as "near 70, grade C" in Paper 4, on

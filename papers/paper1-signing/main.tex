@@ -59,9 +59,15 @@ follows the channel index rather than the link type (measured by moving the
 transport of each channel independently), which motivates an active, read-only
 probe. Third, we map each observed property to the essential
 requirements of EU Regulation~2024/2847 (the Cyber Resilience Act) and the
-command-link requirement of Delegated Regulation~2019/945, producing, to our
-knowledge, the first measurable conformance-evidence crosswalk for civil
-drones. All code, models, and data are released for reproduction.
+command-link requirement of Delegated Regulation~2019/945. We claim no primacy
+for that mapping: Annex~I crosswalks for drone products are already published
+as compliance guidance, including ones that name unauthenticated MAVLink as the
+control-link weakness to remediate, and the four-column crosswalk form itself
+is established practice. What differs here is the content of the cells. Those
+crosswalks map a requirement to an intended control; each row of ours is
+anchored to a measurement taken from a running autopilot, with the record
+published alongside it, including the rows where the measurement was
+inconclusive and earned nothing. All code, models, and data are released for reproduction.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -606,7 +612,8 @@ ArduPilot's primary channel in a way no passive observer can see---a case our
 formal model predicts. For EU manufacturers the CRA turns this integrator
 responsibility into a legal obligation with live reporting duties. A reproducible
 audit that pairs passive observation with a read-only active probe is a cheap,
-machine-checkable first piece of conformance evidence.
+machine-checkable starting point for conformance evidence---not a substitute
+for the assessment, but a row in it that someone else can re-run.
 
 \section*{Availability and Ethics}
 All code, models, and data are released under permissive licences for

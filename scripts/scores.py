@@ -7,6 +7,7 @@ longitudinal releases, and emit a table + figure.
 from __future__ import annotations
 
 import json
+import time
 import sys
 from pathlib import Path
 
@@ -107,8 +108,12 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     cs = cross_section()
     lg = longitudinal()
+    # The record carries its own date. Without it the figures that read this file had to
+    # hard-code one, and a hard-coded date outlived its measurement on the very next re-run.
     (out / "scores.json").write_text(json.dumps(
-        {"score_version": SCORE_VERSION, "cross_section": cs, "longitudinal": lg}, indent=2))
+        {"score_version": SCORE_VERSION,
+         "generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+         "cross_section": cs, "longitudinal": lg}, indent=2))
 
     lines = ["# Secure-by-default scores", "",
              f"Computed by `mavaudit.score`, criteria set **v{SCORE_VERSION}** (axioms: "

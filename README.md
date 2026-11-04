@@ -108,7 +108,7 @@ Full guide: [docs/setup.md](docs/setup.md) (Spanish: [docs/setup.es.md](docs/set
 | Path | What |
 |---|---|
 | [`mavaudit/`](mavaudit/) | The auditor; `mavaudit/sim/fake_vehicle.py` is the reference vehicle used in tests |
-| [`tests/`](tests/) | 52 tests: auditor (unsigned, signed, signing-exempt and MAVLink 1 vehicles, advisories, exit codes, scope guard), the formal model (incl. conformance against recorded SITL observations) and the score (incl. the empty-run guard) |
+| [`tests/`](tests/) | 53 tests: auditor (unsigned, signed, signing-exempt and MAVLink 1 vehicles, advisories, exit codes, scope guard), the formal model (incl. conformance against recorded SITL observations) and the score (incl. the empty-run guard) |
 | [`scripts/`](scripts/) | SITL build and experiment runners |
 | [`results/`](results/README.md) | Recorded evidence: measured runs, plus source-derived extraction (`allowlists/`) and static build inspection, each labelled in its own README |
 | [`paper/`](paper/paper1-draft.md) | Paper 1 draft: MAVLink signing in 2026 and the CRA |

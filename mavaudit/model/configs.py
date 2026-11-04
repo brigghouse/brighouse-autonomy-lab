@@ -50,6 +50,7 @@ PX4_117 = Policy(
     trusted=LINKS,                   # everything behaves like an always-trusted link
     open_when_unkeyed=True,
     tofu=False,                      # SETUP_SIGNING has no effect
+    signing_implemented=False,       # there is no signing code in this release
 )
 
 #: ArduPilot 4.7.2 (GCS_Signing.cpp): MAVLINK_COMM_0 always accepts unsigned; RADIO_STATUS

@@ -9,7 +9,7 @@ git clone https://github.com/brigghouse/brighouse-autonomy-lab.git
 cd brighouse-autonomy-lab
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                                   # 15 tests against a reference MAVLink vehicle
+pytest -q                                   # 53 tests against a reference MAVLink vehicle
 ```
 
 Try it without any autopilot:

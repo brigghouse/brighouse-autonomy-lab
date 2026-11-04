@@ -17,7 +17,7 @@ Probado en Ubuntu 22.04/24.04 (en Windows, usa WSL2 con Ubuntu).
 git clone https://github.com/brigghouse/brighouse-autonomy-lab.git brighouse-autonomy-lab
 cd brighouse-autonomy-lab
 python3 -m pip install -e ".[dev]"
-python3 -m pytest -q          # 15 tests con un vehículo simulado en Python
+python3 -m pytest -q          # 53 tests con un vehículo simulado en Python
 ```
 
 Prueba rápida sin instalar ningún autopiloto:

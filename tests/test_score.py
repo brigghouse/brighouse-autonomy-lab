@@ -239,3 +239,43 @@ def test_recorded_measurements_declare_their_repeatability_and_target():
     assert "SITL is not NuttX" in surface and "POSIX/SITL build" in surface
     dds = (base / "dds/README.md").read_text()
     assert "Repeatability" in dds
+
+
+def test_every_recorded_rejection_carries_the_evidence_that_makes_it_one():
+    """The defect this pins: the first version of the channel-0 experiment measured a
+    timeout and recorded it as a rejection. A negative may only be called `rejected` when
+    the vehicle was seen alive in the same window and, where it can run, a correctly
+    signed read on the same link was answered. Anything else is `inconclusive` and must
+    not be counted as agreement or refutation."""
+    import json
+    from pathlib import Path
+    d = json.loads((Path(__file__).resolve().parent.parent
+                    / "results/ch0-configs/ch0-configs.json").read_text())
+    runs = d if isinstance(d, list) else d.get("configs", d.get("runs", [d]))
+    assert runs
+    rejections = 0
+    for r in runs:
+        cases = r["cases"]
+        # The denominator may not quietly absorb inconclusive cases.
+        decided = [c for c in cases if c["agree"] is not None]
+        assert r["total"] == len(decided)
+        assert r.get("inconclusive", 0) == len(cases) - len(decided)
+        for c in cases:
+            if c["verdict"] == "inconclusive":
+                assert c["agree"] is None
+                assert c["inconclusive_reason"]
+                continue
+            assert c["verdict"] in ("accepted", "rejected")
+            if c["verdict"] != "rejected":
+                continue
+            rejections += 1
+            e = c["evidence_for_negative"]
+            # Liveness is mandatory for every rejection, without exception.
+            assert e["heartbeats_during_window"] >= 1, (r["config"], c["link"])
+            pc = e["positive_control"]
+            if pc["ran"]:
+                assert pc["answered"] is True, (r["config"], c["link"])
+            else:
+                # A control that cannot run must say why; silence is what we are fixing.
+                assert pc.get("skipped_because")
+    assert rejections >= 1, "a campaign with no rejections would make this test vacuous"

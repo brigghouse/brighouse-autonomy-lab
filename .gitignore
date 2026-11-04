@@ -22,3 +22,6 @@ papers/**/*.fdb_latexmk
 papers/**/*.log
 papers/**/*.out
 papers/**/*.synctex.gz
+
+# SITL scratch state: rewritten on every simulator run, never a source artefact.
+eeprom.bin

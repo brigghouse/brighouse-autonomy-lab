@@ -1,5 +1,6 @@
 """Figure for the web page: does the exemption follow the channel index or the transport?
 Drawn from results/ch0-configs/ch0-configs.json. Regenerate with this script."""
+import datetime, json as _json, pathlib as _pl
 import json, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -18,13 +19,20 @@ order = [("A-ch0tcp-ch1tcp", "A"), ("B-ch0udp-ch1tcp", "B"),
 BG, FG, MUT = "#02060D", "#F7FBFF", "#8FA3B8"
 OPEN, SHUT = "#FF9D8A", "#9DEAF4"
 
+# Dated from the record rather than typed in, because the hard-coded "3 November 2026"
+# survived a re-measurement and said the wrong thing on the published page.
+_d = _json.loads(_pl.Path("results/ch0-configs/ch0-configs.json").read_text())
+_when = (_d.get("started_utc") or "")[:10] if isinstance(_d, dict) else ""
+_nice = (datetime.date.fromisoformat(_when).strftime("%-d %B %Y") if _when else "see results/")
+CAPTION = f"ArduPilot Copter 4.7.2 in simulation, {_nice} \u2014 results/ch0-configs"
+
 fig, ax = plt.subplots(figsize=(9.0, 4.3), dpi=200)
 fig.patch.set_facecolor(BG); ax.set_facecolor(BG)
 ax.set_xlim(0, 10); ax.set_ylim(0, 4.9); ax.axis("off")
 
 ax.text(0.15, 4.62, "Key active. An unsigned read arrives. Is it answered?",
         color=FG, fontsize=11.5, fontweight="bold")
-ax.text(0.15, 4.28, "ArduPilot Copter 4.7.2 in simulation, 3 November 2026 — results/ch0-configs",
+ax.text(0.15, 4.28, CAPTION,
         color=MUT, fontsize=8.5)
 ax.text(3.15, 3.85, "channel 0", color=MUT, fontsize=9, ha="center")
 ax.text(6.9, 3.85, "channel 1", color=MUT, fontsize=9, ha="center")

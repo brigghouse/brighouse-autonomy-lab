@@ -12,7 +12,7 @@ This repository contains:
 - **measured results** on ArduPilot Copter 4.7.2, PX4 v1.17.0 and PX4 v1.18.0-rc1;
 - a **paper draft** and a referenced **literature review**.
 
-## Key findings (2026-11-02, simulation)
+## Key findings (re-measured 2026-11-04, simulation)
 
 | | ArduPilot 4.7.2 | PX4 v1.17.0 (stable) | PX4 v1.18.0-rc1 |
 |---|---|---|---|
@@ -21,15 +21,37 @@ This repository contains:
 | MAVLink FTP advertised to unauthenticated peer (default) | yes | yes | yes |
 | Signing can be enabled | yes | **no: not in the release** | yes |
 | After provisioning: unsigned input rejected | SERIAL1 yes; **SERIAL0 / channel 0 no, by design** | n/a | yes, on both links |
-| Unsigned re-key after first key rejected | not tested | n/a | yes |
-| Read-only FTP directory listing answered (default) | yes (25 B) | yes (101 B) | yes (110 B) |
+| Unsigned re-key after first key rejected | **not measured** | n/a | yes |
+| Read-only FTP directory listing answered (default) | yes | yes | yes |
 | `mavlink_shell` present in the build (static check) | no | yes | yes |
-| Unauthenticated second control plane (uXRCE-DDS) | none in this build | **yes** | **yes** |
+| Unauthenticated second control plane (uXRCE-DDS) | **not established** | **yes** | **yes** |
 
-Two of those rows need a word of care. The FTP row says *answered*, not merely advertised:
-we asked for a directory listing and got one. The second-plane row is a measurement of a
-build, not of a project — ArduPilot's source defaults `DDS_ENABLE` to 1 where the subsystem
-is compiled in, and this SITL build does not compile it.
+Three of those rows need a word of care, and one of them is a claim we withdrew.
+
+The FTP row says *answered*, not merely advertised: we asked for a directory listing and got
+one. It no longer carries a byte count. The size we used to print was the size field of a
+listing of whatever directory the simulator happened to start in — re-running the same probe
+from elsewhere changes it — so it was never a property of the release.
+
+**The second-plane row used to read "none in this build" for ArduPilot. That was wrong, and
+it was our error.** Our probe captured no datagrams on the port ArduPilot would use, and we
+read that silence as the stack offering no second plane. Zero datagrams cannot distinguish
+that from a probe that listened in the wrong place or started too late. The probe now marks
+such a capture inconclusive, the criterion earns nothing, and any score that depends on it is
+reported as a lower bound. Correcting it removed eight points and the ordering it had
+produced: ArduPilot signed on SERIAL1 no longer sits above PX4 v1.18 signed — they tie.
+
+For PX4 the row is firmer, and narrower than we first wrote. Unauthenticated agent discovery
+was *observed*. But `uxrce_dds_client` is compiled into 73 of the 286 board configurations in
+the v1.18.0-rc1 tree and started unconditionally only by the stock **POSIX** startup script
+(`ROMFS/px4fmu_common/init.d-posix/rcS:326`); the stock NuttX script never starts it. So the
+second plane is a property of POSIX targets — SITL and Linux companion computers — and a
+NuttX flight board may carry the module with nothing listening.
+
+Every refusal recorded in this repository is an *observed* refusal, not a timeout. Each one
+carries a liveness check and, where it can run, a correctly signed read on the same link in
+the same window. An earlier version recorded a five-second silence as a rejection; that was
+the method we fixed, and the findings survived it.
 
 Details and raw data: [results/](results/README.md). Per-campaign write-ups, each with its
 own limits section:
@@ -37,7 +59,7 @@ own limits section:
 | | What it measures |
 |---|---|
 | [`results/ch0-configs/`](results/ch0-configs/README.md) | Whether ArduPilot's unsigned-accept exemption follows the channel index or the transport (it follows the index) |
-| [`results/dds/`](results/dds/README.md) | The second control plane, and whether a MAVLink key reaches it (it does not) |
+| [`results/dds/`](results/dds/README.md) | The second control plane, whether a MAVLink key reaches it (it does not), and why the ArduPilot capture is inconclusive rather than clean |
 | [`results/surface/`](results/surface/README.md) | What each release answers to a peer that has presented no credential |
 | [`results/allowlists/`](results/allowlists/README.md) | The exceptions to signing, extracted from source with file and line |
 | [`results/scores/`](results/scores/README.md) | The secure-by-default score per configuration, criteria v2 |

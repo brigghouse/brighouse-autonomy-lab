@@ -39,6 +39,47 @@ Reading:
 - All 23 observations agree with the formal policy, which already models ch0 as the
   trusted link irrespective of transport.
 
+## Every negative in this campaign is now an observed rejection, not a timeout
+
+The first version of this experiment measured a **timeout** and recorded it as a
+rejection. A silent link and a refusing autopilot are indistinguishable from the probe's
+side, so "no reply in 5 s" was carrying the weight of "the policy refused" with nothing
+behind it. That affected every negative case here, and those negatives are what the
+channel-0 finding rests on.
+
+The probe now runs two controls inside the same connection and the same window as the
+negative result:
+
+- **Liveness.** `HEARTBEAT` is broadcast and allowlisted by both stacks, so it arrives
+  whether or not our frame was accepted. Heartbeats still arriving while our
+  `PARAM_VALUE` does not means the peer was alive and chose not to answer.
+- **Positive control.** A correctly signed read on the same link, immediately after. A
+  policy that is refusing our unsigned frame must answer that one. If the control is also
+  unanswered, the probe or the link is implicated and the case says nothing about the
+  policy.
+
+A negative is recorded as `rejected` only when both controls pass; otherwise the case is
+`inconclusive`, carries its reason, and is excluded from the agreement counts rather than
+scored as a refusal. `agree`/`total` now count decided cases only, and `inconclusive` is
+reported beside them.
+
+**Outcome of the re-run: 23 cases, 4 rejections, 0 inconclusive.** The three configurations
+whose channel 1 runs MAVLink 2 recorded 5-6 heartbeats in the window *and* a positive
+control that was answered, so those refusals are observed. The published finding survived
+the check; the method it rested on did not, and that is the part we fixed.
+
+**One case is weaker than the other three, and it should not be quoted as if it were not.**
+In configuration D channel 1 is a MAVLink 1 port, which has no signature field, so the
+positive control cannot run there at all. That rejection rests on liveness alone: 5
+heartbeats, no reply. It is a weaker form of the same claim, and the record says so in
+`positive_control.skipped_because` rather than leaving the absence to be noticed.
+
+A side effect worth stating, because it closes a gap we had listed as open: the positive
+control is also the **verification that key provisioning actually took**. Previously
+`provision_signing` was never checked, so a failed key installation would have produced
+exactly the pattern we would have read as a strict policy. In all four configurations the
+signed read on channel 0 was answered, which is that check.
+
 ## Repeatability
 
 The four configurations were run three times end to end on 2026-11-03. All three runs are

@@ -469,8 +469,20 @@ still accepts unsigned input.}
 \paragraph*{A second control plane the key does not cover}
 Signing protects MAVLink links, and a deployment that has provisioned a key may
 reasonably believe its command path is authenticated. PX4 ships a second one.
-The \code{uxrce\_dds\_client} module is included in SITL and most firmware
-builds and started by the stock init script; it bridges uORB to a DDS network,
+The \code{uxrce\_dds\_client} module is compiled into 73 of the 286 board
+configurations in the v1.18.0-rc1 tree (12 disable it explicitly; its Kconfig
+default is \emph{n}), but being compiled in is not the same as listening. The
+only startup script in the tree that starts it is the POSIX one, which runs it
+unconditionally with no parameter gate---unlike Zenoh two lines below, which is
+behind \code{ZENOH\_ENABLE}. The stock NuttX startup script contains no
+reference to it at all, so a flight board can carry the module in flash with
+nothing listening on the port. The plane we measure below is therefore a
+property of POSIX targets---SITL, and Linux companion computers such as
+ModalAI's VoXL2, whose own start script also launches it---and does not
+transfer unexamined to a NuttX board. We state this precisely because an
+earlier version of this paper said "most firmware builds", which a
+case-sensitive search had appeared to support and the configuration symbol
+contradicts. It bridges uORB to a DDS network,
 and PX4's documentation states that the transport is unauthenticated and reaches
 uORB directly. We measured the consequence passively: binding the configured
 agent port and decoding what arrives, without answering. Both PX4~v1.17.0 and

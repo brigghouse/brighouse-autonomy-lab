@@ -34,6 +34,8 @@ def detex(s: str) -> str:
     s = re.sub(r"\\&", "&", s)
     s = re.sub(r"\\[a-zA-Z]+\s*", "", s)
     s = re.sub(r"[{}]", "", s)
+    s = re.sub(r"\\([#%&_$])", r"\1", s)  # escaped specials: \# -> #
+    s = re.sub(r"\s+([)\],.;:])", r"\1", s)  # no space before ) after a dropped \cite
     return re.sub(r"\s+", " ", s).strip()
 
 

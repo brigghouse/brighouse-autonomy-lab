@@ -5,8 +5,8 @@ authors:
   - family-names: Brighouse
     given-names: Ian
     affiliation: Brighouse Security Labs
-version: 0.2.0
-date-released: 2026-11-02
+version: 0.3.0
+date-released: 2026-11-04
 license: Apache-2.0
 repository-code: "https://github.com/brigghouse/brighouse-autonomy-lab"
 keywords:
@@ -15,3 +15,36 @@ keywords:
   - PX4
   - ArduPilot
   - Cyber Resilience Act
+references:
+  - type: unpublished
+    title: "Signed but Unprotected: A Formal and Empirical Study of MAVLink 2 Message-Signing Defaults and Their Bearing on the EU Cyber Resilience Act"
+    authors:
+      - family-names: Brighouse
+        given-names: Ian
+    year: 2026
+    doi: 10.13140/RG.2.2.20818.31689
+    notes: "Preprint, ResearchGate, CC BY 4.0, not peer reviewed"
+  - type: unpublished
+    title: "A Decade of Defaults: How \"Secure by Default\" Evolved in the MAVLink Flight Stacks (ArduPilot and PX4, 2016-2026)"
+    authors:
+      - family-names: Brighouse
+        given-names: Ian
+    year: 2026
+    doi: 10.13140/RG.2.2.27660.27529
+    notes: "Preprint, ResearchGate, CC BY 4.0, not peer reviewed"
+  - type: unpublished
+    title: "Acceptance Semantics for MAVLink 2 Signing: Bounded Symbolic Analysis and Model-Based Conformance Testing of Flight Stacks"
+    authors:
+      - family-names: Brighouse
+        given-names: Ian
+    year: 2026
+    doi: 10.13140/RG.2.2.20949.38885
+    notes: "Preprint, ResearchGate, CC BY 4.0, not peer reviewed"
+  - type: unpublished
+    title: "Scoring \"Secure by Default\": A Reproducible, CRA-Grounded Metric with a Drone Command-Link Instantiation"
+    authors:
+      - family-names: Brighouse
+        given-names: Ian
+    year: 2026
+    doi: 10.13140/RG.2.2.34371.16164
+    notes: "Preprint, ResearchGate, CC BY 4.0, not peer reviewed"

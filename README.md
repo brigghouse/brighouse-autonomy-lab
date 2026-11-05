@@ -73,7 +73,16 @@ Four reproducible IEEE-format papers build on this data and model (see [papers/]
 3. **Acceptance Semantics for MAVLink 2 Signing** — bounded symbolic analysis + model-based conformance testing; a liveness-constrained *greedy* search finds a two-edit repair for ArduPilot where PX4 1.18 takes one. Greedy is not proven minimal and the recorded alternatives include a single-edit path, so this is what the search found, not what is necessary.
 4. **Scoring Secure by Default** — a reproducible, CRA-grounded 0–100 metric that prices the ch0 pitfall numerically (50 vs 74) and states the bound plainly: a link configured as well as MAVLink 2 signing alone allows scores **82, grade B**, never higher. The last 18 points need out-of-band key provisioning (12) and link encryption (6), neither of which the protocol provides.
 
-To our knowledge, no prior work gives a formal model of MAVLink signing, a decade-long measurement of flight-stack defaults, or a measurable CRA conformance score (see [research/](research/)). · Discussion: [paper draft](paper/paper1-draft.md) §7.
+All four are published as preprints on ResearchGate (CC BY 4.0, not peer reviewed):
+[10.13140/RG.2.2.20818.31689](https://doi.org/10.13140/RG.2.2.20818.31689) ·
+[10.13140/RG.2.2.27660.27529](https://doi.org/10.13140/RG.2.2.27660.27529) ·
+[10.13140/RG.2.2.20949.38885](https://doi.org/10.13140/RG.2.2.20949.38885) ·
+[10.13140/RG.2.2.34371.16164](https://doi.org/10.13140/RG.2.2.34371.16164).
+
+What we claim is narrower than it first reads. The formal model and the model-based
+conformance tests are, as far as a documented search found, new for MAVLink signing (see
+[research/](research/)); the CRA crosswalk form is not ours and Paper 1 says so; and the
+"decade" in Paper 2 is version-control history, with measured behaviour for two releases.
 
 ## mavaudit
 
@@ -111,7 +120,7 @@ Full guide: [docs/setup.md](docs/setup.md) (Spanish: [docs/setup.es.md](docs/set
 | [`tests/`](tests/) | 53 tests: auditor (unsigned, signed, signing-exempt and MAVLink 1 vehicles, advisories, exit codes, scope guard), the formal model (incl. conformance against recorded SITL observations) and the score (incl. the empty-run guard) |
 | [`scripts/`](scripts/) | SITL build and experiment runners |
 | [`results/`](results/README.md) | Recorded evidence: measured runs, plus source-derived extraction (`allowlists/`) and static build inspection, each labelled in its own README |
-| [`paper/`](paper/paper1-draft.md) | Paper 1 draft: MAVLink signing in 2026 and the CRA |
+| [`papers/`](papers/README.md) | The four preprints (LaTeX sources, figures regenerated from `results/`) and their DOIs. `paper/paper1-draft.md` is the superseded early draft, kept for the record |
 | [`research/`](research/) | [Literature review](research/literature-review.md) (20 academic references plus 17 regulatory and project sources, CVE tables) and [experiment plan](research/experiment-plan.md) |
 | [`notebook/`](notebook/INDEX.md) | Lab notebook: diary, lessons learned, roadmap. Open the repo root as an Obsidian vault |
 | [`docs/`](docs/) | Setup guides, the findings reference, and an example report |

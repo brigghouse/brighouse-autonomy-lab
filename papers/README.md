@@ -1,20 +1,26 @@
 # Papers
 
-Three IEEEtran papers, all reproducible from the data and models in this repository.
+Four IEEEtran preprints, all reproducible from the data and models in this repository.
 Figures and data tables are regenerated from `results/` before each build, so the PDFs
-never drift from the measurements.
+never drift from the measurements. Published as preprints on ResearchGate (CC BY 4.0);
+none has been peer reviewed.
 
-| # | Directory | Title | Status |
+| # | Directory | Title | DOI |
 |---|---|---|---|
-| 1 | [`paper1-signing/`](paper1-signing/) | *Signed but Unprotected: A Formal and Empirical Study of MAVLink 2 Message-Signing Defaults and Their Bearing on the EU Cyber Resilience Act* | complete (measurements + model + CRA crosswalk) |
-| 2 | [`paper2-longitudinal/`](paper2-longitudinal/) | *A Decade of Defaults: How "Secure by Default" Evolved in the MAVLink Flight Stacks (2016–2026)* | results fill as the multi-version build completes |
-| 3 | [`paper3-formal/`](paper3-formal/) | *Acceptance Semantics for MAVLink 2 Signing: Bounded Symbolic Analysis and Model-Based Conformance Testing of Flight Stacks* | complete (live conformance agreement inserted after the SITL run) |
+| 1 | [`paper1-signing/`](paper1-signing/) | *Signed but Unprotected: A Formal and Empirical Study of MAVLink 2 Message-Signing Defaults and Their Bearing on the EU Cyber Resilience Act* | [10.13140/RG.2.2.20818.31689](https://doi.org/10.13140/RG.2.2.20818.31689) |
+| 2 | [`paper2-longitudinal/`](paper2-longitudinal/) | *A Decade of Defaults: How "Secure by Default" Evolved in the MAVLink Flight Stacks (ArduPilot and PX4, 2016–2026)* | [10.13140/RG.2.2.27660.27529](https://doi.org/10.13140/RG.2.2.27660.27529) |
+| 3 | [`paper3-formal/`](paper3-formal/) | *Acceptance Semantics for MAVLink 2 Signing: Bounded Symbolic Analysis and Model-Based Conformance Testing of Flight Stacks* | [10.13140/RG.2.2.20949.38885](https://doi.org/10.13140/RG.2.2.20949.38885) |
+| 4 | [`paper4-score/`](paper4-score/) | *Scoring "Secure by Default": A Reproducible, CRA-Grounded Metric with a Drone Command-Link Instantiation* | [10.13140/RG.2.2.34371.16164](https://doi.org/10.13140/RG.2.2.34371.16164) |
+
+What each one does and does not establish is stated in its own abstract; the short
+version: Paper 2's *measured* evidence covers two releases, its *version-control*
+evidence covers the decade, and Paper 1's CRA crosswalk claims no primacy.
 
 ## Build
 
 ```bash
 pip install -e ".[dev]"            # from repo root
-make -C papers all                 # regenerate data + figures, then compile all three
+make -C papers all                 # regenerate data + figures, then compile all four
 make -C papers paper1-signing      # one paper
 ```
 
@@ -30,6 +36,9 @@ Requires a TeX Live install with `IEEEtran`, `tikz`, `algorithm2e`/`algpseudocod
   and model-based conformance testing). Papers 1 and 3 cross-reference.
 - **Paper 2** extends Paper 1's cross-sectional measurement over the release history,
   grounded in version-control milestones.
+- **Paper 4** turns the measured findings into a 0–100 score with a letter grade,
+  released as code with a property-test suite; it depends on Papers 1 and 3 for its
+  inputs and adds nothing new to the measurements.
 
 ## Data provenance
 

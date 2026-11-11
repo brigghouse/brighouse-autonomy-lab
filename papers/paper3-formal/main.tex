@@ -125,11 +125,12 @@ signatures are unforgeable and collision-free.
 \end{definition}
 
 \begin{definition}[Policy]
-A policy $\pi$ is a tuple
-$\langle \mathsf{trusted}\subseteq\mathcal{L},\ \mathsf{allow}\subseteq
-\text{Kinds},\ \mathsf{openUnkeyed},\ \mathsf{tofu},\ \mathsf{oob},\
-\mathsf{uRekey},\ \mathsf{sRekey},\ \mathsf{refuseArmed},\ \mathsf{replay}\rangle$
-of the specification's open choices.
+A policy $\pi$ is a tuple of the specification's open choices,
+\begin{align*}
+\pi=\langle\,&\mathsf{trusted}\subseteq\mathcal{L},\ \mathsf{allow}\subseteq\text{Kinds},\\
+&\mathsf{openUnkeyed},\ \mathsf{tofu},\ \mathsf{oob},\ \mathsf{uRekey},\\
+&\mathsf{sRekey},\ \mathsf{refuseArmed},\ \mathsf{replay}\,\rangle .
+\end{align*}
 \end{definition}
 
 The transition relation $\sigma \xrightarrow{f/d}_\pi \sigma'$, with

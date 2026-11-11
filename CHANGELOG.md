@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Paper 1: the abstract no longer says "no prior work has stated precisely or
+  measured end to end" — the related-work section already credits PAVE-MAVLink
+  with formal verification and hardware testing, so the abstract contradicted it.
+  It now claims only the parameterised semantics measured across stacks.
+- Paper 1: CISA advisory ICSA-26-090-02 is now cited where CVE-2026-1579 is named.
+- Papers 1 and 3: two tables/definitions overflowed the column by ~45 pt; fixed.
+- papers/Makefile built three of the four papers; it now builds all four.
+
 Corrections, not features. Everything below removes a claim or dates one; nothing
 new is measured.
 

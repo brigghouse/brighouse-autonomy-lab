@@ -1,6 +1,6 @@
-# Build all three papers. Figures and data tables are regenerated first from committed
+# Build all four papers. Figures and data tables are regenerated first from committed
 # results, so the PDFs are always in sync with the measurements and the model.
-PAPERS := paper1-signing paper2-longitudinal paper3-formal
+PAPERS := paper1-signing paper2-longitudinal paper3-formal paper4-score
 REPO   := ..
 
 .PHONY: all figures data clean $(PAPERS)

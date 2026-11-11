@@ -34,9 +34,10 @@ MAVLink is the de facto command-and-control (C2) protocol of the open-source
 drone ecosystem. Since 2016 MAVLink~2 has offered optional per-frame
 \emph{message signing}, yet whether a deployed aircraft is actually protected
 depends on a tangle of implementation choices---default state, allow-lists,
-link exemptions, and a trust-on-first-use key-provisioning step---that, to our
-knowledge, no prior work has stated precisely or measured end to end. We make
-three contributions.
+link exemptions, and a trust-on-first-use key-provisioning step---that the
+specification leaves to each implementation. The protocol has been verified
+formally before; what we have not found is these choices stated as one
+parameterised semantics and measured across stacks. We make three contributions.
 First, we give a compact parameterised \emph{acceptance semantics} for MAVLink~2
 signing: a transition system whose parameters capture the points at which
 PX4 and ArduPilot differ, together with a bounded symbolic adversary and six
@@ -85,7 +86,8 @@ version carried no authentication whatsoever~\cite{marty2014}. Unauthenticated
 C2 has been shown repeatedly to enable mission disruption and
 takeover~\cite{kwon2018,marty2014}, and the three protocol-level weaknesses are
 catalogued as CVE-2020-10281 through CVE-2020-10283. In 2026 a CISA advisory
-rated unauthenticated MAVLink in PX4 at CVSS~9.8 (CVE-2026-1579), and a cluster
+rated unauthenticated MAVLink in PX4 at CVSS~9.8
+(CVE-2026-1579~\cite{cisa_icsa2609002}), and a cluster
 of memory-safety CVEs in MAVLink file transfer, the MAVLink shell, and log
 handlers showed that these sinks are reachable by \emph{any} peer when signing
 is off.
@@ -114,7 +116,7 @@ Exploration produces short attack witnesses and shows that an idealised
 out-of-band provisioning policy satisfies all six, while the policies PX4 and
 ArduPilot implement each violate a distinct subset.
 \item An empirical study of three stacks built from source
-(Section~\ref{sec:method}--\ref{sec:results}), using \emph{mavaudit}, a
+(Sections~\ref{sec:method}--\ref{sec:results}), using \emph{mavaudit}, a
 released passive/active auditor. Key findings: insecure by default everywhere;
 no signing in stable PX4; and a sign-everything-yet-accept-unsigned behaviour on
 ArduPilot's primary channel that only an active probe detects. The behaviour
@@ -450,15 +452,16 @@ stricter than the text. All 23 observations agree with the policy.
 \caption{Channel-0 exemption vs.\ transport, ArduPilot 4.7.2 SITL, key active,
 unsigned \code{PARAM\_REQUEST\_READ}. Recorded in \code{results/ch0-configs}.}
 \label{tab:ch0}
-\centering
-\begin{tabular}{llll}
+\centering\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}llll@{}}
 \toprule
-Config & SERIAL0 (ch0) & SERIAL1 (ch1) & unsigned read answered \\
+ & SERIAL0 (ch0) & SERIAL1 (ch1) & unsigned read answered \\
 \midrule
 A & TCP & TCP & ch0 yes, ch1 no \\
 B & \textbf{UDP} & TCP & ch0 \textbf{yes}, ch1 no \\
 C & TCP & \textbf{UDP} & ch0 yes, ch1 \textbf{no} \\
-D & TCP & TCP, MAVLink~1 & ch0 yes, ch1 no (MAVLink~1 probe) \\
+D & TCP & TCP, MAVLink~1 & ch0 yes, ch1 no (v1 probe) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -486,7 +489,7 @@ nothing listening on the port. The plane we measure below is therefore a
 property of POSIX targets---SITL, and Linux companion computers such as
 ModalAI's VoXL2, whose own start script also launches it---and does not
 transfer unexamined to a NuttX board. We state this precisely because an
-earlier version of this paper said "most firmware builds", which a
+earlier version of this paper said ``most firmware builds, which a
 case-sensitive search had appeared to support and the configuration symbol
 contradicts. It bridges uORB to a DDS network,
 and PX4's documentation states that the transport is unauthenticated and reaches

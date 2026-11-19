@@ -25,3 +25,6 @@ papers/**/*.synctex.gz
 
 # SITL scratch state: rewritten on every simulator run, never a source artefact.
 eeprom.bin
+
+# SITL storage written when a run starts in the repo root
+*.stg

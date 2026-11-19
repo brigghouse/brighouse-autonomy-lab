@@ -1,6 +1,23 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 (2026-11-19) — the proposed upstream fix, tested
+
+- **New campaign, `results/pr34780/`.** ArduPilot master (`9d7be65`) built with and
+  without the four commits of PR #34780, the proposed fix for issue #34489, and probed
+  with the channel-0 read probe (liveness + signed positive control). Where channel 0 is
+  not SERIAL0 (`SERIAL0_PROTOCOL=-1`, channel 0 = SERIAL1 over TCP or UDP), master answers
+  keyed unsigned reads on channel 0 and the PR rejects them; with SERIAL0 as channel 0
+  (TCP or UDP) both builds answer, as the PR intends for SITL. 48/48 cases agree with the
+  per-build policy in each of two identical runs, 0 inconclusive. The Linux HAL path is
+  not covered and the README says so. Script: `scripts/pr34780.py`.
+- Paper 1: new paragraph and table (Table IV) reporting that test.
+- Bibliography: removed the four `[VERIFY]` notes that were printing in the PDFs. The
+  DASC 2023 entry had a wrong author list (one invented name, two authors missing); it now
+  matches the published record (Siddiqui et al., ten authors). The NDSS 2022 author list
+  was checked and was already correct. The Matter ePrint entry no longer says "to appear
+  at IEEE S&P 2027", which could not be confirmed.
+
+## Unreleased (folded into 0.4.0)
 
 - Paper 1: the abstract no longer says "no prior work has stated precisely or
   measured end to end" — the related-work section already credits PAVE-MAVLink

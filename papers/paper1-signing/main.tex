@@ -53,7 +53,7 @@ PX4 release contains no signing implementation at all; and that with signing
 enabled ArduPilot's primary channel signs every outbound frame while still
 accepting unsigned commands---so a purely passive observer would wrongly judge
 it protected. This channel-0 exemption is a documented upstream behaviour
-(ArduPilot issue~\#34489, with a fix proposed but not yet merged~\cite{ardupilot_issue34489,ardupilot_pr34780});
+(ArduPilot issue~\#34489, with a fix proposed but not yet merged~\cite{ardupilot_issue34489,ardupilot_pr34780}, which we test in SITL against master);
 our contribution is to measure it independently, to show that the model built
 from the implementation reproduces it, and to make explicit that the exemption
 follows the channel index rather than the link type (measured by moving the
@@ -462,6 +462,39 @@ A & TCP & TCP & ch0 yes, ch1 no \\
 B & \textbf{UDP} & TCP & ch0 \textbf{yes}, ch1 no \\
 C & TCP & \textbf{UDP} & ch0 yes, ch1 \textbf{no} \\
 D & TCP & TCP, MAVLink~1 & ch0 yes, ch1 no (v1 probe) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Validating the proposed fix} PR~\#34780~\cite{ardupilot_pr34780}
+exempts channel~0 only when its port reports \code{is\_usb()}; in SITL it makes
+SERIAL0 stand in for USB whatever its transport. SITL can therefore test the fix
+only where channel~0 is \emph{not} SERIAL0, which happens when SERIAL0 does not
+speak MAVLink: channel~0 is then the lowest-numbered MAVLink port, here SERIAL1.
+We built the same ArduPilot master commit (\code{9d7be65}) with and without the
+four PR commits and ran the probe above, with its liveness and signed positive
+controls, on both (Table~\ref{tab:pr34780}). On master, a keyed SERIAL1 that has
+become channel~0 answers unsigned reads over TCP and over UDP; with the PR it
+rejects them, while the documented SITL workflow (SERIAL0 trusted, on TCP or UDP)
+is unchanged. In each of two identical runs all 48 cases agree with the
+corresponding policy, none inconclusive. The Linux HAL path, where the PR reports no port as USB, needs a
+Linux board build and is not covered.
+
+\begin{table}[t]
+\caption{PR~\#34780 vs.\ master (\code{9d7be65}), ArduPilot Copter SITL, key
+active, unsigned \code{PARAM\_REQUEST\_READ} on channel~0. Channel~1 rejected it
+in every run. Recorded in \code{results/pr34780}.}
+\label{tab:pr34780}
+\centering\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+ & SERIAL0 & channel~0 & master & PR \\
+\midrule
+A & MAVLink, TCP & SERIAL0 & answered & answered \\
+B & MAVLink, UDP & SERIAL0 & answered & answered \\
+E & off & SERIAL1, TCP & \textbf{answered} & \textbf{rejected} \\
+F & off & SERIAL1, UDP & \textbf{answered} & \textbf{rejected} \\
 \bottomrule
 \end{tabular}
 \end{table}

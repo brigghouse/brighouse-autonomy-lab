@@ -5,7 +5,7 @@ authors:
   - family-names: Brighouse
     given-names: Ian
     affiliation: Brighouse Security Labs
-version: 0.4.0
+version: 0.5.0
 date-released: 2026-11-19
 license: Apache-2.0
 repository-code: "https://github.com/brigghouse/brighouse-autonomy-lab"

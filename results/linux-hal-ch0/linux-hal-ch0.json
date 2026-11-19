@@ -1,0 +1,645 @@
+{
+  "stack": "ArduPilot Copter, Linux HAL (--board linux) on an x86-64 host",
+  "pr": "ArduPilot/ardupilot#34780",
+  "master_rev": "untagged@9d7be65cd63a",
+  "pr_rev": "untagged@0769cebc96e0",
+  "started_utc": "2026-11-19T21:40:49Z",
+  "runs": [
+    {
+      "build": "master",
+      "config": "L1-ser0udp-ser1tcp",
+      "args": [
+        "--serial0",
+        "udp:127.0.0.1:14650",
+        "--serial1",
+        "tcp:127.0.0.1:5771"
+      ],
+      "policy": "ardupilot-4.7.2",
+      "keyed_unsigned_read": {
+        "ch0": "accepted",
+        "ch1": "rejected"
+      },
+      "vehicle_log_tail": "",
+      "cases": [
+        {
+          "state": "unkeyed",
+          "link": "ch0",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 1,
+            "positive_control": {
+              "ran": false,
+              "answered": null,
+              "skipped_because": "no key provisioned yet on this link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "unkeyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 7,
+            "positive_control": {
+              "ran": false,
+              "answered": null,
+              "skipped_because": "no key provisioned yet on this link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 1,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 1,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": false,
+          "observed": false,
+          "verdict": "rejected",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 17,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 1,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        }
+      ],
+      "agree": 6,
+      "total": 6,
+      "inconclusive": 0
+    },
+    {
+      "build": "master",
+      "config": "L2-ser0tcp-ser1udp",
+      "args": [
+        "--serial0",
+        "tcp:127.0.0.1:5770",
+        "--serial1",
+        "udp:127.0.0.1:14651"
+      ],
+      "policy": "ardupilot-4.7.2",
+      "keyed_unsigned_read": {
+        "ch0": "accepted",
+        "ch1": "rejected"
+      },
+      "vehicle_log_tail": "",
+      "cases": [
+        {
+          "state": "unkeyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 5,
+            "positive_control": {
+              "ran": false,
+              "answered": null,
+              "skipped_because": "no key provisioned yet on this link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "unkeyed",
+          "link": "ch1",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 0,
+            "positive_control": {
+              "ran": false,
+              "answered": null,
+              "skipped_because": "no key provisioned yet on this link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 0,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 1,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": false,
+          "observed": false,
+          "verdict": "rejected",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 10,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 1,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        }
+      ],
+      "agree": 6,
+      "total": 6,
+      "inconclusive": 0
+    },
+    {
+      "build": "pr34780",
+      "config": "L1-ser0udp-ser1tcp",
+      "args": [
+        "--serial0",
+        "udp:127.0.0.1:14650",
+        "--serial1",
+        "tcp:127.0.0.1:5771"
+      ],
+      "policy": "ardupilot-pr34780-ch0-not-usb",
+      "keyed_unsigned_read": {
+        "ch0": "rejected",
+        "ch1": "rejected"
+      },
+      "vehicle_log_tail": "",
+      "cases": [
+        {
+          "state": "unkeyed",
+          "link": "ch0",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 0,
+            "positive_control": {
+              "ran": false,
+              "answered": null,
+              "skipped_because": "no key provisioned yet on this link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "unkeyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 7,
+            "positive_control": {
+              "ran": false,
+              "answered": null,
+              "skipped_because": "no key provisioned yet on this link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": false,
+          "observed": false,
+          "verdict": "rejected",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 10,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 1,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": false,
+          "observed": false,
+          "verdict": "rejected",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 27,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 1,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        }
+      ],
+      "agree": 6,
+      "total": 6,
+      "inconclusive": 0
+    },
+    {
+      "build": "pr34780",
+      "config": "L2-ser0tcp-ser1udp",
+      "args": [
+        "--serial0",
+        "tcp:127.0.0.1:5770",
+        "--serial1",
+        "udp:127.0.0.1:14651"
+      ],
+      "policy": "ardupilot-pr34780-ch0-not-usb",
+      "keyed_unsigned_read": {
+        "ch0": "rejected",
+        "ch1": "rejected"
+      },
+      "vehicle_log_tail": "",
+      "cases": [
+        {
+          "state": "unkeyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 5,
+            "positive_control": {
+              "ran": false,
+              "answered": null,
+              "skipped_because": "no key provisioned yet on this link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "unkeyed",
+          "link": "ch1",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 1,
+            "positive_control": {
+              "ran": false,
+              "answered": null,
+              "skipped_because": "no key provisioned yet on this link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": false,
+          "observed": false,
+          "verdict": "rejected",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 11,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch0",
+          "transport": "tcp",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 0,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": false,
+          "predicted": false,
+          "observed": false,
+          "verdict": "rejected",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 11,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        },
+        {
+          "state": "keyed",
+          "link": "ch1",
+          "transport": "udpin",
+          "wire_first_byte_sent": 253,
+          "wire": 2,
+          "signed": true,
+          "predicted": true,
+          "observed": true,
+          "verdict": "accepted",
+          "inconclusive_reason": null,
+          "evidence_for_negative": {
+            "heartbeats_during_window": 1,
+            "positive_control": {
+              "ran": true,
+              "answered": true,
+              "means": "the link and the probe both work; a silent negative on this link is the policy refusing, not a dead link"
+            },
+            "timeout_s": 5.0,
+            "note": "a negative is recorded as a rejection only when the vehicle was seen alive in the same window and a correctly signed read on the same link was answered"
+          },
+          "agree": true
+        }
+      ],
+      "agree": 6,
+      "total": 6,
+      "inconclusive": 0
+    }
+  ]
+}

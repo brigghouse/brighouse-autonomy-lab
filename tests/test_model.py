@@ -220,3 +220,61 @@ def test_mavlink1_frame_cannot_be_signed():
         Frame("ch1", (1, 1), READ, signed=True, wire=1)
     with pytest.raises(ValueError):
         Frame("ch1", (1, 1), READ, wire=3)
+
+
+def test_pr34780_recorded_fix():
+    """Recorded SITL runs (results/pr34780): with channel 0 moved off SERIAL0, master
+    accepts a keyed unsigned read on channel 0 and PR #34780 rejects it; with channel 0 on
+    SERIAL0 both accept (the PR keeps SERIAL0 as the SITL stand-in for USB). Two runs,
+    identical, every case decided, every rejection backed by an answered signed control."""
+    import json
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent / "results/pr34780"
+    runs = [json.loads((root / f).read_text()) for f in ("pr34780.json", "pr34780-run2.json")]
+    want = {("master", "A"): "accepted", ("master", "B"): "accepted",
+            ("master", "E"): "accepted", ("master", "F"): "accepted",
+            ("pr34780", "A"): "accepted", ("pr34780", "B"): "accepted",
+            ("pr34780", "E"): "rejected", ("pr34780", "F"): "rejected"}
+    for d in runs:
+        got = {(r["build"], r["config"][0]): r["keyed_unsigned_read"]["ch0"] for r in d["runs"]}
+        assert got == want
+        assert all(r["keyed_unsigned_read"]["ch1"] == "rejected" for r in d["runs"])
+        assert sum(r["agree"] for r in d["runs"]) == sum(r["total"] for r in d["runs"]) == 48
+        assert all(r["inconclusive"] == 0 for r in d["runs"])
+        for r in d["runs"]:
+            for c in r["cases"]:
+                if c["verdict"] == "rejected":
+                    assert c["evidence_for_negative"]["positive_control"]["answered"] is True
+                    assert c["evidence_for_negative"]["heartbeats_during_window"] > 0
+
+
+def test_pr34780_policy_predicts_the_recorded_fix():
+    """The named PR policy, fed the frame the probe sends, predicts the PR's E/F verdict,
+    and the 4.7.2 policy predicts master's: the difference between the builds is exactly
+    the removal of the trusted link."""
+    from mavaudit.model.configs import ARDUPILOT_472, ARDUPILOT_PR34780_NON_USB
+    from mavaudit.model.semantics import READ, Frame, State, step
+    st = State(key="K", clock=2_000_000)
+    fr = Frame("ch0", (9, 9), READ, signed=False, ts=2_000_050, link_id=1)
+    assert step(ARDUPILOT_472, st, fr).accepted is True
+    assert step(ARDUPILOT_PR34780_NON_USB, st, fr).accepted is False
+
+
+def test_linux_hal_recorded_fix():
+    """Recorded Linux HAL runs (results/linux-hal-ch0): the Bebop arrangement. On master
+    SERIAL0 accepts a keyed unsigned read over UDP and over TCP; with PR #34780 it rejects
+    it on both, and channel 1 rejects it everywhere. Two identical runs, all decided."""
+    import json
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent / "results/linux-hal-ch0"
+    for f in ("linux-hal-ch0.json", "linux-hal-ch0-run2.json"):
+        d = json.loads((root / f).read_text())
+        got = {(r["build"], r["config"][:2]): r["keyed_unsigned_read"] for r in d["runs"]}
+        for cfg in ("L1", "L2"):
+            assert got[("master", cfg)] == {"ch0": "accepted", "ch1": "rejected"}
+            assert got[("pr34780", cfg)] == {"ch0": "rejected", "ch1": "rejected"}
+        assert sum(r["agree"] for r in d["runs"]) == sum(r["total"] for r in d["runs"]) == 24
+        for r in d["runs"]:
+            for c in r["cases"]:
+                if c["verdict"] == "rejected":
+                    assert c["evidence_for_negative"]["positive_control"]["answered"] is True

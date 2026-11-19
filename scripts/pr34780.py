@@ -37,7 +37,7 @@ from pathlib import Path
 
 import labkit
 from ch0_configs import _case, probe
-from mavaudit.model.configs import ARDUPILOT_472
+from mavaudit.model.configs import ARDUPILOT_472, ARDUPILOT_PR34780_NON_USB
 
 UDP0, UDP1 = 14600, 14601
 
@@ -64,7 +64,7 @@ def policy_for(build: str, cfg: dict):
     PR: channel 0 is trusted only when it is the port SITL reports as USB, i.e. SERIAL0."""
     if build == "master" or cfg["ch0_port"] == "SERIAL0":
         return dataclasses.replace(ARDUPILOT_472, name=f"{build}-ch0-trusted")
-    return dataclasses.replace(ARDUPILOT_472, name=f"{build}-no-trusted-link", trusted=frozenset())
+    return ARDUPILOT_PR34780_NON_USB
 
 
 def start_sitl(ap: Path, workdir: Path, cfg: dict) -> subprocess.Popen:

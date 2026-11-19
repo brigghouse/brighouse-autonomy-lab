@@ -79,5 +79,20 @@ ARDUPILOT_472_DOC = Policy(
     v1_bypasses_signing=True,
 )
 
+#: ArduPilot with PR #34780 applied, for a configuration in which channel 0 is *not* the
+#: USB port (on SITL: SERIAL0 not speaking MAVLink; on Linux boards: every port). The
+#: exemption is gone, so no link is trusted; everything else is unchanged. Where channel 0
+#: is the USB port the PR behaves exactly like ARDUPILOT_472. Measured in results/pr34780.
+ARDUPILOT_PR34780_NON_USB = Policy(
+    name="ardupilot-pr34780-ch0-not-usb",
+    trusted=frozenset(),
+    allow_unsigned=frozenset({RADIO}),
+    tofu=True,
+    setup_links=None,
+    unsigned_rekey_on_trusted=True,
+)
+
 ALL = [SPEC_STRICT, IDEAL_OOB, PX4_118, PX4_117, ARDUPILOT_472, ARDUPILOT_472_DOC]
-BY_NAME = {p.name: p for p in ALL}
+#: Not in ALL: the papers' tables enumerate ALL, and this policy describes a proposed
+#: patch rather than a release. It is reachable by name for scripts and tests.
+BY_NAME = {p.name: p for p in ALL + [ARDUPILOT_PR34780_NON_USB]}

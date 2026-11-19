@@ -53,7 +53,7 @@ PX4 release contains no signing implementation at all; and that with signing
 enabled ArduPilot's primary channel signs every outbound frame while still
 accepting unsigned commands---so a purely passive observer would wrongly judge
 it protected. This channel-0 exemption is a documented upstream behaviour
-(ArduPilot issue~\#34489, with a fix proposed but not yet merged~\cite{ardupilot_issue34489,ardupilot_pr34780}, which we test in SITL against master);
+(ArduPilot issue~\#34489, with a fix proposed but not yet merged~\cite{ardupilot_issue34489,ardupilot_pr34780}, which we test against master in SITL and on the Linux HAL);
 our contribution is to measure it independently, to show that the model built
 from the implementation reproduces it, and to make explicit that the exemption
 follows the channel index rather than the link type (measured by moving the
@@ -477,13 +477,21 @@ controls, on both (Table~\ref{tab:pr34780}). On master, a keyed SERIAL1 that has
 become channel~0 answers unsigned reads over TCP and over UDP; with the PR it
 rejects them, while the documented SITL workflow (SERIAL0 trusted, on TCP or UDP)
 is unchanged. In each of two identical runs all 48 cases agree with the
-corresponding policy, none inconclusive. The Linux HAL path, where the PR reports no port as USB, needs a
-Linux board build and is not covered.
+corresponding policy, none inconclusive. The Linux case the issue was opened
+for cannot appear in SITL, so we also built the same commit for the generic Linux
+board and ran it on an x86 host. Without sensors the vehicle stays in its
+configuration-error loop, which keeps servicing MAVLink; the signing decision is
+taken while each frame is parsed, before any vehicle-state logic. On master,
+SERIAL0 answers keyed unsigned reads over UDP (the Bebop arrangement) and over
+TCP; with the PR it rejects them on both (rows L1--L2; 24/24 cases per run, two
+identical runs). The PR thus closes the exemption on Linux too, at the cost that
+a Linux board has no unsigned recovery port, as its description states.
 
 \begin{table}[t]
-\caption{PR~\#34780 vs.\ master (\code{9d7be65}), ArduPilot Copter SITL, key
-active, unsigned \code{PARAM\_REQUEST\_READ} on channel~0. Channel~1 rejected it
-in every run. Recorded in \code{results/pr34780}.}
+\caption{PR~\#34780 vs.\ master (\code{9d7be65}), ArduPilot Copter, key active,
+unsigned \code{PARAM\_REQUEST\_READ} on channel~0. A--F: SITL; L1--L2: Linux HAL
+build on an x86 host. Channel~1 rejected it in every run. Recorded in
+\code{results/pr34780} and \code{results/linux-hal-ch0}.}
 \label{tab:pr34780}
 \centering\footnotesize
 \setlength{\tabcolsep}{3.5pt}
@@ -495,6 +503,9 @@ A & MAVLink, TCP & SERIAL0 & answered & answered \\
 B & MAVLink, UDP & SERIAL0 & answered & answered \\
 E & off & SERIAL1, TCP & \textbf{answered} & \textbf{rejected} \\
 F & off & SERIAL1, UDP & \textbf{answered} & \textbf{rejected} \\
+\midrule
+L1 & Linux HAL, UDP & SERIAL0 & \textbf{answered} & \textbf{rejected} \\
+L2 & Linux HAL, TCP & SERIAL0 & \textbf{answered} & \textbf{rejected} \\
 \bottomrule
 \end{tabular}
 \end{table}

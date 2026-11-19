@@ -1,0 +1,18 @@
+{
+  "master": {
+    "heartbeat_system_status": 1,
+    "statustext": [
+      "Config Error: Baro: unable to initialise driver",
+      "Config Error: fix problem then reboot"
+    ],
+    "window_s": 20
+  },
+  "pr34780": {
+    "heartbeat_system_status": 1,
+    "statustext": [
+      "Config Error: Baro: unable to initialise driver",
+      "Config Error: fix problem then reboot"
+    ],
+    "window_s": 20
+  }
+}

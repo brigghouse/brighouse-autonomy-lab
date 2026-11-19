@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 (2026-11-19) — the Linux case, on the Linux HAL
+
+- **New campaign, `results/linux-hal-ch0/`.** The same master commit built for the
+  generic Linux board (`--board linux`) with and without PR #34780 and run on an x86
+  host: the case issue #34489 was opened for, which SITL cannot show. With SERIAL0 on UDP
+  (the Bebop arrangement) or TCP, master answers keyed unsigned reads on SERIAL0 and the
+  PR rejects them; channel 1 rejects them on both builds. 24/24 cases per run, two
+  identical runs, 0 inconclusive. Without sensors the vehicle stays in its config-error
+  loop, which keeps servicing MAVLink; the README cites the lines and states what this
+  does not cover. Script: `scripts/linux_hal_ch0.py`.
+- Model: named policy `ardupilot-pr34780-ch0-not-usb` (reachable via `BY_NAME`, not in
+  `ALL`, so the papers' policy tables are unchanged). 56 tests: three new ones pin the
+  recorded SITL and Linux runs and the policy's prediction.
+- Paper 1: the validation paragraph and Table IV now include the Linux HAL rows.
+
 ## 0.4.0 (2026-11-19) — the proposed upstream fix, tested
 
 - **New campaign, `results/pr34780/`.** ArduPilot master (`9d7be65`) built with and
